@@ -50,6 +50,7 @@ class ToolMetadata(BaseModel):
     expose_to_user: bool
     ic_introduction: Optional[str]
     can_generate_task: bool
+    accessible_inside_workflow: bool = False  # If True, tool is accessible when inside another workflow (task_stack non-empty)
 
 class FrontendInputStruct(BaseModel):
     value: str # All input needs to be serialised

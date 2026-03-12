@@ -36,6 +36,7 @@ from smart_investigator.foundation.schemas.schemas import (
     DoneType
 )
 from smart_investigator.foundation.tools.tool_names import MASTER_AGENT_NAME
+from smart_investigator.foundation.agent_helpers.dl_helpers import convert_dl_response_to_event_stream
 from mlflow.deployments import get_deploy_client
 from mlflow.types.responses_helpers import (
     OutputItem, 
@@ -77,6 +78,18 @@ class ToolFactory:
         - self.agent.predict_stream (local agent)
         - Mosaic AI responses endpoint
         """
+        if self.tool_config["name"]==DECLINE_LETTER_AGENT_NAME:
+            response = self.client.responses.create(
+                model=self.tool_config['endpoint_name'],
+                input=request.get("input", []),
+                stream=False,
+                extra_body={
+                    "user": request.get("user", []),
+                    "custom_inputs": request.get("custom_inputs", {}),
+                    "databricks_options": dict(return_trace=False),
+                },
+            )
+            return convert_dl_response_to_stream(response)
         if self.agent:
             # Databricks Agent streaming
             return self.agent.predict_stream(request)
@@ -175,7 +188,8 @@ class ToolFactory:
             metadata=ToolMetadata(
                 expose_to_user=self.tool_config['metadata']['expose_to_user'],
                 ic_introduction=self.tool_config['metadata']['ic_introduction'],
-                can_generate_task=self.tool_config['metadata']['can_generate_task']
+                can_generate_task=self.tool_config['metadata']['can_generate_task'],
+                accessible_inside_workflow=self.tool_config['metadata'].get('accessible_inside_workflow', False)
             ),
         )
         def tool_func(

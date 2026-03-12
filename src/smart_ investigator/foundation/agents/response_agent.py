@@ -150,14 +150,11 @@ def _preprocess_request(
         human_message = HumanMessage(content=text, additional_kwargs={"custom_inputs": custom_inputs})
 
         if checkpointer:
-            is_resume = request.custom_inputs.get("is_resume", False)
             history = checkpointer.get_tuple(config)
 
-            if history and is_resume:
-                if history.pending_writes:
-                    lg_input = Command(resume=content, update={"default_resume": True})
-                else:
-                    lg_input = {"messages": [human_message]}
+            if history and history.pending_writes:
+                # Auto-resume if there are pending writes (interrupt waiting)
+                lg_input = Command(resume=content, update={"default_resume": True})
             else:
                 lg_input = {"messages": [human_message]}
         else:

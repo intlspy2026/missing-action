@@ -46,7 +46,7 @@ _AGENT_NAME = "human_in_the_loop"
 # --- Human In The Loop Tool --- [file:9][file:8][file:7]
 @tool_with_metadata(
     description=f"The tool that connect to human for input. Only call this tool if <user_query> and <context> does not make sense, related to unsupported tool, or require the follow up clarification.",
-    metadata=ToolMetadata(expose_to_user=False, ic_introduction=None, can_generate_task=False),
+    metadata=ToolMetadata(expose_to_user=False, ic_introduction=None, can_generate_task=False, accessible_inside_workflow=True),
     name_or_callable=_AGENT_NAME
 )
 def human_in_the_loop(
@@ -117,25 +117,25 @@ def human_in_the_loop(
     )
 
 # --- Helper Functions --- [file:7][file:6]
-def prepare_hitl_task(agent_name: str, text: str, context: str, state: Optional[str]=None, is_direct: bool = True, artifact: dict[str,Any] = {}) -> list[Content]:
-    arguments = json.dumps(dict(text = text))
-    return [
-        Content(
-            type='output_text',
-            text=text,
-            custom_outputs=ContentCustomOutput(
-                sender=agent_name,
-                artifact=artifact,
-                # forms_to_render=artifact.get("forms_to_render", []),
-                # metrics=artifact.get("metrics", {}),
-                master_agent_context=MasterAgentContext(
-                    is_direct = True,
-                    context = context if context else f"{agent_name} was requesting for `{text}`",
-                    next_tool = ToolDict(
-                        name = _AGENT_NAME,
-                        arguments = arguments, #EMPTY_HITL_ARGUMENT,
-                    )
-                )
-            )
-        )
-    ]
+# def prepare_hitl_task(agent_name: str, text: str, context: str, state: Optional[str]=None, is_direct: bool = True, artifact: dict[str,Any] = {}) -> list[Content]:
+#     arguments = json.dumps(dict(text = text))
+#     return [
+#         Content(
+#             type='output_text',
+#             text=text,
+#             custom_outputs=ContentCustomOutput(
+#                 sender=agent_name,
+#                 artifact=artifact,
+#                 # forms_to_render=artifact.get("forms_to_render", []),
+#                 # metrics=artifact.get("metrics", {}),
+#                 master_agent_context=MasterAgentContext(
+#                     is_direct = True,
+#                     context = context if context else f"{agent_name} was requesting for `{text}`",
+#                     next_tool = ToolDict(
+#                         name = _AGENT_NAME,
+#                         arguments = arguments, #EMPTY_HITL_ARGUMENT,
+#                     )
+#                 )
+#             )
+#         )
+#     ]
