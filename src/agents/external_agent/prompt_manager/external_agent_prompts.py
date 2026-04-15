@@ -14,18 +14,18 @@ BEFORE drafting any concerns, you MUST understand these rules. Violating these r
 
 **RULE 4 - NEUTRAL LANGUAGE**: Do not use: "fraudulent", "fraud", "suspicious", "red flags", "motive", "collusion", "grossly", "high-risk". Instead use: "requires verification", "pattern of similar claims", "discrepancy between X and Y". Investigative terminology (e.g., "staged accident", "misrepresentation") is acceptable when describing the type of concern, but rationales must remain factual and evidence-based. Do not infer intent or wrongdoing from associations, criminal history, or claim history alone. A prior claim is not evidence of fraud unless it was declined or investigated for fraud.
 
-**RULE 5 - EVIDENCE-BASED**: Every concern must be grounded in specific facts, evidence, or discrepancies found in INITIAL REVIEW. Do not raise concerns based on general knowledge, assumptions about vehicle features, or hypothetical scenarios not referenced in INITIAL REVIEW.
+**RULE 5 - EVIDENCE-BASED**: Every concern must be grounded in specific facts, evidence, or discrepancies found in INITIAL REVIEW or ADDITIONAL INFORMATION. Do not raise concerns based on general knowledge, assumptions about vehicle features, or hypothetical scenarios not referenced in these sources.
 </CRITICAL_RULES>
 
 <TASK>
-Draft key concerns for external investigation based on INITIAL REVIEW.
+Draft key concerns for external investigation based on INITIAL REVIEW and ADDITIONAL INFORMATION.
 
 Key concerns are material issues that could impact coverage, liability, or claim validity. They are NOT general observations or call outs from the INITIAL REVIEW.
 
-**IMPORTANT**: The INITIAL REVIEW contains both relevant concerns AND irrelevant observations. Your job is to FILTER and identify only the material, actionable concerns that comply with CRITICAL_RULES above.
+**IMPORTANT**: The INITIAL REVIEW and ADDITIONAL INFORMATION contain both relevant concerns AND irrelevant observations. Your job is to FILTER and identify only the material, actionable concerns that comply with CRITICAL_RULES above. ADDITIONAL INFORMATION may contain supplementary details (e.g., police reports, engineer reports, incident reports) not captured in INITIAL REVIEW — use these as additional evidence where relevant.
 
 Steps:
-1. Read INITIAL REVIEW and identify potential issues. When identifying concerns, name the type of concern explicitly using investigative terminology (e.g., staged accident, misrepresentation, inflated claim) where the evidence supports it. Do not dilute material concerns into vague language.
+1. Read INITIAL REVIEW and ADDITIONAL INFORMATION to identify potential issues. When identifying concerns, name the type of concern explicitly using investigative terminology (e.g., staged accident, misrepresentation, inflated claim) where the evidence supports it. Do not dilute material concerns into vague language.
 2. For EACH potential issue, check against CRITICAL_RULES - if it fails ANY rule, exclude it
 3. Consolidate overlapping issues into single concerns
 4. Draft concerns with factual rationales that include specific evidence and financial/valuation implications
@@ -33,7 +33,7 @@ Steps:
 
 <RATIONALE_REQUIREMENTS>
 Each rationale must include:
-- Specific evidence/data from INITIAL REVIEW (cite facts, dates, values)
+- Specific evidence/data from INITIAL REVIEW or ADDITIONAL INFORMATION (cite facts, dates, values)
 - Why this matters for coverage, liability, or claim validity
 - Financial or valuation implications where relevant
 
@@ -48,6 +48,10 @@ Use neutral framing. Frame as "determine whether X is consistent with insured's 
 <INITIAL REVIEW>
 {initial_review}
 </INITIAL REVIEW>
+
+<ADDITIONAL INFORMATION>
+{additional_info}
+</ADDITIONAL INFORMATION>
 </CONTEXT>
 """
 
@@ -122,7 +126,7 @@ Output:
 </EXAMPLES>
 """
 
-ADDITIONAL_ENQUIRIES_DRAFT_PROMPT = f"""
+ADDITIONAL_ENQUIRIES_DRAFT_PROMPT = """
 
 <TASK_DEFINITION>
 Additional Enquiries are the additional responsibilities which the external investigator is required to perform in addition to their core responsibilities for provided investigation type.
@@ -210,13 +214,11 @@ BEFORE drafting any questions, you MUST understand these rules. Violating these 
 
 **RULE 1 - CONTEXTUALISE**: Every question from INVESTIGATION PROCESSES must be rewritten using case-specific details from INITIAL REVIEW (names, dates, locations, vehicle details). The output must never read like a generic template. A question like "Establish the date and time of the collision" must become specific to this case.
 
-**RULE 2 - RELEVANCE FILTER**: Adapt each question to the actual incident type and circumstances described in INITIAL REVIEW. If a question references a scenario that does not apply to this case, adapt it to fit the case where possible. Only exclude if the question is entirely inapplicable and cannot be adapted.
+**RULE 2 - RELEVANCE FILTER**: Every question from INVESTIGATION PROCESSES must be included unless it references a scenario that clearly does not exist in this case based on INITIAL REVIEW. When in doubt, include and adapt the question rather than exclude it. The burden is on exclusion, not inclusion.
 
 **RULE 3 - EXPAND BROAD INSTRUCTIONS**: When INVESTIGATION PROCESSES contains broad or general instructions, expand them into multiple specific questions using facts from INITIAL REVIEW. A single broad instruction may become several detailed questions.
 
 **RULE 4 - NO DUPLICATES**: The same question must not appear across multiple categories. If the same question appears in multiple categories in INVESTIGATION PROCESSES, include it only once under the most relevant category — but do not drop the question entirely.
-
-**RULE 5 - COMPLETENESS**: Include ALL questions from INVESTIGATION PROCESSES by default. Only exclude a question when it references a scenario that clearly does not apply to this case and cannot be adapted. When in doubt, include the question — do not make subjective judgements about relevance.
 </CRITICAL_RULES>
 
 <TASK>
@@ -234,11 +236,11 @@ Steps:
     c. If it is a broad instruction, expand into multiple specific questions using INITIAL REVIEW details (apply RULE 3).
 
 4. Each object must include:
-    - "question_id" -> the number of the question.
+    - "question_id" -> sequentially numbered starting from 1 in the output (do not carry over IDs from INVESTIGATION PROCESSES).
     - "category" -> a category label. Do not jump back to a previous category later in the interview.
     - "question_text" -> the interview question.
 
-5. Review your plan and ensure that you have included all possible questions. Compare your output against INVESTIGATION PROCESSES and verify that every question is either included (contextualised) or has a clear reason for exclusion based on RULE 2. Ensure it is following the order of questions in the INVESTIGATION PROCESSES. If you are unsure, progress from incident details --> claim-specific --> reports/documents/evidence --> underwriting/policy disclosure --> financial history. Any underwriting and/or financial history questions must be at the end.
+5. Review your plan and ensure that you have included all relevant questions. Ensure it is following the order of questions in the INVESTIGATION PROCESSES. If you are unsure, progress from incident details --> claim-specific --> reports/documents/evidence --> underwriting/policy disclosure --> financial history. Any underwriting and/or financial history questions must be at the end.
 </TASK>
 
 <OUTPUT>

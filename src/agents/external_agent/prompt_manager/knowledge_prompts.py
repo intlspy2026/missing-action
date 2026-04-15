@@ -7,30 +7,32 @@ RETRIEVAL_TASKS = {
         "task": "Determine the additional enquiries required for external investigation given the provided investigation type",
         "stopping_criteria": "You have clearly put down all the additional enquiries required for external investigation for the provided investigation type"
     },
+    # --- Commented out: interview plan retrieval tasks not yet active ---
     # "question_categories": {
     #     "task": """
-    # Determine interview question categories for the given investigation type and extract all questions per category except for underwriting and financial history rela
+    # Determine interview question categories for the given investigation type and extract all questions per category except for underwriting and financial history related
     # categories.
     #     For example, if the investigation type is 'Policy Exclusion | DUI investigation', you should call 'query_investigation_processes' to first assess the categories:
     #     - "List the category names of interview questions for a Policy Exclusion - DUI"
     #     Then, review the response and call 'query_investigation_processes' again with the following queries in parallel:
     #     - "Extract a list of all suggested interview questions in the category <insert category name> associated with Policy Exclusion DUI-related investigation, verbatim
     # stated in the context."
-    # """
-    # "stopping_criteria": "You have clearly stated all interview question categories(except underwriting and financial history) and all discovered categories have had a
-    # questions extracted verbatim"
+    # """,
+    #     "stopping_criteria": "You have clearly stated all interview question categories(except underwriting and financial history) and all discovered categories have had all questions extracted verbatim"
     # },
     # "underwriting_financial": {
     #     "task": """
     # Determine whether underwriting matters and/or financial history questions should be asked for the given investigation type, and if so, extract.
-    #     For example, if the investigation type is 'Policy Exclusion | DUI investigation', you should call 'query_investigation_processes' with the following queries in par
-    #     - Extract a list of all suggested interview questions for Underwriting Matters/Canvassing associated with Policy Exclusion DUI-related investigation, verbatim as i
+    #     For example, if the investigation type is 'Policy Exclusion | DUI investigation', you should call 'query_investigation_processes' with the following queries in parallel:
+    #     - Extract a list of all suggested interview questions for Underwriting Matters/Canvassing associated with Policy Exclusion DUI-related investigation, verbatim as it is
     # stated in the context.
-    #     - Extract a list of all suggested interview questions for Financial History associated with Policy Exclusion DUI-related investigation, verbatim as it is stated in
+    #     - Extract a list of all suggested interview questions for Financial History associated with Policy Exclusion DUI-related investigation, verbatim as it is stated in the
     # context.
-
-    #  - There can be investigation types for which there will be no questions related to Underwriting Matters/Canvassing and Financial History so do not create any catego
-
+    #
+    #  - There can be investigation types for which there will be no questions related to Underwriting Matters/Canvassing and Financial History so do not create any categories
+    # """,
+    #     "stopping_criteria": "You have determined whether underwriting and financial history questions apply and extracted them if so"
+    # },
 }
 
 
@@ -77,25 +79,56 @@ KNOWLEDGE_RETRIEVAL_SYSTEM_PROMPT = """
 You are a fraud knowledge-retrieval assistant. You will receive an investigation type and your goal is to retrieve relevant knowledge using your tools.
 """
 
-# KNOWLEDGE_RETRIEVAL_SYSTEM_PROMPT = """
-# You are an insurance knowledge-retrieval assistant. Your goal is to retrieve all relevant searches to be done in preliminary review for the provided investigation type using
-# your tools.
+
+# --- Commented out: replaced by per-section SECTION_KNOWLEDGE_REPORT_PROMPT ---
+# KNOWLEDGE_REPORT_SYSTEM_PROMPT = """
+# You are an insurance report drafting assistant. Your task is to synthesise retrieved knowledge into a structured report which contains all the searches for the provided investigation
+# type .
+# """
+#
+# KNOWLEDGE_REPORT_PROMPT = """
+# <TASK>
+# Using the provided retrieved knowledge, produce a structured report for the given investigation type.
+#
+# You MUST:
+# - Use ONLY the provided knowledge.
+# - Not introduce new content
+# - Not paraphrase questions
+# - Preserve wording of concerns raised.
+# </TASK>
+#
+# <INPUTS>
+# <INVESTIGATION_TYPE>
+# {investigation_type}
+# </INVESTIGATION_TYPE>
+#
+# <RETRIEVED_KNOWLEDGE>
+# {knowledge_set}
+# </RETRIEVED_KNOWLEDGE>
+# </INPUTS>
+#
+# <OUTPUT>
+# Compile your report into the following format:
+# {format}
+# Do NOT output any extra commentary outside this JSON. Only return this.
+#
+# </OUTPUT>
 # """
 
-KNOWLEDGE_REPORT_SYSTEM_PROMPT = """
-You are an insurance report drafting assistant. Your task is to synthesise retrieved knowledge into a structured report which contains all the searches for the provided investigation
-type .
+
+SECTION_KNOWLEDGE_REPORT_SYSTEM_PROMPT = """
+You are an insurance report drafting assistant. Your task is to synthesise retrieved knowledge into a structured report for a specific section of an external investigation.
 """
 
-KNOWLEDGE_REPORT_PROMPT = """
+SECTION_KNOWLEDGE_REPORT_PROMPT = """
 <TASK>
-Using the provided retrieved knowledge, produce a structured report for the given investigation type.
+Using the provided retrieved knowledge, produce a structured report for the {section_name} section of an external investigation for the given investigation type.
 
 You MUST:
 - Use ONLY the provided knowledge.
-- Not introduce new content
-- Not paraphrase questions
-- Preserve wording of concerns raised.
+- Not introduce new content.
+- Not paraphrase — preserve original wording.
+- Extract ALL relevant items for this section.
 </TASK>
 
 <INPUTS>
@@ -109,9 +142,7 @@ You MUST:
 </INPUTS>
 
 <OUTPUT>
-Compile your report into the following format:
 {format}
 Do NOT output any extra commentary outside this JSON. Only return this.
-
 </OUTPUT>
 """
