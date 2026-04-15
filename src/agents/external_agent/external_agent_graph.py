@@ -1,19 +1,45 @@
 from typing import List, TypedDict, Optional, Annotated, Union, Any, Literal, Tuple, Dict
 from smart_investigator.foundation.schemas.schemas import SmartInvestigatorAgentState, SIErrorCode
 from smart_investigator.foundation.tools.tool_names import EXTERNAL_AGENT_NAME
-from agents.external_agent.prompt_manager.knowledge_prompts import KNOWLEDGE_RETRIEVAL_SYSTEM_PROMPT, KNOWLEDGE_REPORT_SYSTEM_PROMPT, KNOWLEDGE_REPORT_PROMPT, RETRIEVAL_TASKS, KNOWLEDGE_RETRIEVAL_TASK_PROMPT
+from agents.external_agent.prompt_manager.knowledge_prompts import (
+    KNOWLEDGE_RETRIEVAL_SYSTEM_PROMPT,
+    RETRIEVAL_TASKS,
+    KNOWLEDGE_RETRIEVAL_TASK_PROMPT,
+    SECTION_KNOWLEDGE_REPORT_SYSTEM_PROMPT,
+    SECTION_KNOWLEDGE_REPORT_PROMPT,
+)
+from agents.external_agent.prompt_manager.external_agent_prompts import (
+    EXTERNAL_AGENT_SYSTEM_PROMPT,
+    KEY_CONCERNS_DRAFT_PROMPT,
+    DOC_REQUEST_DRAFT_PROMPT,
+    ADDITIONAL_ENQUIRIES_DRAFT_PROMPT,
+    INTERVIEW_PLAN_DRAFT_PROMPT,
+)
+# --- Commented out: unused imports ---
 # from agents.external_agent.prompt_manager.interview_strategy_prompts import INTERVIEW_STRATEGY_SYSTEM_PROMPT, INTERVIEW_STRATEGY_DRAFT_PROMPT, INTERVIEW_STRATEGY_FEEDBACK_PROMPT
-# from agents.external_agent.prompt_manager.external_agent_prompts import EXTERNAL_AGENT_SYSTEM_PROMPT, KEY_CONCERNS_DRAFT_PROMPT, INTERVIEW_DOC_REQUEST_PROMPT,
-# INTERVIEW_PLAN_FEEDBACK_PROMPT, DOC_REQUEST_DRAFT_PROMPT, ADDITIONAL_ENQUIRIES_DRAFT_PROMPT, INTERVIEW_PLAN_DRAFT_PROMPT
+# from agents.external_agent.prompt_manager.external_agent_prompts import INTERVIEW_DOC_REQUEST_PROMPT, INTERVIEW_PLAN_FEEDBACK_PROMPT
 # from agents.external_agent.prompt_manager.online_eval_prompts import eval_user_msg_template, eval_sys_msg_template
+# from agents.external_agent.prompt_manager.knowledge_prompts import KNOWLEDGE_REPORT_SYSTEM_PROMPT, KNOWLEDGE_REPORT_PROMPT
 from agents.external_agent.tools.query_investigation_processes import query_investigation_processes
 from agents.external_agent.tools.think_tool import think_tool
 from agents.external_agent.tools.search_complete import search_complete
-from agents.external_agent.utils import build_form_info, build_form_strategy, parse_form_to_interview_strategy, build_form_plan, parse_form_to_interview_plan, build_form_final
+# --- Commented out: utils.py is empty ---
+# from agents.external_agent.utils import build_form_info, build_form_strategy, parse_form_to_interview_strategy, build_form_plan, parse_form_to_interview_plan, build_form_final
 from smart_investigator.foundation.utils.utils import prepare_thinking_message, prepare_hitl_task
-from agents.external_agent.schemas import InterviewStrategy, InterviewQuestion, InterviewQuestionSets, DocRequest, DocRequestSet, InterviewPlan, KnowledgeSet, KnowledgeReport, Knowledge, HITLDecision, InterviewPlanState, KeyConcern, KeyConcernSet, ExternalAgentPlan, AdditionalEnquiriesSet, AdditionalEnquiries
+from agents.external_agent.schemas import (
+    InterviewQuestion, InterviewQuestionSets,
+    DocRequest, DocRequestSet,
+    KnowledgeSet, Knowledge,
+    HITLDecision, ExternalAgentState,
+    KeyConcern, KeyConcernSet,
+    ExternalAgentPlan,
+    AdditionalEnquiriesSet, AdditionalEnquiries,
+)
+# --- Commented out: unused schema imports ---
+# from agents.external_agent.schemas import InterviewStrategy, InterviewPlan, KnowledgeReport, InterviewPlanState
 
-from smart_investigator.foundation.evals.online.eval_core import run_evaluation_from_yaml
+# --- Commented out: online evaluation no longer used ---
+# from smart_investigator.foundation.evals.online.eval_core import run_evaluation_from_yaml
 
 from pydantic import BaseModel, Field
 from langchain_core.output_parsers import PydanticOutputParser
@@ -21,7 +47,7 @@ from langchain_core.messages import AIMessage, HumanMessage, ToolMessage, BaseMe
 from langchain_core.language_models.chat_models import BaseChatModel
 from langgraph.graph import StateGraph, START, END, MessagesState
 from langgraph.config import get_stream_writer
-from langgraph.types import Command, interrupt, StreamWriter
+from langgraph.types import Command, interrupt, StreamWriter, Send
 from langgraph.runtime import Runtime, get_runtime
 from copy import deepcopy
 import json
@@ -73,7 +99,7 @@ def get_graph(llm: BaseChatModel) -> StateGraph:
 
         parser = PydanticOutputParser(pydantic_object=HITLDecision)
         prompt = f"""
-        You are routing and summarising the next task for a human-in-the-loop response for an insurance fraud interview plan workflow. The task should either be to draft an interview plan, or to edit based on user feedback.
+        You are routing and summarising the next task for a human-in-the-loop response for an insurance fraud external agent instruction workflow. The task should either be to draft instructions, or to edit based on user feedback.
 
         Previous task: {prev_task}
 
@@ -115,519 +141,500 @@ def get_graph(llm: BaseChatModel) -> StateGraph:
         - unrelated always restarts
         - accept/feedback re-enters the relevant node
         """
-        # accept/feedback go back to the generating node for that step
         if pending_step == "init":
             return "initialise_query"
-        # if pending_step == "strategy_review":
-        #     return "generate_strategy"
-        if pending_step == "plan_review":
-            return "generate_plan"
+        # --- Commented out: plan_review routing not yet implemented for new architecture ---
+        # if pending_step == "plan_review":
+        #     return "generate_plan"
 
         # unknown step -> restart
         return "initialise_query"
 
-    def _resolve_hitl_artifact(state: "InterviewPlanState", pending_step: str, incoming_artifact: dict | None) -> Any:
+    def _resolve_hitl_artifact(state: "ExternalAgentState", pending_step: str, incoming_artifact: dict | None) -> Any:
         """
         If the frontend didn't send an artifact (common for feedback-only resumes), fall back to the last generated output stored in state for the relevant step.
         """
         incoming_artifact = incoming_artifact or {}
 
-        if pending_step == "strategy_review":
-            # prev: InterviewStrategy | None = state.get("interview_strategy")
-            # if incoming_artifact:
-            #     payload = incoming_artifact
-            #     if isinstance(payload, dict):
-            #         return parse_form_to_interview_strategy(payload, previous=prev)
-
-            # return prev
-            pass
+        # --- Commented out: strategy_review no longer used ---
+        # if pending_step == "strategy_review":
+        #     pass
 
         if pending_step == "plan_review":
-            prev: InterviewPlan | None = state.get("interview_plans")
+            prev: ExternalAgentPlan | None = state.get("external_agent_plan")
             if incoming_artifact:
                 payload = incoming_artifact
                 if isinstance(payload, dict):
-                    return parse_form_to_interview_plan(payload, previous=prev)
+                    return payload  # TODO: add parse_form_to_external_plan when HITL feedback is implemented
             return prev
 
         # For init/unknown, nothing sensible to fall back to
         return incoming_artifact
 
 
-def _parse_investigation_type_to_filters(lob: str, inv_type: str) -> dict:
-    """
-    Input examples:
-    - lob: "Motor", investigation_type: "Staged accident"
-    - lob: "Motor", investigation_type: "Misrepresentation | sub-type"
+    def _parse_investigation_type_to_filters(lob: str, inv_type: str) -> dict:
+        """
+        Input examples:
+        - lob: "Motor", investigation_type: "Staged accident"
+        - lob: "Motor", investigation_type: "Misrepresentation | sub-type"
 
-    Output:
-    {"lob": ["Motor"], "fraud_type": ["staged accident"]}
-    """
-    s = (inv_type or "").strip()
+        Output:
+        {"lob": ["Motor"], "fraud_type": ["staged accident"]}
+        """
+        s = (inv_type or "").strip()
 
-    # Fraud type is before the sub type delimiter "|"
-    fraud_type = s.split("|", 1)[0].strip()
+        # Fraud type is before the sub type delimiter "|"
+        fraud_type = s.split("|", 1)[0].strip()
 
-    if not fraud_type:
-        raise ValueError(
-            f"Could not parse fraud_type from investigation_type: {inv_type}")
+        if not fraud_type:
+            raise ValueError(
+                f"Could not parse fraud_type from investigation_type: {inv_type}")
 
-    return {"lob": [lob], "fraud_type": [fraud_type]}
+        return {"lob": [lob], "fraud_type": [fraud_type]}
 
-# ------------------------------------
-# Nodes
-# ------------------------------------
+    # ------------------------------------
+    # Async tool helpers (unchanged)
+    # ------------------------------------
 
+    async def _run_tool_call_async(
+        call: dict,
+        *,
+        filters: dict,
+        knowledge_endpoint: str
+    ) -> Tuple[str, dict, Any]:
+        """
+        Run ONE tool call concurrently (async).
+        Returns: (tool_name, args, result)
+        """
+        tool_name = call["name"]
+        args = call.get("args", {}) or {}
 
-def route_interrupt(state: "InterviewPlanState") -> Command:
-    """
-    Central interrupt handler:
-    1) Calls interrupt(...) exactly once per HITL prompt.
-    2) On resume, classifies accept/feedback/unrelated.
-    3) Extracts a concise task summary for the agent.
-    4) Routes back to the correct node based on pending_step.
-    """
-    runtime, writer, messages = _get_ctx(state)
+        if tool_name == "query_investigation_processes":
+            result = await asyncio.to_thread(
+                query_investigation_processes.invoke,
+                {"endpoint_name": knowledge_endpoint,
+                    "query": args["query"], "filters": filters},
+            )
+            return tool_name, args, result
 
-    pending_step = state.get("pending_step")
-    hitl_task = state.get("hitl_task")
-    prev_decision = state.get("hitl_decision")
+        if tool_name == "think_tool":
+            result = await asyncio.to_thread(
+                think_tool.invoke,
+                args.get("reflection", ""),
+            )
+            return tool_name, args, result
 
-    # - First pass: pauses execution here.
-    # - Resume: returns immediately with resume payload (text).
-    _ = interrupt(hitl_task)
+        if tool_name == "search_complete":
+            return tool_name, args, {"ok": True}
 
-    hitl = _frontend_input(runtime)
-    hitl_text = (hitl.get("text") or "").strip()
-    incoming_artifact = hitl.get("custom_inputs", {}).get(
-        "artifact").get("form_data") or {}
-    prev_task = prev_decision.task_summary if prev_decision else ""
+        return tool_name, args, {"error": f"Unknown tool {tool_name}"}
 
-    hitl_decision = _classify_hitl(hitl_text, incoming_artifact, prev_task)
-    hitl_artifact = _resolve_hitl_artifact(
-        state, pending_step, incoming_artifact)
+    async def _run_retrieval_task(
+        task_key: str,
+        system_prompt: str,
+        prompt: str,
+        llm_with_tools,
+        filters: dict,
+        knowledge_endpoint: str,
+        max_iterations: int = 20
+    ) -> list[Knowledge]:
+        """
+        Run ONE retrieval task and return extracted knowledge
+        """
+        prompts = [SystemMessage(content=system_prompt),
+                   HumanMessage(content=prompt)]
 
-    intent = hitl_decision.intent
-    task_summary = hitl_decision.task_summary
+        collected: list[Knowledge] = []
 
-    if intent == "unrelated":
-        text = "Please review the AI generated output and either edit and submit, or provide your feedback."
-        new_hitl_task = prepare_hitl_task(
-            agent_name=EXTERNAL_AGENT_NAME,
-            text=text,
-            context="User must accept, edit+submit, or provide feedback relevant to the current output.",
-            state={} if use_checkpointer else {
-                **state, "messages": messages + [AIMessage(text)]},
-            artifact=hitl_artifact,
+        for _ in range(max_iterations):
+            llm_response = await asyncio.to_thread(
+                llm_with_tools.invoke,
+                prompts,
+                temperature=0.0,
+                max_tokens=8192,
+            )
+
+            tool_calls = getattr(llm_response, "tool_calls", []) or []
+            if not tool_calls:
+                break
+
+            finish = any(c["name"] == "search_complete" for c in tool_calls)
+            calls_to_run = [
+                c for c in tool_calls if c["name"] != "search_complete"]
+
+            if not calls_to_run:
+                break
+
+            results = await asyncio.gather(
+                *[_run_tool_call_async(c, filters=filters, knowledge_endpoint=knowledge_endpoint)
+                  for c in calls_to_run],
+                return_exceptions=True,
+            )
+
+            for call, r in zip(calls_to_run, results):
+                if isinstance(r, Exception):
+                    raise Exception(
+                        f"Retrieval task '{task_key}' failed",
+                        SIErrorCode.AGENT_ENDPOINT_FAILURE,
+                    ) from r
+
+                tool_name, _, result = r
+                prompts.append(
+                    HumanMessage(f"[Tool {tool_name}] result:\n{result}")
+                )
+
+                if tool_name == "query_investigation_processes":
+                    rows = (result or {}).get("knowledge", []) or []
+                    for row in rows:
+                        collected.append(
+                            Knowledge(
+                                query=row.get("query", ""),
+                                answer=row.get("answer", ""),
+                            )
+                        )
+
+            if finish:
+                break
+
+        return collected
+
+    # ------------------------------------
+    # Per-section knowledge helpers
+    # ------------------------------------
+
+    async def _retrieve_section_knowledge(
+        task_key: str,
+        task_def: dict,
+        state: "ExternalAgentState",
+        knowledge_endpoint: str,
+    ) -> KnowledgeSet:
+        """
+        Retrieve knowledge for a single section.
+        Loops over investigation_types from state, runs _run_retrieval_task
+        for the given task_key only. Returns raw KnowledgeSet.
+        """
+        lob = state.get("lob", "")
+        investigation_types = state.get("investigation_type", []) or []
+        if not investigation_types or not lob:
+            raise ValueError(
+                f"lob or investigation_type has not been passed in state: {state}")
+
+        parser = PydanticOutputParser(pydantic_object=KnowledgeSet)
+        llm_with_tools = llm.bind_tools(
+            [query_investigation_processes, search_complete, think_tool])
+
+        knowledge_items: list[Knowledge] = []
+
+        for inv_type in investigation_types:
+            filters = _parse_investigation_type_to_filters(lob, inv_type)
+            system_prompt = KNOWLEDGE_RETRIEVAL_SYSTEM_PROMPT
+            prompt = KNOWLEDGE_RETRIEVAL_TASK_PROMPT.format(
+                task=task_def["task"],
+                stopping_criteria=task_def["stopping_criteria"],
+                investigation_type=inv_type,
+                format=parser.get_format_instructions(),
+            )
+
+            result = await _run_retrieval_task(
+                task_key=task_key,
+                system_prompt=system_prompt,
+                prompt=prompt,
+                llm_with_tools=llm_with_tools,
+                filters=filters,
+                knowledge_endpoint=knowledge_endpoint,
+            )
+            knowledge_items.extend(result)
+
+        return KnowledgeSet(knowledge=knowledge_items)
+
+    def _synthesize_section_knowledge(
+        section_name: str,
+        knowledge_set: KnowledgeSet,
+        investigation_types: list[str],
+        output_schema,
+    ) -> Any:
+        """
+        Synthesize raw knowledge into a section-specific structured output.
+        Uses SECTION_KNOWLEDGE_REPORT_PROMPT with the given output_schema
+        as the Pydantic parser format.
+        """
+        parser = PydanticOutputParser(pydantic_object=output_schema)
+        prompt = SECTION_KNOWLEDGE_REPORT_PROMPT.format(
+            section_name=section_name,
+            investigation_type=", ".join(investigation_types),
+            knowledge_set=knowledge_set.model_dump_json(),
+            format=parser.get_format_instructions(),
         )
 
-        writer(prepare_thinking_message(EXTERNAL_AGENT_NAME,
-               "HITL response unrelated; re-prompting user."))
-        return Command(
-            goto="route_interrupt",
-            update={
-                "hitl_task": new_hitl_task,
-                "hitl_decision": hitl_decision,
-                "hitl_artifact": hitl_artifact,
-                "messages": messages + [AIMessage(f"HITL decision: unrelated (step={pending_step})")],
-            },
+        prompts = [
+            SystemMessage(content=SECTION_KNOWLEDGE_REPORT_SYSTEM_PROMPT),
+            HumanMessage(content=prompt),
+        ]
+
+        response = llm.invoke(
+            input=prompts,
+            temperature=0.0,
+            max_tokens=8192,
+            response_format={"type": "json_object"},
         )
+        content = response.content if isinstance(
+            response.content, str) else response.content[0]["text"]
+        return parser.parse(content)
 
-    custom_message = prepare_thinking_message(
-        EXTERNAL_AGENT_NAME, f"Decision is {intent}, proceeding... \n{task_summary}")
-    writer(custom_message)
+    # --- Commented out: replaced by per-section _retrieve_section_knowledge helper ---
+    # async def retrieve_knowledge_async(state: "ExternalAgentState") -> Command:
+    #     runtime, writer, messages = _get_ctx(state)
+    #     knowledge_endpoint = runtime.context["resources_endpoint_name"]
+    #
+    #     writer(prepare_thinking_message(EXTERNAL_AGENT_NAME,
+    #            "Retrieving knowledge on external agent..."))
+    #
+    #     decision = state.get("hitl_decision")
+    #     task_summary = decision.task_summary if decision else ""
+    #
+    #     lob = state.get("lob", "")
+    #     investigation_types = state.get("investigation_type", []) or []
+    #     if not investigation_types or not lob:
+    #         raise ValueError(
+    #             f"lob or investigation_type has not been passed in state: {state}")
+    #     initial_review = state.get("initial_review", "")
+    #
+    #     parser = PydanticOutputParser(pydantic_object=KnowledgeSet)
+    #     llm_with_tools = llm.bind_tools(
+    #         [query_investigation_processes, search_complete, think_tool])
+    #
+    #     knowledge_items: list[Knowledge] = []
+    #
+    #     for inv_type in investigation_types:
+    #         filters = _parse_investigation_type_to_filters(lob, inv_type)
+    #         system_prompt = KNOWLEDGE_RETRIEVAL_SYSTEM_PROMPT
+    #         task_results = await asyncio.gather(
+    #             *[
+    #                 _run_retrieval_task(
+    #                     task_key=task_key,
+    #                     system_prompt=system_prompt,
+    #                     prompt=KNOWLEDGE_RETRIEVAL_TASK_PROMPT.format(
+    #                         task=task_def["task"],
+    #                         stopping_criteria=task_def["stopping_criteria"],
+    #                         investigation_type=inv_type,
+    #                         format=parser.get_format_instructions(),
+    #                     ),
+    #                     llm_with_tools=llm_with_tools,
+    #                     filters=filters,
+    #                     knowledge_endpoint=knowledge_endpoint
+    #                 )
+    #                 for task_key, task_def in RETRIEVAL_TASKS.items()
+    #             ]
+    #         )
+    #         for result in task_results:
+    #             knowledge_items.extend(result)
+    #
+    #     knowledge = KnowledgeSet(knowledge=knowledge_items)
+    #
+    #     report_parser = PydanticOutputParser(pydantic_object=KnowledgeReport)
+    #     report_system_prompt = KNOWLEDGE_REPORT_SYSTEM_PROMPT
+    #     report_prompt = KNOWLEDGE_REPORT_PROMPT.format(
+    #         investigation_type=", ".join(investigation_types),
+    #         knowledge_set=knowledge.model_dump_json(),
+    #         format=report_parser.get_format_instructions()
+    #     )
+    #     report_prompts = [SystemMessage(content=report_system_prompt), HumanMessage(content=report_prompt)]
+    #     report_response = llm.invoke(input=report_prompts, temperature=0.0, max_tokens=8192, response_format={"type": "json_object"})
+    #     report_content = report_response.content if isinstance(report_response.content, str) else report_response.content[0]["text"]
+    #     knowledge_report = report_parser.parse(report_content)
+    #
+    #     return Command(
+    #         goto="generate_plan",
+    #         update={
+    #             "knowledge": knowledge_report,
+    #             "messages": messages + [AIMessage("Investigation processes retrieved.")],
+    #             "pending_step": None,
+    #         },
+    #     )
+    #
+    # def retrieve_knowledge(state: "ExternalAgentState") -> Command:
+    #     """Sync wrapper so LangGraph node can stay def-based."""
+    #     try:
+    #         return asyncio.run(retrieve_knowledge_async(state))
+    #     except RuntimeError:
+    #         loop = asyncio.get_event_loop()
+    #         return loop.run_until_complete(retrieve_knowledge_async(state))
 
-    goto = _route_from_pending_step(pending_step)
+    # ------------------------------------
+    # Nodes
+    # ------------------------------------
 
-    return Command(
-        goto=goto,
-        update={
-            "resume": False,
-            "hitl_decision": hitl_decision,
-            "hitl_artifact": hitl_artifact,
-            "hitl_task": None,
-            "messages": messages + [AIMessage(f"HITL decision: {intent} (step={pending_step}, task={task_summary})")],
-        },
-    )
+    def route_interrupt(state: "ExternalAgentState") -> Command:
+        """
+        Central interrupt handler:
+        1) Calls interrupt(...) exactly once per HITL prompt.
+        2) On resume, classifies accept/feedback/unrelated.
+        3) Extracts a concise task summary for the agent.
+        4) Routes back to the correct node based on pending_step.
+        """
+        runtime, writer, messages = _get_ctx(state)
 
+        pending_step = state.get("pending_step")
+        hitl_task = state.get("hitl_task")
+        prev_decision = state.get("hitl_decision")
 
-def initialise_query(state: "InterviewPlanState") -> Command:
-    runtime, writer, messages = _get_ctx(state)
-    form_config = runtime.context["forms"]
-    # print("form config", form_config)
+        # - First pass: pauses execution here.
+        # - Resume: returns immediately with resume payload (text).
+        _ = interrupt(hitl_task)
 
-    # If we arrived here after routing, consume decision if relevant
-    # print(f"state {state}")
-    decision = state.get("hitl_decision")
-    hitl_artifact = state.get("hitl_artifact") or {}
-    feedback = decision.task_summary if decision and decision.intent == "feedback" else ""
+        hitl = _frontend_input(runtime)
+        hitl_text = (hitl.get("text") or "").strip()
+        incoming_artifact = hitl.get("custom_inputs", {}).get(
+            "artifact").get("form_data") or {}
+        prev_task = prev_decision.task_summary if prev_decision else ""
 
-    # If user accepted the form (artifact present), persist into state and proceed
-    if decision and decision.intent == "accept" and hitl_artifact:
-        claim_id = hitl_artifact.get("claim_id")
-        brand = hitl_artifact.get("brand")
-        # interviewee = hitl_artifact.get("interviewee")
-        lob = hitl_artifact.get("lob")
-        investigation_type = hitl_artifact.get("investigation_type")
-        investigation_scope = hitl_artifact.get("investigation_scope")
-        initial_review = hitl_artifact.get("initial_review")
-        additional_info = hitl_artifact.get("additional_info")
-        # full_investigation = hitl_artifact.get("full_investigation")
-        # additional_enquiries = hitl_artifact.get("additional_enquiries")
-        print(f"investigation type {investigation_type}")
+        hitl_decision = _classify_hitl(hitl_text, incoming_artifact, prev_task)
+        hitl_artifact = _resolve_hitl_artifact(
+            state, pending_step, incoming_artifact)
 
-        if claim_id and investigation_type and investigation_scope and initial_review:
+        intent = hitl_decision.intent
+        task_summary = hitl_decision.task_summary
+
+        if intent == "unrelated":
+            text = "Please review the AI generated output and either edit and submit, or provide your feedback."
+            new_hitl_task = prepare_hitl_task(
+                agent_name=EXTERNAL_AGENT_NAME,
+                text=text,
+                context="User must accept, edit+submit, or provide feedback relevant to the current output.",
+                state={} if use_checkpointer else {
+                    **state, "messages": messages + [AIMessage(text)]},
+                artifact=hitl_artifact,
+            )
+
+            writer(prepare_thinking_message(EXTERNAL_AGENT_NAME,
+                   "HITL response unrelated; re-prompting user."))
             return Command(
-                goto="retrieve_knowledge",
+                goto="route_interrupt",
                 update={
-                    "claim_id": claim_id,
-                    "brand": brand,
-                    # "interviewee": interviewee,
-                    "lob": lob,
-                    "investigation_type": investigation_type,
-                    "investigation_scope": investigation_scope,
-                    "initial_review": initial_review,
-                    "additional_info": additional_info,
-                    # "full_investigation": full_investigation,
-                    # "additional_enquiries": additional_enquiries,
-                    "hitl_decision": decision,
-                    "hitl_artifact": None,
-                    "pending_step": None,
-                    "messages": messages + [AIMessage("Inputs captured. Proceeding to retrieve knowledge.")],
+                    "hitl_task": new_hitl_task,
+                    "hitl_decision": hitl_decision,
+                    "hitl_artifact": hitl_artifact,
+                    "messages": messages + [AIMessage(f"HITL decision: unrelated (step={pending_step})")],
                 },
             )
 
-    # If already have required fields, proceed
-    if state.get("claim_id") and state.get("lob") and state.get("investigation_type") and state.get("initial_review"):
+        custom_message = prepare_thinking_message(
+            EXTERNAL_AGENT_NAME, f"Decision is {intent}, proceeding... \n{task_summary}")
+        writer(custom_message)
+
+        goto = _route_from_pending_step(pending_step)
+
         return Command(
-            goto="retrieve_knowledge",
-            update={"messages": messages +
-                    [AIMessage("Inputs present. Retrieving knowledge.")], "pending_step": None},
+            goto=goto,
+            update={
+                "resume": False,
+                "hitl_decision": hitl_decision,
+                "hitl_artifact": hitl_artifact,
+                "hitl_task": None,
+                "messages": messages + [AIMessage(f"HITL decision: {intent} (step={pending_step}, task={task_summary})")],
+            },
         )
 
-    # Otherwise: prompt user with form via HITL
-    text = "Hi! I am the External Agent - I can assist you in writing instructions for external agent appointment. To begin, please proceed to fill out the form..."
-    artifact = build_form_info(form_config)
-    hitl_task = prepare_hitl_task(
-        agent_name=EXTERNAL_AGENT_NAME,
-        text=text,
-        context="User must provide details.",
-        state={} if use_checkpointer else {
-            **state, "messages": messages + [AIMessage(text)]},
-        artifact=artifact,
-    )
+    def initialise_query(state: "ExternalAgentState") -> Command:
+        runtime, writer, messages = _get_ctx(state)
+        form_config = runtime.context["forms"]
 
-    custom_message = prepare_thinking_message(
-        EXTERNAL_AGENT_NAME, f"Waiting for form submission...")
-    writer(custom_message)
+        decision = state.get("hitl_decision")
+        hitl_artifact = state.get("hitl_artifact") or {}
+        feedback = decision.task_summary if decision and decision.intent == "feedback" else ""
 
-    return Command(
-        goto="route_interrupt",
-        update={
-            "pending_step": "init",
-            "hitl_task": hitl_task,
-            "messages": messages + [AIMessage("Awaiting form submission.")],
-            "hitl_decision": None,
-            "hitl_artifact": None,
-        },
-    )
+        # If user accepted the form (artifact present), persist into state and proceed
+        if decision and decision.intent == "accept" and hitl_artifact:
+            claim_id = hitl_artifact.get("claim_id")
+            brand = hitl_artifact.get("brand")
+            lob = hitl_artifact.get("lob")
+            investigation_type = hitl_artifact.get("investigation_type")
+            investigation_scope = hitl_artifact.get("investigation_scope")
+            initial_review = hitl_artifact.get("initial_review")
+            additional_info = hitl_artifact.get("additional_info")
+            selected_sections = hitl_artifact.get("selected_sections", ["doc_request", "additional_enquiries"])
 
+            if claim_id and investigation_type and investigation_scope and initial_review:
+                return Command(
+                    goto="dispatch_sections",
+                    update={
+                        "claim_id": claim_id,
+                        "brand": brand,
+                        "lob": lob,
+                        "investigation_type": investigation_type,
+                        "investigation_scope": investigation_scope,
+                        "initial_review": initial_review,
+                        "additional_info": additional_info,
+                        "selected_sections": selected_sections,
+                        "hitl_decision": decision,
+                        "hitl_artifact": None,
+                        "pending_step": None,
+                        "messages": messages + [AIMessage("Inputs captured. Dispatching section generation.")],
+                    },
+                )
 
-async def _run_tool_call_async(
-    call: dict,
-    *,
-    filters: dict,
-    knowledge_endpoint: str
-) -> Tuple[str, dict, Any]:
-    """
-    Run ONE tool call concurrently (async).
-    Returns: (tool_name, args, result)
-    """
-    tool_name = call["name"]
-    args = call.get("args", {}) or {}
-
-    if tool_name == "query_investigation_processes":
-        result = await asyncio.to_thread(
-            query_investigation_processes.invoke,
-            {"endpoint_name": knowledge_endpoint,
-                "query": args["query"], "filters": filters},
-        )
-        return tool_name, args, result
-
-    if tool_name == "think_tool":
-        result = await asyncio.to_thread(
-            think_tool.invoke,
-            args.get("reflection", ""),
-        )
-        return tool_name, args, result
-
-    if tool_name == "search_complete":
-        return tool_name, args, {"ok": True}
-
-    return tool_name, args, {"error": f"Unknown tool {tool_name}"}
-
-
-async def _run_retrieval_task(
-    task_key: str,
-    system_prompt: str,
-    prompt: str,
-    llm_with_tools,
-    filters: dict,
-    knowledge_endpoint: str,
-    max_iterations: int = 20
-) -> list[Knowledge]:
-    """
-    Run ONE retrieval task and return extracted knowledge
-    """
-    prompts = [SystemMessage(content=system_prompt),
-               HumanMessage(content=prompt)]
-
-    collected: list[Knowledge] = []
-
-    for _ in range(max_iterations):
-        llm_response = await asyncio.to_thread(
-            llm_with_tools.invoke,
-            prompts,
-            temperature=0.0,
-            max_tokens=8192,
-        )
-
-        tool_calls = getattr(llm_response, "tool_calls", []) or []
-        if not tool_calls:
-            break
-
-        finish = any(c["name"] == "search_complete" for c in tool_calls)
-        calls_to_run = [
-            c for c in tool_calls if c["name"] != "search_complete"]
-
-        if not calls_to_run:
-            break
-
-        results = await asyncio.gather(
-            *[_run_tool_call_async(c, filters=filters, knowledge_endpoint=knowledge_endpoint)
-              for c in calls_to_run],
-            return_exceptions=True,
-        )
-
-        for call, r in zip(calls_to_run, results):
-            if isinstance(r, Exception):
-                raise Exception(
-                    f"Retrieval task '{task_key}' failed",
-                    SIErrorCode.AGENT_ENDPOINT_FAILURE,
-                ) from r
-
-            tool_name, _, result = r
-            prompts.append(
-                HumanMessage(f"[Tool {tool_name}] result:\n{result}")
+        # If already have required fields, proceed
+        if state.get("claim_id") and state.get("lob") and state.get("investigation_type") and state.get("initial_review"):
+            return Command(
+                goto="dispatch_sections",
+                update={"messages": messages +
+                        [AIMessage("Inputs present. Dispatching section generation.")], "pending_step": None},
             )
 
-            if tool_name == "query_investigation_processes":
-                rows = (result or {}).get("knowledge", []) or []
-                for row in rows:
-                    collected.append(
-                        Knowledge(
-                            query=row.get("query", ""),
-                            answer=row.get("answer", ""),
-                        )
-                    )
-
-        if finish:
-            break
-
-    return collected
-
-
-async def retrieve_knowledge_async(state: "InterviewPlanState") -> Command:
-    runtime, writer, messages = _get_ctx(state)
-    knowledge_endpoint = runtime.context["resources_endpoint_name"]
-
-    writer(prepare_thinking_message(EXTERNAL_AGENT_NAME,
-           "Retrieving knowledge on external agent..."))
-
-    decision = state.get("hitl_decision")
-    # print(f"decision {decision}")
-    task_summary = decision.task_summary if decision else ""
-
-    lob = state.get("lob", "")
-    investigation_types = state.get("investigation_type", []) or []
-    print(f"investigation type {investigation_types}")
-    if not investigation_types or not lob:
-        raise ValueError(
-            f"lob or investigation_type has not been passed in state: {state}")
-    initial_review = state.get("initial_review", "")
-
-    parser = PydanticOutputParser(pydantic_object=KnowledgeSet)
-    llm_with_tools = llm.bind_tools(
-        [query_investigation_processes, search_complete, think_tool])
-
-    knowledge_items: list[Knowledge] = []
-
-    for inv_type in investigation_types:
-        filters = _parse_investigation_type_to_filters(lob, inv_type)
-
-        system_prompt = KNOWLEDGE_RETRIEVAL_SYSTEM_PROMPT
-
-        task_results = await asyncio.gather(
-            *[
-                _run_retrieval_task(
-                    task_key=task_key,
-                    system_prompt=system_prompt,
-                    prompt=KNOWLEDGE_RETRIEVAL_TASK_PROMPT.format(
-                        task=task_def["task"],
-                        stopping_criteria=task_def["stopping_criteria"],
-                        investigation_type=inv_type,
-                        # interview_case=initial_review,
-                        format=parser.get_format_instructions(),
-                    ),
-                    llm_with_tools=llm_with_tools,
-                    filters=filters,
-                    knowledge_endpoint=knowledge_endpoint
-                )
-                for task_key, task_def in RETRIEVAL_TASKS.items()
-            ]
+        # Otherwise: prompt user with form via HITL
+        text = "Hi! I am the External Agent - I can assist you in writing instructions for external agent appointment. To begin, please proceed to fill out the form..."
+        # TODO: build_form_info needs to be implemented in utils.py
+        # artifact = build_form_info(form_config)
+        artifact = {}
+        hitl_task = prepare_hitl_task(
+            agent_name=EXTERNAL_AGENT_NAME,
+            text=text,
+            context="User must provide details.",
+            state={} if use_checkpointer else {
+                **state, "messages": messages + [AIMessage(text)]},
+            artifact=artifact,
         )
 
-        for result in task_results:
-            knowledge_items.extend(result)
-
-    knowledge = KnowledgeSet(knowledge=knowledge_items)
-
-    # ---- Report synthesis
-    writer(prepare_thinking_message(EXTERNAL_AGENT_NAME,
-           "Synthesising knowledge on external agent instruction planning..."))
-
-    report_parser = PydanticOutputParser(pydantic_object=KnowledgeReport)
-    report_system_prompt = KNOWLEDGE_REPORT_SYSTEM_PROMPT
-    report_prompt = KNOWLEDGE_REPORT_PROMPT.format(
-        investigation_type=", ".join(investigation_types),
-        knowledge_set=knowledge.model_dump_json(),
-        format=report_parser.get_format_instructions()
-    )
-
-    report_prompts = [SystemMessage(
-        content=report_system_prompt), HumanMessage(content=report_prompt)]
-
-    report_response = llm.invoke(
-        input=report_prompts,
-        temperature=0.0,
-        max_tokens=8192,
-        response_format={"type": "json_object"},
-    )
-    report_content = report_response.content if isinstance(
-        report_response.content, str) else report_response.content[0]["text"]
-    knowledge_report = report_parser.parse(report_content)
-
-    return Command(
-        goto="generate_plan",
-        update={
-            "knowledge": knowledge_report,
-            "messages": messages + [AIMessage("Investigation processes retrieved.")],
-            "pending_step": None,
-        },
-    )
-
-
-def retrieve_knowledge(state: "InterviewPlanState") -> Command:
-    """
-    Sync wrapper so LangGraph node can stay def-based.
-    Uses asyncio to run the parallel tool executor.
-    """
-    try:
-        return asyncio.run(retrieve_knowledge_async(state))
-    except RuntimeError:
-        loop = asyncio.get_event_loop()
-        return loop.run_until_complete(retrieve_knowledge_async(state))
-
-
-def generate_plan(state: "InterviewPlanState") -> Command:
-    runtime, writer, messages = _get_ctx(state)
-
-    decision = state.get("hitl_decision")
-    hitl_artifact = state.get("hitl_artifact") or {}
-    hitl_feedback = decision.task_summary if decision and decision.intent == "feedback" else ""
-
-    print(
-        f"inside generate_plan decision {decision} \n hitl artifact {hitl_artifact}")
-
-    # Accept => persist edited plan and proceed to finalise
-    if decision and decision.intent == "accept" and hitl_artifact:
-        interview_plan = hitl_artifact
+        custom_message = prepare_thinking_message(
+            EXTERNAL_AGENT_NAME, f"Waiting for form submission...")
+        writer(custom_message)
 
         return Command(
-            goto="finalise_plan",
+            goto="route_interrupt",
             update={
-                "interview_plans": interview_plan,
-                "messages": messages + [AIMessage("Interview plan accepted.")],
-                "pending_step": None,
-                # "hitl_decision": None,
+                "pending_step": "init",
+                "hitl_task": hitl_task,
+                "messages": messages + [AIMessage("Awaiting form submission.")],
+                "hitl_decision": None,
                 "hitl_artifact": None,
             },
         )
 
-    # Otherwise: generate/re-generate draft (feedback triggers regeneration)
-    initial_review = state.get("initial_review", "")
-    additional_info = state.get("additional_info", "")
-    # additional_enquiries = state.get("additional_enquiries")
-    # interviewee = state.get("interviewee", "")
+    def dispatch_sections(state: "ExternalAgentState") -> Command:
+        """Thin node that triggers conditional fan-out via route_sections."""
+        messages = state.get("messages", [])
+        return Command(
+            update={"messages": messages + [AIMessage("Dispatching section generation...")]},
+        )
 
-    # interview_strategy = state.get("interview_strategy")
-    # strategy_json = interview_strategy.model_dump_json(indent=2, exclude_none=True)
+    # ------------------------------------
+    # Per-section generation nodes
+    # ------------------------------------
 
-    knowledge_report: KnowledgeReport = state.get("knowledge")
-    doc_knowledge_json = knowledge_report.model_dump_json(
-        indent=2, exclude_none=True, include={"document_set"})
-    print(f"Doc Knowledge json {doc_knowledge_json}")
-    enquiry_knowledge_json = knowledge_report.model_dump_json(
-        indent=2, exclude_none=True, include={"enquiries_rationale"})
-    print(f"Enquiry Knowledge json {enquiry_knowledge_json}")
-    # interview_plan_knowledge_json = knowledge_report.model_dump_json(indent=2, exclude_none=True, include={"interview_plan"})
-    # print(f"Interview Plan Knowledge json {interview_plan_knowledge_json}")
+    def generate_key_concerns(state: "ExternalAgentState") -> Command:
+        runtime, writer, messages = _get_ctx(state)
 
-    # ---- Extract previous plan version
-    prev_plan: InterviewPlan = state.get("interview_plans") or {}
-    prev_version = getattr(prev_plan, "version", None)
-    if prev_version is None and isinstance(prev_plan, dict):
-        prev_version = prev_plan.get("version", 0)
-    version = prev_version + 1
+        writer(prepare_thinking_message(
+            EXTERNAL_AGENT_NAME, "Drafting key concerns..."))
 
-    # ---- Extract feedback
-    online_feedback = state.get("online_eval", {}).get("per_metric", [])
-    online_feedback_block = (
-        "\n\n".join(
-            f"Metric: {f['metric_id']} \nSuggestions: {f['suggestions']}" for f in online_feedback)
-        if online_feedback
-        else ""
-    )
+        initial_review = state.get("initial_review", "")
+        additional_info = state.get("additional_info", "")
 
-    # feedback = (hitl_feedback or online_feedback_block).strip()
-    feedback = (hitl_feedback).strip()
-
-    max_version = 5
-    if (not hitl_feedback) and online_feedback_block and prev_version >= max_version:
-        # stop looping
-        feedback = ""
-        custom_message = prepare_thinking_message(
-            EXTERNAL_AGENT_NAME, "Maximum redrafts reached...")
-        writer(custom_message)
-
-    custom_message = prepare_thinking_message(
-        EXTERNAL_AGENT_NAME, f"Drafting agents for external investigation version={version}...")
-    writer(custom_message)
-
-    system_prompt = EXTERNAL_AGENT_SYSTEM_PROMPT
-
-    # ---- Feedback path
-    if feedback:
-        mlflow.update_current_trace(tags={"llm_step": "plan_feedback"})
-        parser = PydanticOutputParser(pydantic_object=ExternalAgentPlan)
-        prompt = INTERVIEW_PLAN_FEEDBACK_PROMPT.format(
-            prev_version=prev_plan.model_dump_json(
-                indent=2, exclude_none=True),
-            feedback=feedback,
+        system_prompt = EXTERNAL_AGENT_SYSTEM_PROMPT
+        parser = PydanticOutputParser(pydantic_object=KeyConcernSet)
+        prompt = KEY_CONCERNS_DRAFT_PROMPT.format(
             initial_review=initial_review,
             additional_info=additional_info,
-            # knowledge=str(knowledge_json),
-            # interview_strategy=str(strategy_json),
             format=parser.get_format_instructions(),
         )
 
@@ -642,147 +649,389 @@ def generate_plan(state: "InterviewPlanState") -> Command:
         )
         content = response.content if isinstance(
             response.content, str) else response.content[0]["text"]
-        parsed_plan: ExternalAgentPlan = parser.parse(content)
+        parsed: KeyConcernSet = parser.parse(content)
 
-        draft_plan = ExternalAgentPlan(
-            concern_set=parsed_plan,
-            document_set=parsed_plan,
-            enquiry_rationale_set=parsed_plan,
-            version=version,
-            created_at=datetime.utcnow().isoformat(),
-            update_notes=None
+        return Command(
+            goto="assemble_plan",
+            update={
+                "key_concerns": parsed,
+                "messages": messages + [AIMessage("Key concerns drafted.")],
+            },
         )
 
-    # ---- Draft path
-    else:
-        mlflow.update_current_trace(tags={"llm_step": "plan_draft"})
-        # key concern section
-        question_parser = PydanticOutputParser(pydantic_object=KeyConcernSet)
-        question_prompt = KEY_CONCERNS_DRAFT_PROMPT.format(
-            # interviewee=interviewee,
+    async def generate_doc_request_async(state: "ExternalAgentState") -> Command:
+        runtime, writer, messages = _get_ctx(state)
+        knowledge_endpoint = runtime.context["resources_endpoint_name"]
+
+        writer(prepare_thinking_message(
+            EXTERNAL_AGENT_NAME, "Retrieving knowledge for document requests..."))
+
+        # 1. Retrieve
+        raw_knowledge = await _retrieve_section_knowledge(
+            task_key="doc_requests",
+            task_def=RETRIEVAL_TASKS["doc_requests"],
+            state=state,
+            knowledge_endpoint=knowledge_endpoint,
+        )
+
+        # 2. Synthesize
+        writer(prepare_thinking_message(
+            EXTERNAL_AGENT_NAME, "Synthesising document request knowledge..."))
+
+        investigation_types = state.get("investigation_type", []) or []
+        synthesized: DocRequestSet = _synthesize_section_knowledge(
+            section_name="document requests",
+            knowledge_set=raw_knowledge,
+            investigation_types=investigation_types,
+            output_schema=DocRequestSet,
+        )
+
+        # 3. Draft
+        writer(prepare_thinking_message(
+            EXTERNAL_AGENT_NAME, "Drafting document requests..."))
+
+        initial_review = state.get("initial_review", "")
+        system_prompt = EXTERNAL_AGENT_SYSTEM_PROMPT
+        parser = PydanticOutputParser(pydantic_object=DocRequestSet)
+        prompt = DOC_REQUEST_DRAFT_PROMPT.format(
             initial_review=initial_review,
-            additional_info=additional_info,
-            # knowledge=str(knowledge_json),
-            # interview_strategy=str(strategy_json),
-            format=question_parser.get_format_instructions(),
+            knowledge=synthesized.model_dump_json(indent=2, exclude_none=True),
+            format=parser.get_format_instructions(),
         )
 
         prompts = [SystemMessage(content=system_prompt),
-                   HumanMessage(content=question_prompt)]
+                   HumanMessage(content=prompt)]
 
-        # Response handling for concerns
-        response = llm.invoke(input=prompts, temperature=0.0,
-                              max_tokens=15104, response_format={"type": "json_object"})
-        question_content = response.content if isinstance(
+        response = llm.invoke(
+            input=prompts,
+            temperature=0.0,
+            max_tokens=4000,
+            response_format={"type": "json_object"},
+        )
+        content = response.content if isinstance(
             response.content, str) else response.content[0]["text"]
-        parsed_questions: KeyConcernSet = question_parser.parse(
-            question_content)
+        parsed: DocRequestSet = parser.parse(content)
 
-        # document request section
-        doc_parser = PydanticOutputParser(pydantic_object=DocRequestSet)
-        doc_request_prompt = DOC_REQUEST_DRAFT_PROMPT.format(
+        return Command(
+            goto="assemble_plan",
+            update={
+                "doc_request": parsed,
+                "messages": messages + [AIMessage("Document requests drafted.")],
+            },
+        )
+
+    def generate_doc_request(state: "ExternalAgentState") -> Command:
+        """Sync wrapper for generate_doc_request_async."""
+        try:
+            return asyncio.run(generate_doc_request_async(state))
+        except RuntimeError:
+            loop = asyncio.get_event_loop()
+            return loop.run_until_complete(generate_doc_request_async(state))
+
+    async def generate_enquiries_async(state: "ExternalAgentState") -> Command:
+        runtime, writer, messages = _get_ctx(state)
+        knowledge_endpoint = runtime.context["resources_endpoint_name"]
+
+        writer(prepare_thinking_message(
+            EXTERNAL_AGENT_NAME, "Retrieving knowledge for additional enquiries..."))
+
+        # 1. Retrieve
+        raw_knowledge = await _retrieve_section_knowledge(
+            task_key="additional_enquiries",
+            task_def=RETRIEVAL_TASKS["additional_enquiries"],
+            state=state,
+            knowledge_endpoint=knowledge_endpoint,
+        )
+
+        # 2. Synthesize
+        writer(prepare_thinking_message(
+            EXTERNAL_AGENT_NAME, "Synthesising additional enquiries knowledge..."))
+
+        investigation_types = state.get("investigation_type", []) or []
+        synthesized: AdditionalEnquiriesSet = _synthesize_section_knowledge(
+            section_name="additional enquiries",
+            knowledge_set=raw_knowledge,
+            investigation_types=investigation_types,
+            output_schema=AdditionalEnquiriesSet,
+        )
+
+        # 3. Draft
+        writer(prepare_thinking_message(
+            EXTERNAL_AGENT_NAME, "Drafting additional enquiries..."))
+
+        initial_review = state.get("initial_review", "")
+        system_prompt = EXTERNAL_AGENT_SYSTEM_PROMPT
+        parser = PydanticOutputParser(pydantic_object=AdditionalEnquiriesSet)
+        prompt = ADDITIONAL_ENQUIRIES_DRAFT_PROMPT.format(
             initial_review=initial_review,
-            knowledge=str(doc_knowledge_json),
-            format=doc_parser.get_format_instructions()
+            knowledge=synthesized.model_dump_json(indent=2, exclude_none=True),
+            format=parser.get_format_instructions(),
         )
 
         prompts = [SystemMessage(content=system_prompt),
-                   HumanMessage(content=doc_request_prompt)]
-        response = llm.invoke(input=prompts, temperature=0.0,
-                              max_tokens=4000, response_format={"type": "json_object"})
-        doc_content = response.content if isinstance(
-            response.content, str) else response.content[0]["text"]
-        parsed_doc: DocRequestSet = doc_parser.parse(doc_content)
+                   HumanMessage(content=prompt)]
 
-        # additional enquiries rationale section
-        enquiry_parser = PydanticOutputParser(
-            pydantic_object=AdditionalEnquiriesSet)
-        additional_enquiry_prompt = ADDITIONAL_ENQUIRIES_DRAFT_PROMPT.format(
-            # additional_enquiries=additional_enquiries,
+        response = llm.invoke(
+            input=prompts,
+            temperature=0.0,
+            max_tokens=4000,
+            response_format={"type": "json_object"},
+        )
+        content = response.content if isinstance(
+            response.content, str) else response.content[0]["text"]
+        parsed: AdditionalEnquiriesSet = parser.parse(content)
+
+        return Command(
+            goto="assemble_plan",
+            update={
+                "additional_enquiries": parsed,
+                "messages": messages + [AIMessage("Additional enquiries drafted.")],
+            },
+        )
+
+    def generate_enquiries(state: "ExternalAgentState") -> Command:
+        """Sync wrapper for generate_enquiries_async."""
+        try:
+            return asyncio.run(generate_enquiries_async(state))
+        except RuntimeError:
+            loop = asyncio.get_event_loop()
+            return loop.run_until_complete(generate_enquiries_async(state))
+
+    async def generate_interview_plan_async(state: "ExternalAgentState") -> Command:
+        runtime, writer, messages = _get_ctx(state)
+        knowledge_endpoint = runtime.context["resources_endpoint_name"]
+
+        writer(prepare_thinking_message(
+            EXTERNAL_AGENT_NAME, "Retrieving knowledge for interview plan..."))
+
+        # NOTE: interview plan retrieval tasks are currently commented out in RETRIEVAL_TASKS.
+        # When ready, uncomment "question_categories" and "underwriting_financial" in knowledge_prompts.py.
+        task_key = "interview_plan"
+        task_def = RETRIEVAL_TASKS.get(task_key)
+        if not task_def:
+            writer(prepare_thinking_message(
+                EXTERNAL_AGENT_NAME, "No retrieval task configured for interview plan, drafting from initial review..."))
+            raw_knowledge = KnowledgeSet(knowledge=[])
+        else:
+            raw_knowledge = await _retrieve_section_knowledge(
+                task_key=task_key,
+                task_def=task_def,
+                state=state,
+                knowledge_endpoint=knowledge_endpoint,
+            )
+
+        # 2. Synthesize (skip if no knowledge retrieved)
+        investigation_types = state.get("investigation_type", []) or []
+        if raw_knowledge.knowledge:
+            writer(prepare_thinking_message(
+                EXTERNAL_AGENT_NAME, "Synthesising interview plan knowledge..."))
+
+            synthesized: InterviewQuestionSets = _synthesize_section_knowledge(
+                section_name="interview plan",
+                knowledge_set=raw_knowledge,
+                investigation_types=investigation_types,
+                output_schema=InterviewQuestionSets,
+            )
+            knowledge_json = synthesized.model_dump_json(indent=2, exclude_none=True)
+        else:
+            knowledge_json = ""
+
+        # 3. Draft
+        writer(prepare_thinking_message(
+            EXTERNAL_AGENT_NAME, "Drafting interview plan..."))
+
+        initial_review = state.get("initial_review", "")
+        system_prompt = EXTERNAL_AGENT_SYSTEM_PROMPT
+        parser = PydanticOutputParser(pydantic_object=InterviewQuestionSets)
+        prompt = INTERVIEW_PLAN_DRAFT_PROMPT.format(
             initial_review=initial_review,
-            knowledge=str(enquiry_knowledge_json),
-            format=enquiry_parser.get_format_instructions()
+            knowledge=knowledge_json,
+            format=parser.get_format_instructions(),
         )
 
-        prompts = [SystemMessage(content=system_prompt), HumanMessage(
-            content=additional_enquiry_prompt)]
-        response = llm.invoke(input=prompts, temperature=0.0,
-                              max_tokens=4000, response_format={"type": "json_object"})
-        enquiry_content = response.content if isinstance(
+        prompts = [SystemMessage(content=system_prompt),
+                   HumanMessage(content=prompt)]
+
+        response = llm.invoke(
+            input=prompts,
+            temperature=0.0,
+            max_tokens=8192,
+            response_format={"type": "json_object"},
+        )
+        content = response.content if isinstance(
             response.content, str) else response.content[0]["text"]
-        parsed_enquiries: AdditionalEnquiriesSet = enquiry_parser.parse(
-            enquiry_content)
+        parsed: InterviewQuestionSets = parser.parse(content)
 
-        # interview plan section (commented out in source)
-        # ...
-
-        draft_plan = ExternalAgentPlan(
-            concern_set=parsed_questions,
-            document_set=parsed_doc,
-            enquiry_set=parsed_enquiries,
-            # interview_plan=parsed_interview_plan,
-            version=version,
-            created_at=datetime.utcnow().isoformat(),
-            update_notes=None
+        return Command(
+            goto="assemble_plan",
+            update={
+                "interview_plan": parsed,
+                "messages": messages + [AIMessage("Interview plan drafted.")],
+            },
         )
 
-    return Command(
-        goto="online_evaluation",
-        update={
-            "interview_plans": draft_plan,
-            # "pending_step": "plan_review",
-            # "hitl_task": hitl_task,
-            "messages": messages + [AIMessage("Proceeding to online evaluation.")],
-            # "hitl_decision": None,
-            "hitl_artifact": None,
-        },
-    )
+    def generate_interview_plan(state: "ExternalAgentState") -> Command:
+        """Sync wrapper for generate_interview_plan_async."""
+        try:
+            return asyncio.run(generate_interview_plan_async(state))
+        except RuntimeError:
+            loop = asyncio.get_event_loop()
+            return loop.run_until_complete(generate_interview_plan_async(state))
 
+    # --- Commented out: replaced by per-section generate nodes ---
+    # def generate_plan(state: "ExternalAgentState") -> Command:
+    #     runtime, writer, messages = _get_ctx(state)
+    #
+    #     decision = state.get("hitl_decision")
+    #     hitl_artifact = state.get("hitl_artifact") or {}
+    #     hitl_feedback = decision.task_summary if decision and decision.intent == "feedback" else ""
+    #
+    #     # Accept => persist edited plan and proceed to finalise
+    #     if decision and decision.intent == "accept" and hitl_artifact:
+    #         interview_plan = hitl_artifact
+    #         return Command(
+    #             goto="finalise_plan",
+    #             update={
+    #                 "interview_plans": interview_plan,
+    #                 "messages": messages + [AIMessage("Interview plan accepted.")],
+    #                 "pending_step": None,
+    #                 "hitl_artifact": None,
+    #             },
+    #         )
+    #
+    #     initial_review = state.get("initial_review", "")
+    #     additional_info = state.get("additional_info", "")
+    #     knowledge_report = state.get("knowledge")
+    #     doc_knowledge_json = knowledge_report.model_dump_json(indent=2, exclude_none=True, include={"document_set"})
+    #     enquiry_knowledge_json = knowledge_report.model_dump_json(indent=2, exclude_none=True, include={"enquiries_rationale"})
+    #
+    #     prev_plan = state.get("interview_plans") or {}
+    #     prev_version = getattr(prev_plan, "version", None)
+    #     if prev_version is None and isinstance(prev_plan, dict):
+    #         prev_version = prev_plan.get("version", 0)
+    #     version = prev_version + 1
+    #
+    #     online_feedback = state.get("online_eval", {}).get("per_metric", [])
+    #     online_feedback_block = (
+    #         "\n\n".join(f"Metric: {f['metric_id']} \nSuggestions: {f['suggestions']}" for f in online_feedback)
+    #         if online_feedback else ""
+    #     )
+    #     feedback = (hitl_feedback).strip()
+    #
+    #     system_prompt = EXTERNAL_AGENT_SYSTEM_PROMPT
+    #
+    #     if feedback:
+    #         # feedback path
+    #         pass
+    #     else:
+    #         # draft path — key concerns, doc request, additional enquiries sequentially
+    #         pass
+    #
+    #     return Command(goto="online_evaluation", update={...})
 
-def finalise_plan(state: "InterviewPlanState") -> Command:
-    writer: StreamWriter = get_stream_writer()
-    messages = state.get("messages", [])
+    # ------------------------------------
+    # Assembly and finalisation nodes
+    # ------------------------------------
 
-    custom_message = prepare_thinking_message(
-        EXTERNAL_AGENT_NAME, "Finalising instructions for external agent...")
-    writer(custom_message)
+    def assemble_plan(state: "ExternalAgentState") -> Command:
+        """Collect per-section outputs and assemble ExternalAgentPlan."""
+        writer: StreamWriter = get_stream_writer()
+        messages = state.get("messages", [])
 
-    # final_strategy = state.get("interview_strategy")
-    final_plan = state.get("interview_plans")
-    claim_id = state.get("claim_id")
-    online_eval = state.get("online_eval")
-    per_metric = (online_eval.get("per_metric") or [])
-    composite = (online_eval.get("composite") or {})
+        writer(prepare_thinking_message(
+            EXTERNAL_AGENT_NAME, "Assembling external agent plan..."))
 
-    artifact = build_form_final(
-        claim_id=claim_id,
-        # interview_strategy=final_strategy,
-        interview_plan=final_plan,
-        per_metric=per_metric,
-        composite=composite,
-        max_score=4
-    )
+        key_concerns = state.get("key_concerns")
+        doc_request = state.get("doc_request")
+        additional_enquiries = state.get("additional_enquiries")
+        # interview_plan = state.get("interview_plan")
 
-    return Command(
-        update={
-            "messages": messages + [AIMessage("Final interview plan submitted. Note: You are not able to provide any further feedback in the current session.")],
-            "artifact": artifact,
-            "pending_step": None,
+        plan = ExternalAgentPlan(
+            concern_set=key_concerns if key_concerns else KeyConcernSet(concern_set=[]),
+            document_set=doc_request if doc_request else DocRequestSet(document_set=[]),
+            enquiry_set=additional_enquiries if additional_enquiries else AdditionalEnquiriesSet(enquiries_set=[]),
+            # interview_plan=interview_plan,
+            version=1,
+            created_at=datetime.utcnow().isoformat(),
+            update_notes=None,
+        )
+
+        return Command(
+            goto="finalise_plan",
+            update={
+                "external_agent_plan": plan,
+                "messages": messages + [AIMessage("External agent plan assembled.")],
+            },
+        )
+
+    def finalise_plan(state: "ExternalAgentState") -> Command:
+        writer: StreamWriter = get_stream_writer()
+        messages = state.get("messages", [])
+
+        custom_message = prepare_thinking_message(
+            EXTERNAL_AGENT_NAME, "Finalising instructions for external agent...")
+        writer(custom_message)
+
+        final_plan = state.get("external_agent_plan")
+        claim_id = state.get("claim_id")
+
+        # TODO: build_form_final needs to be implemented in utils.py
+        artifact = {
+            "claim_id": claim_id,
+            "external_agent_plan": final_plan.model_dump(exclude_none=True) if final_plan else {},
         }
-    )
+
+        return Command(
+            update={
+                "messages": messages + [AIMessage("Final external agent instructions submitted.")],
+                "artifact": artifact,
+                "pending_step": None,
+            }
+        )
+
+    # ------------------------------------
+    # Routing
+    # ------------------------------------
+
+    def route_sections(state: "ExternalAgentState") -> list[Send]:
+        """
+        Fan-out to per-section nodes based on selected_sections.
+        Key concerns always runs. Other sections run if selected.
+        """
+        sends = [Send("generate_key_concerns", state)]
+
+        selected = state.get("selected_sections", []) or []
+        if "doc_request" in selected:
+            sends.append(Send("generate_doc_request", state))
+        if "additional_enquiries" in selected:
+            sends.append(Send("generate_enquiries", state))
+        if "interview_plan" in selected:
+            sends.append(Send("generate_interview_plan", state))
+
+        return sends
+
+    # ------------------------------------
+    # Graph
+    # ------------------------------------
 
     graph = (
-        StateGraph(InterviewPlanState)
+        StateGraph(ExternalAgentState)
         .add_node("initialise_query", initialise_query)
-        .add_node("retrieve_knowledge", retrieve_knowledge)
-        # .add_node("generate_strategy", generate_strategy)
-        .add_node("generate_plan", generate_plan)
-        .add_node("online_evaluation", online_evaluation)
+        .add_node("dispatch_sections", dispatch_sections)
+        .add_node("generate_key_concerns", generate_key_concerns)
+        .add_node("generate_doc_request", generate_doc_request)
+        .add_node("generate_enquiries", generate_enquiries)
+        .add_node("generate_interview_plan", generate_interview_plan)
+        .add_node("assemble_plan", assemble_plan)
         .add_node("finalise_plan", finalise_plan)
         .add_node("route_interrupt", route_interrupt)
         .add_edge(START, "initialise_query")
-        # .add_edge("retrieve_knowledge", "generate_strategy")
-        .add_edge("retrieve_knowledge", "generate_plan")
+        .add_conditional_edges("dispatch_sections", route_sections)
+        .add_edge("generate_key_concerns", "assemble_plan")
+        .add_edge("generate_doc_request", "assemble_plan")
+        .add_edge("generate_enquiries", "assemble_plan")
+        .add_edge("generate_interview_plan", "assemble_plan")
+        .add_edge("assemble_plan", "finalise_plan")
         .add_edge("finalise_plan", END)
     )
 
