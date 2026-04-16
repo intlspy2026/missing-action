@@ -49,7 +49,7 @@ from langchain_core.messages import AIMessage, HumanMessage, ToolMessage, BaseMe
 from langchain_core.language_models.chat_models import BaseChatModel
 from langgraph.graph import StateGraph, START, END, MessagesState
 from langgraph.config import get_stream_writer
-from langgraph.types import Command, interrupt, StreamWriter, Send
+from langgraph.types import Command, interrupt, StreamWriter
 from langgraph.runtime import Runtime, get_runtime
 from copy import deepcopy
 import json
@@ -648,10 +648,15 @@ def get_graph(llm: BaseChatModel) -> StateGraph:
         )
 
     def dispatch_sections(state: "ExternalAgentState") -> Command:
-        """Thin node that triggers conditional fan-out via route_sections."""
+        """Thin node that kicks off sequential section generation."""
         messages = state.get("messages", [])
         return Command(
-            update={"messages": messages + [AIMessage("Dispatching section generation...")]},
+            goto="generate_key_concerns",
+            update={
+                "hitl_decision": None,
+                "hitl_artifact": None,
+                "messages": messages + [AIMessage("Dispatching section generation...")],
+            },
         )
 
     # ------------------------------------
@@ -1295,23 +1300,6 @@ def get_graph(llm: BaseChatModel) -> StateGraph:
     # Routing
     # ------------------------------------
 
-    def route_sections(state: "ExternalAgentState") -> list[Send]:
-        """
-        Fan-out to per-section nodes based on selected_sections.
-        Key concerns always runs. Other sections run if selected.
-        """
-        sends = [Send("generate_key_concerns", state)]
-
-        selected = state.get("selected_sections", []) or []
-        if "doc_request" in selected:
-            sends.append(Send("generate_doc_request", state))
-        if "additional_enquiries" in selected:
-            sends.append(Send("generate_enquiries", state))
-        if "interview_plan" in selected:
-            sends.append(Send("generate_interview_plan", state))
-
-        return sends
-
     # ------------------------------------
     # Graph
     # ------------------------------------
@@ -1328,11 +1316,7 @@ def get_graph(llm: BaseChatModel) -> StateGraph:
         .add_node("finalise_plan", finalise_plan)
         .add_node("route_interrupt", route_interrupt)
         .add_edge(START, "initialise_query")
-        .add_conditional_edges("dispatch_sections", route_sections)
-        .add_edge("generate_key_concerns", "assemble_plan")
-        .add_edge("generate_doc_request", "assemble_plan")
-        .add_edge("generate_enquiries", "assemble_plan")
-        .add_edge("generate_interview_plan", "assemble_plan")
+        .add_edge("dispatch_sections", "generate_key_concerns")
         .add_edge("assemble_plan", "finalise_plan")
         .add_edge("finalise_plan", END)
     )
