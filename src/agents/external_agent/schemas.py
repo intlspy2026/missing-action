@@ -40,6 +40,8 @@ class InterviewQuestion(BaseModel):
 
 class InterviewQuestionSets(BaseModel):
     question_sets: List[InterviewQuestion]
+    version: int = 1
+    update_notes: Optional[str] = None
 
 
 class KeyConcern(BaseModel):
@@ -49,6 +51,8 @@ class KeyConcern(BaseModel):
 
 class KeyConcernSet(BaseModel):
     concern_set: List[KeyConcern]
+    version: int = 1
+    update_notes: Optional[str] = None
 
 
 class DocRequest(BaseModel):
@@ -58,6 +62,8 @@ class DocRequest(BaseModel):
 
 class DocRequestSet(BaseModel):
     document_set: List[DocRequest]
+    version: int = 1
+    update_notes: Optional[str] = None
 
 
 class AdditionalEnquiries(BaseModel):
@@ -67,6 +73,8 @@ class AdditionalEnquiries(BaseModel):
 
 class AdditionalEnquiriesSet(BaseModel):
     enquiries_set: List[AdditionalEnquiries]
+    version: int = 1
+    update_notes: Optional[str] = None
 
 
 # --- Commented out: leftover from interview plans agent ---
@@ -132,6 +140,11 @@ class ExternalAgentState(MessagesState):
     doc_request: Optional[DocRequestSet] = None
     additional_enquiries: Optional[AdditionalEnquiriesSet] = None
     interview_plan: Optional[InterviewQuestionSets] = None
+
+    # Per-section synthesized knowledge (cached for feedback regeneration)
+    doc_request_knowledge: Optional[str] = None
+    enquiries_knowledge: Optional[str] = None
+    interview_plan_knowledge: Optional[str] = None
 
     # Final assembled output
     external_agent_plan: Optional[ExternalAgentPlan] = None
