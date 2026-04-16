@@ -5,9 +5,10 @@ from datetime import datetime
 from langgraph.graph import StateGraph, START, END, MessagesState
 
 
-class SmartInvestigatorAgentState(MessagesState):
-    artifact: dict[str, Any]
-    resume: bool
+# --- Commented out: duplicate of SmartInvestigatorAgentState in foundation ---
+# class SmartInvestigatorAgentState(MessagesState):
+#     artifact: dict[str, Any]
+#     resume: bool
 
 
 class Reference(BaseModel):
@@ -15,18 +16,20 @@ class Reference(BaseModel):
     source: str
 
 
-class InterviewObjective(BaseModel):
-    objective_title: str = Field(
-        description="Brief 1-4 word label"
-    )
-    objective: str
-    supporting_evidence: Optional[List[Reference]] = None
+# --- Commented out: leftover from interview plans agent ---
+# class InterviewObjective(BaseModel):
+#     objective_title: str = Field(
+#         description="Brief 1-4 word label"
+#     )
+#     objective: str
+#     supporting_evidence: Optional[List[Reference]] = None
 
 
-class InterviewStrategy(BaseModel):
-    aim: str
-    objectives: List[InterviewObjective]
-    update_notes: Optional[str] = None
+# --- Commented out: leftover from interview plans agent ---
+# class InterviewStrategy(BaseModel):
+#     aim: str
+#     objectives: List[InterviewObjective]
+#     update_notes: Optional[str] = None
 
 
 class InterviewQuestion(BaseModel):
@@ -37,6 +40,8 @@ class InterviewQuestion(BaseModel):
 
 class InterviewQuestionSets(BaseModel):
     question_sets: List[InterviewQuestion]
+    version: int = 1
+    update_notes: Optional[str] = None
 
 
 class KeyConcern(BaseModel):
@@ -46,6 +51,8 @@ class KeyConcern(BaseModel):
 
 class KeyConcernSet(BaseModel):
     concern_set: List[KeyConcern]
+    version: int = 1
+    update_notes: Optional[str] = None
 
 
 class DocRequest(BaseModel):
@@ -55,6 +62,8 @@ class DocRequest(BaseModel):
 
 class DocRequestSet(BaseModel):
     document_set: List[DocRequest]
+    version: int = 1
+    update_notes: Optional[str] = None
 
 
 class AdditionalEnquiries(BaseModel):
@@ -64,15 +73,18 @@ class AdditionalEnquiries(BaseModel):
 
 class AdditionalEnquiriesSet(BaseModel):
     enquiries_set: List[AdditionalEnquiries]
-
-
-class InterviewPlan(BaseModel):
-    question_sets: List[InterviewQuestion]
-    additional_evidence_requests: List[str]
-    version: int
-    created_at: str = Field(
-        default_factory=lambda: datetime.utcnow().isoformat())
+    version: int = 1
     update_notes: Optional[str] = None
+
+
+# --- Commented out: leftover from interview plans agent ---
+# class InterviewPlan(BaseModel):
+#     question_sets: List[InterviewQuestion]
+#     additional_evidence_requests: List[str]
+#     version: int
+#     created_at: str = Field(
+#         default_factory=lambda: datetime.utcnow().isoformat())
+#     update_notes: Optional[str] = None
 
 
 class ExternalAgentPlan(BaseModel):
@@ -96,22 +108,12 @@ class Knowledge(BaseModel):
 class KnowledgeSet(BaseModel):
     knowledge: List[Knowledge]
 
+
+# --- Commented out: replaced by per-section synthesis using existing schemas ---
 # class KnowledgeReport(BaseModel):
-#     interview_aim: str
-#     best_practices: str
-#     example_questions_by_category: Dict[str, Any]
-#     underwriting_questions: Optional[List[str]] = None
-#     financial_history_questions: Optional[List[str]] = None
-
-# class SearchesKnowledge(BaseModel):
-#     key_concern: str
-#     description: str
-
-
-class KnowledgeReport(BaseModel):
-    document_set: DocRequestSet
-    enquiries_rationale: List[str]
-    interview_plan: InterviewQuestionSets
+#     document_set: DocRequestSet
+#     enquiries_rationale: List[str]
+#     interview_plan: InterviewQuestionSets
 
 
 class HITLDecision(BaseModel):
@@ -119,8 +121,8 @@ class HITLDecision(BaseModel):
     task_summary: str
 
 
-class InterviewPlanState(MessagesState):
-    """A single state for the interview plans system."""
+class ExternalAgentState(MessagesState):
+    """State for the external agent investigation instructions system."""
     # Case context
     claim_id: str
     brand: str
@@ -128,28 +130,31 @@ class InterviewPlanState(MessagesState):
     additional_info: Optional[str] = None
     lob: str
     investigation_type: List[str]
-    # interviewee: str
     investigation_scope: str
-    # full_investigation: Optional[str] = None
-    # additional_enquiries: Optional[str] = None
 
-    # Outputs of sub-agents/nodes
-    knowledge: Optional[KnowledgeReport] = None
-    # interview_strategy: Optional[InterviewStrategy] = None
-    interview_plans: Optional[InterviewQuestionSets] = None
-    online_eval: Optional[Dict[str, Any]] = None
+    # User-selected sections (key_concerns always generated regardless)
+    selected_sections: List[Literal["doc_request", "additional_enquiries", "interview_plan"]]
 
+    # Per-section outputs
+    key_concerns: Optional[KeyConcernSet] = None
+    doc_request: Optional[DocRequestSet] = None
+    additional_enquiries: Optional[AdditionalEnquiriesSet] = None
+    interview_plan: Optional[InterviewQuestionSets] = None
+
+    # Final assembled output
+    external_agent_plan: Optional[ExternalAgentPlan] = None
+
+    # HITL / control flow
     artifact: dict[str, Any]
     resume: bool
-    pending_step: Optional[Literal["init",
-                                   "strategy_review", "plan_review"]] = None
+    pending_step: Optional[str] = None
     hitl_decision: Optional[HITLDecision] = None
     hitl_artifact: Optional[dict[str, Any]] = None
     hitl_task: Optional[str] = None
 
 
-class InterviewPlanStruct(BaseModel):
-    claim_id: Optional[str] = None
-    lob: Optional[str] = None
-    investigation_type: Optional[List[str]] = None
-    # interviewee: Optional[str] = None
+# --- Commented out: leftover from interview plans agent ---
+# class InterviewPlanStruct(BaseModel):
+#     claim_id: Optional[str] = None
+#     lob: Optional[str] = None
+#     investigation_type: Optional[List[str]] = None
