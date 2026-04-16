@@ -141,6 +141,11 @@ class ExternalAgentState(MessagesState):
     additional_enquiries: Optional[AdditionalEnquiriesSet] = None
     interview_plan: Optional[InterviewQuestionSets] = None
 
+    # Per-section synthesized knowledge (cached for feedback regeneration)
+    doc_request_knowledge: Optional[str] = None
+    enquiries_knowledge: Optional[str] = None
+    interview_plan_knowledge: Optional[str] = None
+
     # Final assembled output
     external_agent_plan: Optional[ExternalAgentPlan] = None
 
