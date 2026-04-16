@@ -19,7 +19,7 @@ from agents.external_agent.prompt_manager.external_agent_prompts import (
 )
 # --- Commented out: unused imports ---
 # from agents.external_agent.prompt_manager.interview_strategy_prompts import INTERVIEW_STRATEGY_SYSTEM_PROMPT, INTERVIEW_STRATEGY_DRAFT_PROMPT, INTERVIEW_STRATEGY_FEEDBACK_PROMPT
-# from agents.external_agent.prompt_manager.external_agent_prompts import INTERVIEW_DOC_REQUEST_PROMPT, INTERVIEW_PLAN_FEEDBACK_PROMPT
+# from agents.external_agent.prompt_manager.external_agent_prompts import INTERVIEW_DOC_REQUEST_PROMPT
 # from agents.external_agent.prompt_manager.online_eval_prompts import eval_user_msg_template, eval_sys_msg_template
 # from agents.external_agent.prompt_manager.knowledge_prompts import KNOWLEDGE_REPORT_SYSTEM_PROMPT, KNOWLEDGE_REPORT_PROMPT
 from agents.external_agent.tools.query_investigation_processes import query_investigation_processes
