@@ -188,10 +188,6 @@ def get_graph(llm: BaseChatModel) -> StateGraph:
                     return previous
             return previous
 
-        # plan_review: pass through raw
-        if pending_step == "plan_review":
-            return incoming_artifact if incoming_artifact else state.get("external_agent_plan")
-
         # For init/unknown, nothing sensible to fall back to
         return incoming_artifact
 
