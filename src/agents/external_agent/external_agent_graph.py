@@ -25,8 +25,14 @@ from agents.external_agent.prompt_manager.external_agent_prompts import (
 from agents.external_agent.tools.query_investigation_processes import query_investigation_processes
 from agents.external_agent.tools.think_tool import think_tool
 from agents.external_agent.tools.search_complete import search_complete
-# --- Commented out: utils.py is empty ---
-# from agents.external_agent.utils import build_form_info, build_form_strategy, parse_form_to_interview_strategy, build_form_plan, parse_form_to_interview_plan, build_form_final
+from agents.external_agent.utils import (
+    build_form_info,
+    build_form_key_concerns, parse_form_to_key_concerns,
+    build_form_doc_request, parse_form_to_doc_request,
+    build_form_enquiries, parse_form_to_enquiries,
+    build_form_interview_plan, parse_form_to_interview_plan,
+    build_form_final,
+)
 from smart_investigator.foundation.utils.utils import prepare_thinking_message, prepare_hitl_task
 from agents.external_agent.schemas import (
     InterviewQuestion, InterviewQuestionSets,
@@ -161,22 +167,30 @@ def get_graph(llm: BaseChatModel) -> StateGraph:
         """
         If the frontend didn't send an artifact (common for feedback-only resumes),
         fall back to the last generated output stored in state for the relevant step.
+        For section review steps, parse incoming form payload through the appropriate parser.
         """
         incoming_artifact = incoming_artifact or {}
 
-        step_to_state_key = {
-            "key_concerns_review": "key_concerns",
-            "doc_request_review": "doc_request",
-            "enquiries_review": "additional_enquiries",
-            "interview_plan_review": "interview_plan",
-            "plan_review": "external_agent_plan",
+        step_to_parser = {
+            "key_concerns_review": (parse_form_to_key_concerns, "key_concerns"),
+            "doc_request_review": (parse_form_to_doc_request, "doc_request"),
+            "enquiries_review": (parse_form_to_enquiries, "additional_enquiries"),
+            "interview_plan_review": (parse_form_to_interview_plan, "interview_plan"),
         }
 
-        state_key = step_to_state_key.get(pending_step)
-        if state_key:
+        if pending_step in step_to_parser:
+            parser_fn, state_key = step_to_parser[pending_step]
+            previous = state.get(state_key)
             if incoming_artifact:
-                return incoming_artifact
-            return state.get(state_key)
+                try:
+                    return parser_fn(incoming_artifact, previous=previous)
+                except Exception:
+                    return previous
+            return previous
+
+        # plan_review: pass through raw
+        if pending_step == "plan_review":
+            return incoming_artifact if incoming_artifact else state.get("external_agent_plan")
 
         # For init/unknown, nothing sensible to fall back to
         return incoming_artifact
@@ -620,9 +634,7 @@ def get_graph(llm: BaseChatModel) -> StateGraph:
 
         # Otherwise: prompt user with form via HITL
         text = "Hi! I am the External Agent - I can assist you in writing instructions for external agent appointment. To begin, please proceed to fill out the form..."
-        # TODO: build_form_info needs to be implemented in utils.py
-        # artifact = build_form_info(form_config)
-        artifact = {}
+        artifact = build_form_info(form_config)
         hitl_task = prepare_hitl_task(
             agent_name=EXTERNAL_AGENT_NAME,
             text=text,
@@ -673,7 +685,9 @@ def get_graph(llm: BaseChatModel) -> StateGraph:
 
         # --- Accept path: persist and move to next section ---
         if decision and decision.intent == "accept":
-            if hitl_artifact and isinstance(hitl_artifact, dict):
+            if isinstance(hitl_artifact, KeyConcernSet):
+                accepted = hitl_artifact
+            elif hitl_artifact and isinstance(hitl_artifact, dict):
                 try:
                     accepted = KeyConcernSet(**hitl_artifact)
                 except Exception:
@@ -740,7 +754,7 @@ def get_graph(llm: BaseChatModel) -> StateGraph:
         parsed: KeyConcernSet = parser.parse(content)
 
         # Send to HITL review
-        artifact = parsed.model_dump(exclude_none=True)
+        artifact = build_form_key_concerns(parsed)
         text = "Key concerns drafted. Please review and provide feedback or accept."
         hitl_task = prepare_hitl_task(
             agent_name=EXTERNAL_AGENT_NAME,
@@ -773,7 +787,9 @@ def get_graph(llm: BaseChatModel) -> StateGraph:
 
         # --- Accept path ---
         if decision and decision.intent == "accept":
-            if hitl_artifact and isinstance(hitl_artifact, dict):
+            if isinstance(hitl_artifact, DocRequestSet):
+                accepted = hitl_artifact
+            elif hitl_artifact and isinstance(hitl_artifact, dict):
                 try:
                     accepted = DocRequestSet(**hitl_artifact)
                 except Exception:
@@ -869,7 +885,7 @@ def get_graph(llm: BaseChatModel) -> StateGraph:
         parsed: DocRequestSet = parser.parse(content)
 
         # Send to HITL review
-        artifact = parsed.model_dump(exclude_none=True)
+        artifact = build_form_doc_request(parsed)
         text = "Document requests drafted. Please review and provide feedback or accept."
         hitl_task = prepare_hitl_task(
             agent_name=EXTERNAL_AGENT_NAME,
@@ -912,7 +928,9 @@ def get_graph(llm: BaseChatModel) -> StateGraph:
 
         # --- Accept path ---
         if decision and decision.intent == "accept":
-            if hitl_artifact and isinstance(hitl_artifact, dict):
+            if isinstance(hitl_artifact, AdditionalEnquiriesSet):
+                accepted = hitl_artifact
+            elif hitl_artifact and isinstance(hitl_artifact, dict):
                 try:
                     accepted = AdditionalEnquiriesSet(**hitl_artifact)
                 except Exception:
@@ -1007,7 +1025,7 @@ def get_graph(llm: BaseChatModel) -> StateGraph:
         parsed: AdditionalEnquiriesSet = parser.parse(content)
 
         # Send to HITL review
-        artifact = parsed.model_dump(exclude_none=True)
+        artifact = build_form_enquiries(parsed)
         text = "Additional enquiries drafted. Please review and provide feedback or accept."
         hitl_task = prepare_hitl_task(
             agent_name=EXTERNAL_AGENT_NAME,
@@ -1048,7 +1066,9 @@ def get_graph(llm: BaseChatModel) -> StateGraph:
 
         # --- Accept path (interview_plan is always last → assemble_plan) ---
         if decision and decision.intent == "accept":
-            if hitl_artifact and isinstance(hitl_artifact, dict):
+            if isinstance(hitl_artifact, InterviewQuestionSets):
+                accepted = hitl_artifact
+            elif hitl_artifact and isinstance(hitl_artifact, dict):
                 try:
                     accepted = InterviewQuestionSets(**hitl_artifact)
                 except Exception:
@@ -1153,7 +1173,7 @@ def get_graph(llm: BaseChatModel) -> StateGraph:
         parsed: InterviewQuestionSets = parser.parse(content)
 
         # Send to HITL review
-        artifact = parsed.model_dump(exclude_none=True)
+        artifact = build_form_interview_plan(parsed)
         text = "Interview plan drafted. Please review and provide feedback or accept."
         hitl_task = prepare_hitl_task(
             agent_name=EXTERNAL_AGENT_NAME,
@@ -1282,11 +1302,7 @@ def get_graph(llm: BaseChatModel) -> StateGraph:
         final_plan = state.get("external_agent_plan")
         claim_id = state.get("claim_id")
 
-        # TODO: build_form_final needs to be implemented in utils.py
-        artifact = {
-            "claim_id": claim_id,
-            "external_agent_plan": final_plan.model_dump(exclude_none=True) if final_plan else {},
-        }
+        artifact = build_form_final(claim_id, final_plan) if final_plan else {}
 
         return Command(
             update={
