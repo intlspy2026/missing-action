@@ -196,6 +196,10 @@ def get_graph(llm: BaseChatModel) -> StateGraph:
                         getattr(parsed, "question_sets", None)
                     )
                     if not parsed_list and previous:
+                        _, writer, _ = _get_ctx(state)
+                        writer(prepare_thinking_message(
+                            EXTERNAL_AGENT_NAME,
+                            f"Parsed artifact for {pending_step} returned empty result — falling back to previous content."))
                         return previous
                     return parsed
                 except Exception:
