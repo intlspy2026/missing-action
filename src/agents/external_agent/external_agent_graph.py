@@ -163,11 +163,13 @@ def get_graph(llm: BaseChatModel) -> StateGraph:
         # unknown step -> restart
         return "initialise_query"
 
-    def _resolve_hitl_artifact(state: "ExternalAgentState", pending_step: str, incoming_artifact: dict | None) -> Any:
+    def _resolve_hitl_artifact(state: "ExternalAgentState", pending_step: str, incoming_artifact: dict | None, *, intent: str = "") -> Any:
         """
         If the frontend didn't send an artifact (common for feedback-only resumes),
         fall back to the last generated output stored in state for the relevant step.
-        For section review steps, parse incoming form payload through the appropriate parser.
+        For section review steps on accept, parse incoming form payload through the
+        appropriate parser. For feedback, always return the previous state output —
+        the user is providing text feedback, not editing the form.
         """
         incoming_artifact = incoming_artifact or {}
 
@@ -181,9 +183,21 @@ def get_graph(llm: BaseChatModel) -> StateGraph:
         if pending_step in step_to_parser:
             parser_fn, state_key = step_to_parser[pending_step]
             previous = state.get(state_key)
-            if incoming_artifact:
+            # Only parse form submission on accept; for feedback return previous as-is
+            if intent == "accept" and incoming_artifact:
                 try:
-                    return parser_fn(incoming_artifact, previous=previous)
+                    parsed = parser_fn(incoming_artifact, previous=previous)
+                    # If parsing produced empty output but previous has content,
+                    # the wrong form artifact was sent — fall back to previous
+                    parsed_list = (
+                        getattr(parsed, "concern_set", None) or
+                        getattr(parsed, "document_set", None) or
+                        getattr(parsed, "enquiries_set", None) or
+                        getattr(parsed, "question_sets", None)
+                    )
+                    if not parsed_list and previous:
+                        return previous
+                    return parsed
                 except Exception:
                     return previous
             return previous
@@ -537,7 +551,7 @@ def get_graph(llm: BaseChatModel) -> StateGraph:
 
         hitl_decision = _classify_hitl(hitl_text, incoming_artifact, prev_task)
         hitl_artifact = _resolve_hitl_artifact(
-            state, pending_step, incoming_artifact)
+            state, pending_step, incoming_artifact, intent=hitl_decision.intent)
 
         intent = hitl_decision.intent
         task_summary = hitl_decision.task_summary
