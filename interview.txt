@@ -50,3 +50,94 @@ Q3: Compress a String (Easy)
       return result
 
   What to look for: Clean recursion. Correct prefix handling (no leading dot). Bonus: handles list values or mixed types gracefully.
+
+---
+  RAG Questions
+
+  ---
+  Q1: Scale RAG to 1 Million Documents
+
+  You have 1M documents in a RAG pipeline. Retrieval is slow and results are noisy. How do you redesign the system?
+
+  Key discussion points:
+  - Indexing strategy — don't embed raw docs, chunk them (size/overlap tradeoffs). Use hierarchical chunking (paragraph → sentence level)
+  - Vector DB choice — Pinecone, Weaviate, Qdrant with HNSW indexing for ANN search. Not brute-force cosine over 1M vectors
+  - Filtering before retrieval — metadata filters (date, source, category) to narrow the search space before vector search
+  - Two-stage retrieval — fast BM25 keyword search first (sparse), then re-rank top-100 with dense embeddings. Hybrid search
+  - Re-ranking — use a cross-encoder (e.g. Cohere Rerank) on top-k results before passing to LLM
+  - Caching — cache embeddings for repeated queries, cache final answers for identical questions
+
+  Follow-up: How do you handle document updates — if a doc changes, how do you re-index without rebuilding everything?
+
+  ---
+  Q2: RAG Returns Outdated or Contradictory Information
+
+  Your RAG system retrieves 5 chunks but two of them contradict each other (e.g. one says policy X is valid, another says it was revoked). What do you do?
+
+  Key discussion points:
+  - At indexing time — attach metadata: source, timestamp, version. Prefer recent docs by boosting recency in ranking
+  - At retrieval time — surface metadata to the LLM so it can reason about which is newer
+  - Prompt design — instruct LLM: "If sources conflict, prefer the most recent. State the conflict explicitly rather than guessing"
+  - Conflict detection layer — post-retrieval step that checks if chunks semantically contradict (NLI model), flags them, and either resolves or surfaces the conflict to the user
+  - Source of truth tagging — mark certain sources as authoritative (e.g. official policy docs > forum posts)
+
+  Follow-up: How do you measure retrieval quality in production?
+
+  ---
+  Q3: RAG Latency is Too High for Real-Time Use
+
+  Your RAG pipeline takes 4 seconds end-to-end. Users expect <1s. Where do you optimize?
+
+  Key discussion points:
+  - Profile first — break down: embedding query (~50ms), vector search (~100ms), LLM call (~2-3s). LLM is usually the bottleneck
+  - Streaming — stream LLM tokens to the user instead of waiting for full response. Perceived latency drops dramatically
+  - Async retrieval — fire retrieval and any pre-processing in parallel
+  - Smaller embedding model — text-embedding-3-small vs large — 5x faster with minimal quality loss
+  - Query caching — semantic cache (e.g. GPTCache) — if new query is similar to a cached one, return cached answer
+  - Reduce context size — don't dump all 5 chunks into the prompt, re-rank and pass only top 2-3
+
+  ---
+  Agentic System Questions
+
+  ---
+  Q4: Agent with Conflicting Memories
+
+  Your agent has a memory store. A user told it "I prefer formal emails" in January, but said "write casually" in March. How do you handle conflicting memories?
+
+  Key discussion points:
+  - Timestamp all memories — newer memory wins for same-category conflicts
+  - Memory taxonomy — categorize memories: preference, fact, instruction. Conflicts within same category are resolved by recency; across categories by priority
+  - Confidence decay — older memories decay in weight over time
+  - Explicit conflict resolution — when conflict detected at retrieval time, ask the user: "You previously said X, but also Y — which should I follow?"
+  - Memory versioning — don't overwrite, append with timestamp. Keep history, surface the latest
+  - Scope-aware memory — some preferences are context-specific ("casual in Slack, formal in email") — store scope alongside the memory
+
+  Follow-up: How do you prevent memory poisoning — a user accidentally storing wrong info?
+
+  ---
+  Q5: Agent in an Infinite Loop
+
+  Your agentic system calls tools in a loop — it keeps searching for information it never finds and never terminates. How do you prevent and detect this?
+
+  Key discussion points:
+  - Step budget — hard cap on number of tool calls per task (e.g. max 15 steps). Agent must conclude or escalate
+  - Loop detection — hash (tool_name + arguments) for each call. If same call appears twice → break
+  - Progress check — after N steps, inject a meta-prompt: "Have you made progress? If not, stop and summarize what you found"
+  - State machine design — model agent as explicit states (planning → executing → reflecting → done). Transitions must be forward-only or explicitly allowed
+  - Timeout + fallback — wall-clock timeout triggers a graceful degradation: return best answer so far
+  - Observability — log every tool call with trace ID. Detect loops in monitoring before users do
+
+  ---
+  Q6: Multi-Agent Coordination — Who Does What?
+
+  You have 3 agents: a researcher, a writer, and a fact-checker. How do you coordinate them without them duplicating work or contradicting each other?
+
+  Key discussion points:
+  - Orchestrator pattern — one controller agent breaks the task and assigns sub-tasks. Agents don't communicate directly
+  - Shared state / blackboard — a central store all agents read/write. Each agent claims a task (with a lock) before starting
+  - Message passing — agents communicate via a queue (like actors). No shared mutable state
+  - Output contracts — define strict input/output schemas per agent. Fact-checker only sees writer's output, not raw research
+  - Idempotency — each agent's task should be safe to retry without side effects
+  - Conflict resolution — fact-checker has veto power; its output overrides writer if contradiction found
+
+  ---
