@@ -5,9 +5,11 @@ Compares two model versions side-by-side per case. For each (case, section, metr
 the judge sees both outputs and returns a verdict: A, B, or tie.
 
 Metrics per section:
-1. accuracy   (LLM-judge, pairwise) - which output is more grounded in source material?
-2. language   (LLM-judge, pairwise) - which output follows language guidelines better?
-3. item_count (deterministic, per-case diff) - directional signal on completeness
+1. accuracy             (LLM-judge, pairwise) - which output is more grounded in source material?
+2. language             (LLM-judge, pairwise) - which output follows language guidelines better?
+3. item_count           (deterministic, per-case diff) - directional signal on completeness
+4. avg_detail_words     (deterministic, per-case diff) - average words in the detail field per item;
+                        read alongside accuracy (high words + flat accuracy = padding)
 
 Expected dataframe columns (one row per case, both models' outputs in same row):
 - case_id                      identifier (e.g. "motor_001")
@@ -59,6 +61,7 @@ SECTIONS: Dict[str, Dict[str, Any]] = {
         "needs_investigation_processes": False,
         "knowledge_col": None,
         "list_field": "concern_set",
+        "detail_field": "rationale",
         "source_summary": (
             "Every concern must be traceable to evidence in INITIAL REVIEW or "
             "ADDITIONAL INFORMATION. No fabrication or unsupported inference."
@@ -73,6 +76,7 @@ SECTIONS: Dict[str, Dict[str, Any]] = {
         "needs_investigation_processes": True,
         "knowledge_col": "doc_request_knowledge",
         "list_field": "document_set",
+        "detail_field": "doc_details",
         "source_summary": (
             "Every doc_type must originate from INVESTIGATION PROCESSES. "
             "INITIAL REVIEW and ADDITIONAL INFORMATION provide case-specific "
@@ -85,6 +89,7 @@ SECTIONS: Dict[str, Dict[str, Any]] = {
         "needs_investigation_processes": True,
         "knowledge_col": "enquiries_knowledge",
         "list_field": "enquiries_set",
+        "detail_field": "enquiry_detail",
         "source_summary": (
             "Every enquiry topic must originate from INVESTIGATION PROCESSES. "
             "INITIAL REVIEW and ADDITIONAL INFORMATION provide case-specific "
@@ -231,6 +236,26 @@ def _count_items(output_str: Any, list_field: str) -> int:
     return 0
 
 
+def _avg_detail_words(output_str: Any, list_field: str, detail_field: str) -> float:
+    """Average word count of `detail_field` across items in `list_field`."""
+    if not output_str:
+        return 0.0
+    try:
+        data = json.loads(output_str) if isinstance(output_str, str) else output_str
+    except (json.JSONDecodeError, TypeError):
+        return 0.0
+    if not isinstance(data, dict):
+        return 0.0
+    items = data.get(list_field) or []
+    if not items:
+        return 0.0
+    total_words = sum(
+        len(str(item.get(detail_field, "") or "").split())
+        for item in items if isinstance(item, dict)
+    )
+    return total_words / len(items)
+
+
 # ============================================================
 # Top-level pairwise comparison
 # ============================================================
@@ -281,20 +306,30 @@ def compare_models(
                         "justification": justification,
                     })
 
-            # Deterministic count diffs
+            # Deterministic count + avg-detail-words diffs
             for section_key, cfg in SECTIONS.items():
-                count_a = _count_items(
-                    row.get(f"{section_key}_output_a"), cfg["list_field"]
+                output_a = row.get(f"{section_key}_output_a")
+                output_b = row.get(f"{section_key}_output_b")
+
+                count_a = _count_items(output_a, cfg["list_field"])
+                count_b = _count_items(output_b, cfg["list_field"])
+
+                avg_words_a = _avg_detail_words(
+                    output_a, cfg["list_field"], cfg["detail_field"]
                 )
-                count_b = _count_items(
-                    row.get(f"{section_key}_output_b"), cfg["list_field"]
+                avg_words_b = _avg_detail_words(
+                    output_b, cfg["list_field"], cfg["detail_field"]
                 )
+
                 count_rows.append({
                     "case_id": case_id,
                     "section": section_key,
                     "count_a": count_a,
                     "count_b": count_b,
-                    "diff_b_minus_a": count_b - count_a,
+                    "count_diff_b_minus_a": count_b - count_a,
+                    "avg_detail_words_a": avg_words_a,
+                    "avg_detail_words_b": avg_words_b,
+                    "avg_detail_words_diff_b_minus_a": avg_words_b - avg_words_a,
                 })
 
         df_verdicts = pd.DataFrame(verdict_rows)
@@ -316,7 +351,7 @@ def compare_models(
                 mlflow.log_metric(f"{section_key}_{metric_key}_b_win_rate", b_wins / total)
                 mlflow.log_metric(f"{section_key}_{metric_key}_tie_rate", ties / total)
 
-            # Count summaries
+            # Count + avg-detail-words summaries
             section_counts = df_counts[df_counts["section"] == section_key]
             if not section_counts.empty:
                 mlflow.log_metric(
@@ -327,7 +362,19 @@ def compare_models(
                 )
                 mlflow.log_metric(
                     f"{section_key}_count_diff_mean",
-                    float(section_counts["diff_b_minus_a"].mean()),
+                    float(section_counts["count_diff_b_minus_a"].mean()),
+                )
+                mlflow.log_metric(
+                    f"{section_key}_avg_detail_words_a_mean",
+                    float(section_counts["avg_detail_words_a"].mean()),
+                )
+                mlflow.log_metric(
+                    f"{section_key}_avg_detail_words_b_mean",
+                    float(section_counts["avg_detail_words_b"].mean()),
+                )
+                mlflow.log_metric(
+                    f"{section_key}_avg_detail_words_diff_mean",
+                    float(section_counts["avg_detail_words_diff_b_minus_a"].mean()),
                 )
 
         # Artifacts: per-case rows for drill-in analysis
