@@ -32,11 +32,16 @@ Usage:
         # Wrap whatever judge LLM client you have. Must return a string response.
         return judge_llm.invoke(prompt).content
 
+    from agents.external_agent.evals.migration_eval import compare_models, configure_judge
+
+    judge_invoke_fn = configure_judge(model="gpt-4o")  # or configure_judge(model="gpt-5.1") for the judge
+
     df_results = compare_models(
         df,
         model_a_name="gpt-4o",
         model_b_name="gpt-5.1",
-        judge_invoke_fn=judge_invoke,
+        judge_invoke_fn=judge_invoke_fn,
+        experiment_name="external_agent_model_migration",  # optional, this is the default
     )
     # Aggregates logged to MLflow; per-case verdicts also returned as a dataframe.
 """
@@ -45,10 +50,43 @@ import json
 import os
 import re
 import tempfile
-from typing import Dict, Any, List, Callable, Tuple
+from typing import Dict, Any, List, Callable, Tuple, Optional
 
 import pandas as pd
 import mlflow
+
+
+# ============================================================
+# Judge LLM configuration
+# ============================================================
+
+def configure_judge(model: str = "gpt-4o", temperature: float = 0.0) -> Callable[[str], str]:
+    """
+    Return a judge_invoke_fn suitable for compare_models.
+
+    Wraps a LangChain ChatOpenAI (or AzureChatOpenAI) instance.  The returned
+    callable accepts a prompt string and returns the model's text response.
+
+    Args:
+        model: model name passed to ChatOpenAI (e.g. "gpt-4o", "gpt-5.1")
+        temperature: sampling temperature — 0 for deterministic verdicts
+
+    Example::
+
+        judge_invoke_fn = configure_judge(model="gpt-4o")
+        df_results = compare_models(df, "gpt-4o", "gpt-5.1", judge_invoke_fn)
+    """
+    try:
+        from langchain_openai import AzureChatOpenAI
+        llm = AzureChatOpenAI(model=model, temperature=temperature)
+    except ImportError:
+        from langchain_openai import ChatOpenAI
+        llm = ChatOpenAI(model=model, temperature=temperature)
+
+    def _invoke(prompt: str) -> str:
+        return llm.invoke(prompt).content
+
+    return _invoke
 
 
 # ============================================================
@@ -265,20 +303,25 @@ def compare_models(
     model_a_name: str,
     model_b_name: str,
     judge_invoke_fn: Callable[[str], str],
+    experiment_name: str = "external_agent_model_migration",
 ) -> pd.DataFrame:
     """
     Run pairwise comparison between two model outputs across 3 sections and 2 LLM-judge metrics.
     Also computes deterministic item-count diffs per section.
 
     Logs to MLflow:
+      - experiment: experiment_name (created if it doesn't exist)
       - params: model_a, model_b, n_cases
       - metrics per (section, metric): a_win_rate, b_win_rate, tie_rate
-      - metrics per section: count_diff_mean, count_a_mean, count_b_mean
+      - metrics per section: count_diff_mean, count_a_mean, count_b_mean,
+                             avg_detail_words_a_mean, avg_detail_words_b_mean, avg_detail_words_diff_mean
       - artifacts: pairwise_results.csv (per-case verdicts), count_diffs.csv
 
     Returns the per-case verdict dataframe with columns:
         case_id, section, metric, verdict, justification
     """
+    mlflow.set_experiment(experiment_name)
+
     verdict_rows: List[Dict[str, Any]] = []
     count_rows: List[Dict[str, Any]] = []
 
