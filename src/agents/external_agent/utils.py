@@ -138,17 +138,11 @@ def build_form_key_concerns(key_concerns: KeyConcernSet) -> List[Dict[str, Any]]
     for idx, kc in enumerate(key_concerns.concern_set, start=1):
         components.append({
             "type": "textarea",
-            "id": f"concern_{idx}",
-            "label": f"Concern {idx}",
-            "placeholder": kc.concern,
-            "required": False,
-        })
-        components.append({
-            "type": "textarea",
             "id": f"rationale_{idx}",
-            "label": "Rationale",
-            "placeholder": kc.rationale,
+            "label": kc.concern,
+            "default_value": kc.rationale,
             "required": False,
+            "not_applicabel": True,
         })
 
     view_data: List[Dict[str, Any]] = [
@@ -182,18 +176,12 @@ def build_form_doc_request(doc_request: DocRequestSet) -> List[Dict[str, Any]]:
 
     for idx, dr in enumerate(doc_request.document_set, start=1):
         components.append({
-            "type": "text",
-            "id": f"doc_type_{idx}",
-            "label": f"Document Type {idx}",
-            "placeholder": dr.doc_type,
-            "required": False,
-        })
-        components.append({
             "type": "textarea",
             "id": f"doc_details_{idx}",
-            "label": "Details",
-            "placeholder": dr.doc_details,
+            "label": dr.doc_type,
+            "default_value": dr.doc_details,
             "required": False,
+            "not_applicabel": True,
         })
 
     view_data: List[Dict[str, Any]] = [
@@ -226,19 +214,20 @@ def build_form_enquiries(enquiries: AdditionalEnquiriesSet) -> List[Dict[str, An
     components: List[Dict[str, Any]] = []
 
     for idx, eq in enumerate(enquiries.enquiries_set, start=1):
-        components.append({
-            "type": "text",
-            "id": f"enquiry_{idx}",
-            "label": f"Enquiry {idx}",
-            "placeholder": eq.enquiry,
-            "required": False,
-        })
+        # components.append({
+        #     "type": "text",
+        #     "id": f"enquiry_{idx}",
+        #     "label": f"Enquiry {idx}",
+        #     "default_value": eq.enquiry,
+        #     "required": False,
+        # })
         components.append({
             "type": "textarea",
             "id": f"enquiry_detail_{idx}",
-            "label": "Detail",
-            "placeholder": eq.enquiry_detail,
+            "label": eq.enquiry,
+            "default_value": eq.enquiry_detail,
             "required": False,
+            "not_applicabel": True
         })
 
     view_data: List[Dict[str, Any]] = [
@@ -285,7 +274,7 @@ def build_form_interview_plan(interview_plan: InterviewQuestionSets) -> List[Dic
                 "type": "text",
                 "id": f"q_{q.question_id}",
                 "label": f"Question {q.question_id}",
-                "placeholder": q.question_text or "",
+                "default_value": q.question_text or "",
                 "required": False,
             })
         accordion_sections.append({"value": cat, "components": components})
@@ -324,35 +313,29 @@ def parse_form_to_key_concerns(
     *,
     previous: Optional[KeyConcernSet] = None,
 ) -> KeyConcernSet:
-    """Parse flat form payload back into KeyConcernSet."""
-    # Collect concern_{N} and rationale_{N} pairs
-    concerns: Dict[int, str] = {}
-    rationales: Dict[int, str] = {}
+    """Parse flat form payload back into KeyConcernSet.
 
+    Only rationale_{N} is in the payload (concern is the display label, not editable).
+    Concern is recovered from `previous` by 1-based position.
+    """
+    rationales: Dict[int, str] = {}
     for k, v in (form_payload or {}).items():
-        m = re.fullmatch(r"concern_(\d+)", str(k))
-        if m:
-            concerns[int(m.group(1))] = (v or "").strip()
         m = re.fullmatch(r"rationale_(\d+)", str(k))
         if m:
             rationales[int(m.group(1))] = (v or "").strip()
 
-    indices = sorted(set(concerns) | set(rationales))
-
-    prev_items = list(previous.concern_set) if previous and previous.concern_set else []
+    prev_items = list(
+        previous.concern_set) if previous and previous.concern_set else []
     items: List[KeyConcern] = []
 
-    for i, idx in enumerate(indices):
-        concern_text = concerns.get(idx, "")
-        rationale_text = rationales.get(idx, "")
-
-        # Carry forward rationale if concern text unchanged
-        if not rationale_text and i < len(prev_items):
-            if concern_text == prev_items[i].concern:
-                rationale_text = prev_items[i].rationale
-
+    for idx in sorted(rationales):
+        if idx - 1 >= len(prev_items):
+            continue
+        concern_text = prev_items[idx - 1].concern
+        rationale_text = rationales[idx]
         if concern_text:
-            items.append(KeyConcern(concern=concern_text, rationale=rationale_text))
+            items.append(KeyConcern(concern=concern_text,
+                         rationale=rationale_text))
 
     return KeyConcernSet(
         concern_set=items,
@@ -366,34 +349,29 @@ def parse_form_to_doc_request(
     *,
     previous: Optional[DocRequestSet] = None,
 ) -> DocRequestSet:
-    """Parse flat form payload back into DocRequestSet."""
-    doc_types: Dict[int, str] = {}
-    doc_details: Dict[int, str] = {}
+    """Parse flat form payload back into DocRequestSet.
 
+    Only doc_details_{N} is in the payload (doc_type is the display label, not editable).
+    doc_type is recovered from `previous` by 1-based position.
+    """
+    doc_details: Dict[int, str] = {}
     for k, v in (form_payload or {}).items():
-        m = re.fullmatch(r"doc_type_(\d+)", str(k))
-        if m:
-            doc_types[int(m.group(1))] = (v or "").strip()
         m = re.fullmatch(r"doc_details_(\d+)", str(k))
         if m:
             doc_details[int(m.group(1))] = (v or "").strip()
 
-    indices = sorted(set(doc_types) | set(doc_details))
-
-    prev_items = list(previous.document_set) if previous and previous.document_set else []
+    prev_items = list(
+        previous.document_set) if previous and previous.document_set else []
     items: List[DocRequest] = []
 
-    for i, idx in enumerate(indices):
-        doc_type_text = doc_types.get(idx, "")
-        doc_details_text = doc_details.get(idx, "")
-
-        # Carry forward details if doc_type unchanged
-        if not doc_details_text and i < len(prev_items):
-            if doc_type_text == prev_items[i].doc_type:
-                doc_details_text = prev_items[i].doc_details
-
+    for idx in sorted(doc_details):
+        if idx - 1 >= len(prev_items):
+            continue
+        doc_type_text = prev_items[idx - 1].doc_type
+        doc_details_text = doc_details[idx]
         if doc_type_text:
-            items.append(DocRequest(doc_type=doc_type_text, doc_details=doc_details_text))
+            items.append(DocRequest(doc_type=doc_type_text,
+                         doc_details=doc_details_text))
 
     return DocRequestSet(
         document_set=items,
@@ -407,34 +385,29 @@ def parse_form_to_enquiries(
     *,
     previous: Optional[AdditionalEnquiriesSet] = None,
 ) -> AdditionalEnquiriesSet:
-    """Parse flat form payload back into AdditionalEnquiriesSet."""
-    enquiries: Dict[int, str] = {}
-    enquiry_details: Dict[int, str] = {}
+    """Parse flat form payload back into AdditionalEnquiriesSet.
 
+    Only enquiry_detail_{N} is in the payload (enquiry is the display label, not editable).
+    enquiry is recovered from `previous` by 1-based position.
+    """
+    enquiry_details: Dict[int, str] = {}
     for k, v in (form_payload or {}).items():
-        m = re.fullmatch(r"enquiry_(\d+)", str(k))
-        if m:
-            enquiries[int(m.group(1))] = (v or "").strip()
         m = re.fullmatch(r"enquiry_detail_(\d+)", str(k))
         if m:
             enquiry_details[int(m.group(1))] = (v or "").strip()
 
-    indices = sorted(set(enquiries) | set(enquiry_details))
-
-    prev_items = list(previous.enquiries_set) if previous and previous.enquiries_set else []
+    prev_items = list(
+        previous.enquiries_set) if previous and previous.enquiries_set else []
     items: List[AdditionalEnquiries] = []
 
-    for i, idx in enumerate(indices):
-        enquiry_text = enquiries.get(idx, "")
-        detail_text = enquiry_details.get(idx, "")
-
-        # Carry forward detail if enquiry text unchanged
-        if not detail_text and i < len(prev_items):
-            if enquiry_text == prev_items[i].enquiry:
-                detail_text = prev_items[i].enquiry_detail
-
+    for idx in sorted(enquiry_details):
+        if idx - 1 >= len(prev_items):
+            continue
+        enquiry_text = prev_items[idx - 1].enquiry
+        detail_text = enquiry_details[idx]
         if enquiry_text:
-            items.append(AdditionalEnquiries(enquiry=enquiry_text, enquiry_detail=detail_text))
+            items.append(AdditionalEnquiries(
+                enquiry=enquiry_text, enquiry_detail=detail_text))
 
     return AdditionalEnquiriesSet(
         enquiries_set=items,
@@ -487,41 +460,49 @@ def parse_form_to_interview_plan(
 # Final output form
 # ------------------------------------
 
-def build_form_final(claim_id: str, external_agent_plan: ExternalAgentPlan) -> List[Dict[str, Any]]:
-    """Build read-only final output view for the assembled external agent plan."""
+def build_form_final(claim_id: str, external_agent_plan: ExternalAgentPlan, selected_sections: List[str]) -> List[Dict[str, Any]]:
+    """Build read-only final output view for the assembled external agent plan.
 
-    # Key Concerns section
-    concern_lines = ["### Key Concerns\n"]
-    for i, kc in enumerate(external_agent_plan.concern_set.concern_set or [], start=1):
-        concern_lines.append(f"**Concern {i}.** {kc.concern}")
-        if kc.rationale:
-            concern_lines.append(f"> {kc.rationale}")
-        concern_lines.append("")
-    concerns_markdown = "\n".join(concern_lines).strip() or "_No key concerns._"
-
-    # Document Requests section
-    doc_lines = ["### Document Requests\n"]
-    for dr in external_agent_plan.document_set.document_set or []:
-        doc_lines.append(f"**{dr.doc_type}:** {dr.doc_details}")
-        doc_lines.append("")
-    docs_markdown = "\n".join(doc_lines).strip() or "_No document requests._"
-
-    # Additional Enquiries section
-    enq_lines = ["### Additional Enquiries\n"]
-    for eq in external_agent_plan.enquiry_set.enquiries_set or []:
-        enq_lines.append(f"**{eq.enquiry}:** {eq.enquiry_detail}")
-        enq_lines.append("")
-    enquiries_markdown = "\n".join(enq_lines).strip() or "_No additional enquiries._"
+    selected_sections controls which optional sections are rendered.
+    Key concerns is always included (it is always generated regardless of selected_sections).
+    """
 
     view_data: List[Dict[str, Any]] = [
         {"type": "markdown", "data": {"content": "## Final External Agent Plan"}},
         {"type": "markdown", "data": {
             "content": f"Claim ID: {claim_id}  \nVersion: {external_agent_plan.version}  \nCreated: {external_agent_plan.created_at}"
         }},
-        {"type": "markdown", "data": {"content": concerns_markdown}},
-        {"type": "markdown", "data": {"content": docs_markdown}},
-        {"type": "markdown", "data": {"content": enquiries_markdown}},
     ]
+
+    # Key Concerns — always rendered
+    view_data.append({"type": "markdown", "data": {"content": "### Key Concerns"}})
+    concerns = external_agent_plan.concern_set.concern_set or []
+    if concerns:
+        for kc in concerns:
+            view_data.append({"type": "markdown", "data": {"content": kc.concern or ""}})
+            view_data.append({"type": "markdown", "data": {"content": kc.rationale or ""}})
+    else:
+        view_data.append({"type": "markdown", "data": {"content": "_No key concerns._"}})
+
+    if "doc_request" in selected_sections:
+        view_data.append({"type": "markdown", "data": {"content": "### Document Requests"}})
+        docs = external_agent_plan.document_set.document_set or []
+        if docs:
+            for dr in docs:
+                view_data.append({"type": "markdown", "data": {"content": dr.doc_type or ""}})
+                view_data.append({"type": "markdown", "data": {"content": dr.doc_details or ""}})
+        else:
+            view_data.append({"type": "markdown", "data": {"content": "_No document requests._"}})
+
+    if "additional_enquiries" in selected_sections:
+        view_data.append({"type": "markdown", "data": {"content": "### Additional Enquiries"}})
+        enquiries = external_agent_plan.enquiry_set.enquiries_set or []
+        if enquiries:
+            for eq in enquiries:
+                view_data.append({"type": "markdown", "data": {"content": eq.enquiry or ""}})
+                view_data.append({"type": "markdown", "data": {"content": eq.enquiry_detail or ""}})
+        else:
+            view_data.append({"type": "markdown", "data": {"content": "_No additional enquiries._"}})
 
     return [{
         "type": "workflow_stage",
