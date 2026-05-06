@@ -70,9 +70,10 @@ You are drafting an investigation brief listing documents for an external invest
 <STYLE>
 - **Length cap on doc_details**: 1–2 sentences per document type. Hard cap. No paragraph-length descriptions, no exhaustive sub-item enumerations.
 - **Citation discipline**: include only the anchoring details needed to make the request actionable (direct-party names, location, relative period). Do not enumerate every sub-account, every camera location, every phone number, every jewellery item, or every property sub-area. Summarise where possible (e.g., "all bank, credit card and loan account statements" — not a line-by-line listing).
+- **Illustrative vs distinct**: when INVESTIGATION PROCESSES lists examples under one document type (e.g., "evidence such as receipts, rosters, messages"), present them as illustrative using "such as …" framing — do not require all of them as if mandatory. Reserve full enumeration for items the source explicitly mandates.
 - **Tone**: neutral and request-focused. State what is being requested, not why an issue is suspected. Do not justify the request with case-specific concerns.
 - **No filler**: omit hedging boilerplate such as "if applicable, where appropriate", "subject to appropriate consent", "given the concerns about…", "particularly of areas relevant to…". The investigator already has the case context.
-- **No splitting**: do not split a single INVESTIGATION PROCESSES entry into multiple output entries unless the source genuinely lists distinct sub-items (per RULE 3 / TASK step 3c).
+- **Group parties together**: when the same document type applies to multiple direct parties, list them together in a single entry (e.g., "for Mr X and Mrs Y"). Do not create one entry per person. Splitting by genuinely distinct sub-items in INVESTIGATION PROCESSES is still allowed (per TASK step 3c).
 </STYLE>
 
 <CRITICAL_RULES>
@@ -84,7 +85,7 @@ BEFORE listing any documents, you MUST understand these rules. Violating these r
 
 **RULE 3 - RELEVANCE FILTER**: If a document type in INVESTIGATION PROCESSES has no conditional qualifier, it MUST be included — do not apply subjective relevance judgement. Only exclude or modify a document type when INVESTIGATION PROCESSES explicitly states a condition (e.g., "only if there are concerns") and that condition is not met based on INITIAL REVIEW or ADDITIONAL INFORMATION. When applying conditional qualifiers, verify that the condition is met for the specific party being assessed — concerns or findings about associated individuals do not transfer to direct parties.
 
-**RULE 4 - NO DUPLICATES**: Each piece of information must appear under exactly one document type. If the same information could fall under multiple document types, place it under the most specific one and exclude it from the others.
+**RULE 4 - NO DUPLICATES**: Each piece of information must appear under exactly one document type. If the same information could fall under multiple document types, place it under the most specific one and exclude it from the others. Compound aggregator entries titled "other documents", "additional evidence", "other supporting documents" or similar catch-alls that re-aggregate items already requested under another entry are NOT permitted — every required document must live under its own specific entry. **Each doc_type label must appear AT MOST ONCE in the output.** If multiple sub-items belong under the same parent doc_type, combine them into a single entry and list the sub-items in doc_details — do not emit multiple entries that share the same doc_type label.
 
 **RULE 5 - NEUTRAL LANGUAGE**: Do not use: "fraudulent", "fraud", "suspicious", "red flags", "motive", "collusion", "grossly", "high-risk". Refer to the underlying event as "incident" rather than "assault" in both doc_type and doc_details. Describe the incident neutrally (e.g., "the incident on [date] at [location]"); do not preface it with "alleged", "potential", or any qualifier that pre-judges the case. Do not infer intent or wrongdoing in any doc_details.
 </CRITICAL_RULES>
@@ -101,7 +102,6 @@ Steps:
 3. For each document type identified in Step 1:
     a. Assess whether it is relevant to this case based on INITIAL REVIEW and ADDITIONAL INFORMATION (apply RULE 3).
     b. If relevant, contextualise the document details with case-specific information from INITIAL REVIEW and ADDITIONAL INFORMATION — include specific names, vehicle details, and locations where applicable. Preserve timeframes from INVESTIGATION PROCESSES as relative periods (e.g., "3-month period", "1 week prior to and after the incident"). Do not convert them into specific date ranges.
-    c. If a document type in INVESTIGATION PROCESSES contains multiple distinct sub-items, you may split them into separate document types in the output. However, do not merge document types that are separate entries in INVESTIGATION PROCESSES, and do not create new document type names — use names derived from INVESTIGATION PROCESSES.
 
 4. **Validation gate**: Before including each document type in your output, confirm:
    - Can I point to the specific entry in INVESTIGATION PROCESSES that this document type comes from? If NO → exclude it.
@@ -158,20 +158,35 @@ ADDITIONAL_ENQUIRIES_DRAFT_PROMPT = """
 Additional Enquiries are the additional responsibilities which the external investigator is required to perform in addition to their core responsibilities for provided investigation type.
 </TASK_DEFINITION>
 
+<ROLE>
+You are drafting an investigation brief listing additional field activities for an external investigator to perform. Your output is an instruction list — NOT a finding, justification, or commentary on the claim. Match the tone and length of a concise senior-investigator brief.
+</ROLE>
+
+<STYLE>
+- **Length cap**: 2–4 sentences per enquiry_detail. Hard cap. No paragraph-length descriptions.
+- **Citation discipline**: cite only the anchoring details needed to make the enquiry actionable (party names, location, date). Do not enumerate every property sub-area, every claimed item, or every case detail in each enquiry — anchor to one or two specifics.
+- **One enquiry per logical activity**: an enquiry represents ONE logical investigative activity (e.g., neighbour canvass, police liaison, CCTV canvass-and-review, alibi verification for a specific party). Combine all sub-tasks and sub-questions for that activity into the enquiry_detail. Do NOT split a single activity into multiple enquiries because it touches on multiple sub-topics or multiple people.
+- **Tone**: neutral and request-focused. State what the investigator is asked to do, not why suspicion exists.
+- **No filler**: omit hedging boilerplate ("if attendance occurred", "where identified", "if any prosecution has been commenced"). The investigator already has the case context.
+</STYLE>
+
 <CRITICAL_RULES>
 BEFORE drafting any enquiries, you MUST understand these rules. Violating these rules is a critical error.
 
 **RULE 1 - SOURCE RESTRICTION**: Every enquiry MUST originate from INVESTIGATION PROCESSES. If an enquiry cannot be traced back to a specific section or requirement in INVESTIGATION PROCESSES, it MUST be excluded — regardless of how relevant it seems based on INITIAL REVIEW or ADDITIONAL INFORMATION.
 
-**RULE 2 - CONTEXTUALISE AND DECOMPOSE**: You must rewrite each enquiry from INVESTIGATION PROCESSES using case-specific details from INITIAL REVIEW and ADDITIONAL INFORMATION. This includes:
-  a. If an enquiry refers to multiple people collectively, split it into separate enquiries — one per person — stating each person's name and role.
-  b. Adapt template details to match the actual case — omit elements that don't apply and include only what is relevant.
-  c. The output must never read like a generic template. Every enquiry must reference specific names, dates, locations, or details from INITIAL REVIEW or ADDITIONAL INFORMATION.
+**RULE 2 - PARTY SCOPE**: Only frame enquiries around parties directly involved in the current claim under investigation. Use INITIAL REVIEW and ADDITIONAL INFORMATION to identify who the direct parties are. Individuals mentioned in prior claims, historical associations, or background checks within INITIAL REVIEW or ADDITIONAL INFORMATION are NOT direct parties to the current claim. Do not generate enquiries focused on associated individuals who are not direct parties. Replace generic references in INVESTIGATION PROCESSES with the specific individuals identified from INITIAL REVIEW and ADDITIONAL INFORMATION.
+
+**RULE 3 - CONTEXTUALISE**: You must rewrite each enquiry from INVESTIGATION PROCESSES using case-specific details from INITIAL REVIEW and ADDITIONAL INFORMATION. This includes:
+  a. Adapt template details to match the actual case — omit elements that don't apply and include only what is relevant.
+  b. The output must never read like a generic template. Every enquiry must reference specific names, dates, locations, or details from INITIAL REVIEW or ADDITIONAL INFORMATION.
 INITIAL REVIEW and ADDITIONAL INFORMATION must NEVER be used to generate new enquiry topics.
 
-**RULE 3 - EXTERNAL SCOPE ONLY**: All enquiries must be actions an external investigator can perform in the field (e.g., canvassing, interviewing witnesses, obtaining records from third parties). Exclude any enquiry that relates to internal processes, internal review, internal assessments, or summarising results of enquiries already conducted by the insurer's own team.
+**RULE 4 - EXTERNAL SCOPE ONLY**: All enquiries must be actions an external investigator can perform in the field (e.g., canvassing, interviewing witnesses, obtaining records from third parties). Exclude any enquiry that relates to internal processes, internal review, internal assessments, or summarising results of enquiries already conducted by the insurer's own team. Exclude any enquiry that involves interviewing the primary insured directly — this is covered by a separate interview plan section. Interviews of OTHER parties (e.g., witnesses, neighbours, third parties, towing companies) remain in scope.
 
-**RULE 4 - RELEVANCE FILTER**: For each enquiry from INVESTIGATION PROCESSES, assess whether it is applicable based on the facts in INITIAL REVIEW and ADDITIONAL INFORMATION. If INVESTIGATION PROCESSES includes a conditional qualifier (e.g., "if police attended"), apply that condition against INITIAL REVIEW and ADDITIONAL INFORMATION — if the condition is not met, exclude the enquiry. Even without an explicit conditional qualifier, if an enquiry references a scenario, person, or event that has no basis in INITIAL REVIEW or ADDITIONAL INFORMATION, exclude it.
+**RULE 5 - RELEVANCE FILTER**: For each enquiry from INVESTIGATION PROCESSES, assess whether it is applicable based on the facts in INITIAL REVIEW and ADDITIONAL INFORMATION. If INVESTIGATION PROCESSES includes a conditional qualifier (e.g., "if police attended"), apply that condition against INITIAL REVIEW and ADDITIONAL INFORMATION — if the condition is not met, exclude the enquiry. Even without an explicit conditional qualifier, if an enquiry references a scenario, person, or event that has no basis in INITIAL REVIEW or ADDITIONAL INFORMATION, exclude it.
+
+**RULE 6 - NEUTRAL LANGUAGE**: Do not use: "fraudulent", "fraud", "suspicious", "red flags", "motive", "collusion", "grossly", "high-risk". Refer to the underlying event as "incident" rather than "assault" in both the enquiry title and enquiry_detail. Describe the incident neutrally (e.g., "the incident on [date] at [location]") — do not preface with "alleged", "potential", or any qualifier that pre-judges the case. Do not infer intent or wrongdoing.
 </CRITICAL_RULES>
 
 <TASK>
@@ -185,17 +200,9 @@ Steps:
 
 3. For each enquiry identified in Step 1, contextualise it with relevant details from Step 2.
 
-4. **Validation gate**: Before including each enquiry in your output, confirm:
-   - Can I point to the specific section in INVESTIGATION PROCESSES that this enquiry comes from? If NO → exclude it..
-   - Does this enquiry reference specific people, places, dates, or details from INITIAL REVIEW or ADDITIONAL INFORMATION? If it still reads like a generic template that could apply to any case → rewrite it with case-specific details.
-   - Does this enquiry cover multiple people? If YES → split it into one enquiry per person.
-   - Is this enquiry applicable based on the facts in INITIAL REVIEW or ADDITIONAL INFORMATION? If it references a scenario or event with no basis in INITIAL REVIEW or ADDITIONAL INFORMATION → exclude it.
+4. Include details about what needs to be done in the additional enquiries. If there are multiple enquiries, details must be explicitly stated for each.
 
-5. Include details about what needs to be done in the additional enquiries. If there are multiple enquiries, details must be explicitly stated for each.
-
-6. Ensure enquiries and details are clear and avoid using any jargons.
-
-Review the enquiries generated and ensure every single one passes the validation gate in Step 4.
+5. Ensure enquiries and details are clear and avoid using any jargons.
 </TASK>
 
 <CONTEXT>
