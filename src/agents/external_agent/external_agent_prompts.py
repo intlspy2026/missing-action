@@ -11,6 +11,7 @@ You are drafting an investigation brief for an external investigator. Your outpu
 - **Length cap**: 3–4 sentences per concern. Hard cap. No paragraph-length rationales, no exhaustive enumerations of claim numbers, dates, or document names.
 - **Title**: short, descriptive noun phrase. Keep it neutral and do not pad with leading qualifiers such as "potential …" or "possible …".
 - **Citation discipline**: cite only the key anchoring facts (one or two specifics — a value, date, or named entity per claim). Do not enumerate every supporting document, policy number, or full claim history. Summarise where possible.
+- **No source attribution**: do not name the source system, database, or check provider the fact came from (e.g., Autoedge, Motor Web, Caspar — list is illustrative, not exhaustive). State only the finding itself; the upstream system is not part of the rationale even if INITIAL REVIEW mentions it.
 - **Tone**: neutral, verification-led. Frame as "verification is required to determine…", "raises questions about…", "this matters for…". Never assert wrongdoing, label intent, or pre-judge outcome.
 - **No filler**: omit hedging boilerplate ("further investigation is warranted…", "it is important to note…"). Do not restate the claim narrative the investigator already has.
 </STYLE>
@@ -68,12 +69,9 @@ You are drafting an investigation brief listing documents for an external invest
 </ROLE>
 
 <STYLE>
-- **Length cap on doc_details**: 1–2 sentences per document type. Hard cap. No paragraph-length descriptions, no exhaustive sub-item enumerations.
-- **Citation discipline**: include only the anchoring details needed to make the request actionable (direct-party names, location, relative period). Do not enumerate every sub-account, every camera location, every phone number, every jewellery item, or every property sub-area. Summarise where possible (e.g., "all bank, credit card and loan account statements" — not a line-by-line listing).
-- **Illustrative vs distinct**: when INVESTIGATION PROCESSES lists examples under one document type (e.g., "evidence such as receipts, rosters, messages"), present them as illustrative using "such as …" framing — do not require all of them as if mandatory. Reserve full enumeration for items the source explicitly mandates.
+- **No source attribution**: do not name the source system, database, or check provider the fact came from (e.g., Autoedge, Motor Web, Caspar — list is illustrative, not exhaustive). State only the request itself; the upstream system is not part of the doc_details even if INITIAL REVIEW or ADDITIONAL INFORMATION mentions it.
 - **Tone**: neutral and request-focused. State what is being requested, not why an issue is suspected. Do not justify the request with case-specific concerns.
-- **No filler**: omit hedging boilerplate such as "if applicable, where appropriate", "subject to appropriate consent", "given the concerns about…", "particularly of areas relevant to…". The investigator already has the case context.
-- **Group parties together**: when the same document type applies to multiple direct parties, list them together in a single entry (e.g., "for Mr X and Mrs Y"). Do not create one entry per person. Splitting by genuinely distinct sub-items in INVESTIGATION PROCESSES is still allowed (per TASK step 3c).
+- **Group parties together**: when the same document type applies to multiple direct parties, list them together in a single entry (e.g., "for Mr X and Mrs Y"). Do not create one entry per person.
 </STYLE>
 
 <CRITICAL_RULES>
@@ -88,32 +86,50 @@ BEFORE listing any documents, you MUST understand these rules. Violating these r
 **RULE 4 - NO DUPLICATES**: Each piece of information must appear under exactly one document type. If the same information could fall under multiple document types, place it under the most specific one and exclude it from the others. Compound aggregator entries titled "other documents", "additional evidence", "other supporting documents" or similar catch-alls that re-aggregate items already requested under another entry are NOT permitted — every required document must live under its own specific entry. **Each doc_type label must appear AT MOST ONCE in the output.** If multiple sub-items belong under the same parent doc_type, combine them into a single entry and list the sub-items in doc_details — do not emit multiple entries that share the same doc_type label.
 
 **RULE 5 - NEUTRAL LANGUAGE**: Do not use: "fraudulent", "fraud", "suspicious", "red flags", "motive", "collusion", "grossly", "high-risk". Refer to the underlying event as "incident" rather than "assault" in both doc_type and doc_details. Describe the incident neutrally (e.g., "the incident on [date] at [location]"); do not preface it with "alleged", "potential", or any qualifier that pre-judges the case. Do not infer intent or wrongdoing in any doc_details.
+
+**RULE 6 - SME SECTION SELECTION**: Determine which SME section in `<GOLD_STANDARDS>` to use from `<INVESTIGATION_TYPE>`. If it includes "Motor", use ONLY MOTOR DOCUMENT STANDARDS. If it includes "Property", use ONLY PROPERTY DOCUMENT STANDARDS. Do NOT mix sections. Do NOT include documents from a section that does not match `<INVESTIGATION_TYPE>`.
+
+**RULE 7 - VERBATIM SME PHRASING**: For every document type included in your output, the doc_details MUST mirror the SME wording from the GOLD_STANDARDS section selected by RULE 6, replacing only placeholders (XXX, XXXX, dates, names, identifiers, periods) with case-specific values from INITIAL REVIEW and ADDITIONAL INFORMATION. You MUST NOT shorten, summarise, paraphrase, simplify, or rewrite the SME wording. You MUST NOT produce short labels or partial instructions — always produce the full SME instruction-style request. If uncertain, default to SME phrasing. If no matching SME entry exists in the selected section for a document type otherwise required by INVESTIGATION PROCESSES, EXCLUDE that document type.
 </CRITICAL_RULES>
+
+<GOLD_STANDARDS>
+{gold_standards}
+</GOLD_STANDARDS>
 
 <TASK>
 **YOUR TASK**
 List down all the document types and document details required for external investigation for provided investigation type:
 
 Steps:
-1. Read INVESTIGATION PROCESSES first. Identify all document types specified for the given investigation type. These are your ONLY permitted document types.
+1. Apply RULE 6 to select the correct SME section in `<GOLD_STANDARDS>` based on `<INVESTIGATION_TYPE>`. This selected section is your phrasing source for the rest of the task.
 
-2. Read INITIAL REVIEW and ADDITIONAL INFORMATION to extract case-specific details (names of relevant parties, dates, locations, incident specifics). ADDITIONAL INFORMATION may contain supplementary details (e.g., police reports, engineer reports, incident reports) not captured in INITIAL REVIEW — use these as additional evidence where relevant.
+2. Read INVESTIGATION PROCESSES. Identify all document types specified for the given investigation type. These are your ONLY permitted document types to consider for inclusion.
 
-3. For each document type identified in Step 1:
-    a. Assess whether it is relevant to this case based on INITIAL REVIEW and ADDITIONAL INFORMATION (apply RULE 3).
-    b. If relevant, contextualise the document details with case-specific information from INITIAL REVIEW and ADDITIONAL INFORMATION — include specific names, vehicle details, and locations where applicable. Preserve timeframes from INVESTIGATION PROCESSES as relative periods (e.g., "3-month period", "1 week prior to and after the incident"). Do not convert them into specific date ranges.
+3. Read INITIAL REVIEW and ADDITIONAL INFORMATION to extract case-specific values (names of direct parties, dates, locations, incident specifics, periods, identifiers). ADDITIONAL INFORMATION may contain supplementary details (e.g., police reports, engineer reports, incident reports) not captured in INITIAL REVIEW — use these as additional evidence where relevant.
 
-4. **Validation gate**: Before including each document type in your output, confirm:
+4. For each document type identified in Step 2:
+    a. Assess relevance against INITIAL REVIEW and ADDITIONAL INFORMATION (apply RULE 3).
+    b. If relevant, locate the matching SME entry in the GOLD_STANDARDS section selected in Step 1. Apply RULE 7: reuse the SME wording verbatim, replacing only placeholders (XXX, XXXX, dates, names, identifiers, periods) with case-specific values from Step 3. Preserve timeframes from INVESTIGATION PROCESSES as relative periods (e.g., "3-month period", "1 week prior to and after the incident") rather than converting them into specific date ranges.
+    c. If no matching SME entry exists in the selected GOLD_STANDARDS section, EXCLUDE the document type (per RULE 7).
+
+5. **Validation gate**: Before including each document type in your output, confirm:
    - Can I point to the specific entry in INVESTIGATION PROCESSES that this document type comes from? If NO → exclude it.
+   - Did I use the GOLD_STANDARDS section selected by RULE 6 (and not the other section)? If NO → revise.
+   - Did I locate a matching SME entry and reuse its wording verbatim with only placeholders replaced? If NO → exclude or revise (per RULE 7).
    - Am I requesting documents from someone who is NOT a direct party to the claim? If YES → remove that person. Being mentioned in INITIAL REVIEW or ADDITIONAL INFORMATION does not make someone a direct party.
    - Is this document applicable based on the facts in INITIAL REVIEW or ADDITIONAL INFORMATION? If a conditional qualifier is not met → exclude it or remove the irrelevant sub-item.
    - For each detail in this document type, check if the same detail appears under any other document type in your output. If YES → remove the duplicate from the document type where it is less central to the overall purpose.
 
-5. Review the final list and ensure all document types pass the validation gate.
+6. Review the final list and ensure all document types pass the validation gate.
 </TASK>
 
 <CONTEXT>
 These are the relevant materials for your case:
+
+The INVESTIGATION_TYPE drives SME section selection in GOLD_STANDARDS (apply RULE 6):
+<INVESTIGATION_TYPE>
+{investigation_type}
+</INVESTIGATION_TYPE>
 
 Here is the INVESTIGATION PROCESSES — this is your ONLY source for document types:
 <INVESTIGATION PROCESSES>
@@ -165,7 +181,8 @@ You are drafting an investigation brief listing additional field activities for 
 <STYLE>
 - **Length cap**: 2–4 sentences per enquiry_detail. Hard cap. No paragraph-length descriptions.
 - **Citation discipline**: cite only the anchoring details needed to make the enquiry actionable (party names, location, date). Do not enumerate every property sub-area, every claimed item, or every case detail in each enquiry — anchor to one or two specifics.
-- **One enquiry per logical activity**: an enquiry represents ONE logical investigative activity (e.g., neighbour canvass, police liaison, CCTV canvass-and-review, alibi verification for a specific party). Combine all sub-tasks and sub-questions for that activity into the enquiry_detail. Do NOT split a single activity into multiple enquiries because it touches on multiple sub-topics or multiple people.
+- **No source attribution**: do not name the source system, database, or check provider the fact came from (e.g., Autoedge, Motor Web, Caspar — list is illustrative, not exhaustive). State only the enquiry itself; the upstream system is not part of the enquiry_detail even if INITIAL REVIEW or ADDITIONAL INFORMATION mentions it.
+- **One enquiry per theme**: INVESTIGATION PROCESSES lists multiple enquiries flatly, but many of these belong to a smaller number of underlying themes. You must recognise the themes yourself and aggregate all enquiries that belong to the same theme into a SINGLE output enquiry — combining their sub-tasks, sub-questions, and any party-specific variations into the enquiry_detail. Do NOT emit one output enquiry per source bullet, per sub-task, or per party. Output should be approximately one enquiry per theme you identify, not one per source line.
 - **Tone**: neutral and request-focused. State what the investigator is asked to do, not why suspicion exists.
 - **No filler**: omit hedging boilerplate ("if attendance occurred", "where identified", "if any prosecution has been commenced"). The investigator already has the case context.
 </STYLE>
@@ -360,6 +377,8 @@ Here is the INVESTIGATION PROCESSES to guide you:
 """
 
 SECTION_FEEDBACK_PROMPT = """
+{gold_standards_block}
+{investigation_type_block}
 <TASK>
 **YOUR TASK**
 Revise the PREVIOUS VERSION of the {section_name} by:
