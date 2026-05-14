@@ -133,7 +133,7 @@ The INVESTIGATION_TYPE drives SME section selection in GOLD_STANDARDS (apply RUL
 {investigation_type}
 </INVESTIGATION_TYPE>
 
-Here is the INVESTIGATION PROCESSES — this is your ONLY source for document types:
+Here is the INVESTIGATION PROCESSES — this is your ONLY source for document types. Each entry in the array contains the documents for ONE investigation type:
 <INVESTIGATION PROCESSES>
 {knowledge}
 </INVESTIGATION PROCESSES>
@@ -227,7 +227,7 @@ Steps:
 <CONTEXT>
 These are the relevant materials for your case:
 
-Here is the INVESTIGATION PROCESSES — this is your ONLY source for enquiry topics:
+Here is the INVESTIGATION PROCESSES — this is your ONLY source for enquiry topics. Each entry in the array contains the enquiries for ONE investigation type:
 <INVESTIGATION PROCESSES>
 {knowledge}
 </INVESTIGATION PROCESSES>
