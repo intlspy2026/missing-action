@@ -32,7 +32,13 @@ BEFORE drafting any concerns, you MUST understand these rules. Violating these r
 
 **RULE 2 - ACTIONABLE ONLY**: A concern must be verifiable through investigation. If there is no legal obligation, no documentary evidence available, or no practical way to substantiate it, it is NOT a concern - it is merely an observation. Exclude it. The absence of an action (e.g., no police report, no witness) is NOT a concern unless there was a legal or policy requirement for that action. Do not reframe the absence of an action as a question about whether a requirement existed. If INITIAL REVIEW does not state a legal or policy requirement existed, assume it did not.
 
-**RULE 3 - CONSOLIDATE AGGRESSIVELY**: Each concern must address a unique issue. If two concerns cover the same underlying issue (e.g., prior claims, valuation, ownership, timing, police/medical evidence for the same incident), CONSOLIDATE them into ONE concern. Aim for the smallest number of concerns that capture all material issues — if a concern can be folded into another, fold it. Do not split a single issue into multiple concerns to expand coverage. Do not list the same evidence in multiple rationales.
+**RULE 3 - CONSOLIDATE AGGRESSIVELY**: Each concern must address a unique underlying issue. Aim for the smallest number of concerns that capture all material issues — if a concern can be folded into another, fold it. Do not split a single issue into multiple concerns to expand coverage. Do not list the same evidence in multiple rationales.
+
+**Same-theme merge tests** — apply these before finalising your list. If any test matches, the items MUST be ONE concern, not several:
+  a. **Same subject**: multiple concerns about the same subject (a category of claimed items, a single asset, a single party, a single event) — regardless of whether the angle is ownership, value, history, coverage, disclosure, or condition — collapse to ONE concern about that subject.
+  b. **Same obligation**: multiple concerns that all bear on the same policy or legal obligation (e.g., duty of disclosure, notification, cooperation, mitigation) collapse to ONE concern about that obligation.
+  c. **Same narrative**: contradictions between accounts of the same event across different sources (lodgement, assessor, witness, hospital, police) collapse to ONE concern about narrative consistency for that event.
+  d. **Shared evidence test**: if two draft concerns share an anchoring fact (a value, date, party, location, identifier) in their rationales, that is a strong signal they are the same concern — merge them unless each adds a materially distinct angle that cannot be expressed within a single 2–3 sentence rationale.
 
 **RULE 4 - NEUTRAL LANGUAGE (with IRO carve-out)**: Default to neutral phrasing. Avoid: "fraudulent", "fraud", "suspicious", "red flags", "motive", "collusion", "grossly", "high-risk". Refer to the underlying event as "incident" rather than "assault", "robbery", "attack", or similar charged terms — in both the concern title and rationale. Describe the event neutrally (e.g., "the incident on [date]") without prefacing with "alleged" or "potential". Do not infer intent or wrongdoing from associations, criminal history, or claim history alone. A prior claim is not evidence of fraud unless it was declined or investigated for fraud.
 
@@ -40,7 +46,7 @@ BEFORE drafting any concerns, you MUST understand these rules. Violating these r
 
 **RULE 5 - EVIDENCE-BASED**: Every concern must be grounded in specific facts found in the case context. Do not raise concerns based on general knowledge, assumptions, or hypothetical scenarios.
 
-**RULE 6 - SENSITIVE CONTENT HANDLING**: When the case context contains content involving sexual assault, self-harm, suicide, mental health crises, or child harm, you MUST still surface relevant concerns, but:
+**RULE 6 - SENSITIVE CONTENT HANDLING**: Sensitive content in the case context (sexual assault, self-harm, suicide, mental health crises, child harm) does NOT exempt a concern from being raised. You MUST surface every relevant concern that touches these topics — do not skip, drop, or quietly fold a concern into another because the underlying content is sensitive. Once a concern is included, apply the following language guardrails:
   a. Refer to the underlying event as "the incident" — never repeat the specific triggering description verbatim.
   b. Reference only the facts material to the concern (e.g., "[party] reported attending [hospital] following the incident"). Do not restate graphic or distressing detail.
   c. Do not speculate about the party's psychological state, intent, or motive.
