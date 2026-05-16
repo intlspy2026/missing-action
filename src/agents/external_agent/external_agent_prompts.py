@@ -100,19 +100,21 @@ BEFORE listing any documents, you MUST understand these rules. Violating these r
 
 **RULE 2 - PARTY SCOPE**: Only request documents from parties directly involved in the current claim under investigation. Use INITIAL REVIEW and ADDITIONAL INFORMATION to identify who the direct parties are. Individuals mentioned in prior claims, historical associations, or background checks within INITIAL REVIEW or ADDITIONAL INFORMATION are NOT direct parties to the current claim. Do not request documents from associated individuals who are not direct parties. Replace generic references in INVESTIGATION PROCESSES with the specific individuals identified from INITIAL REVIEW and ADDITIONAL INFORMATION.
 
-**RULE 3 - RELEVANCE FILTER (tailored to case context)**: For each document type listed in INVESTIGATION PROCESSES for the given investigation type, decide whether it applies to THIS specific claim by checking the document's premise against the facts in INITIAL REVIEW and ADDITIONAL INFORMATION.
+**RULE 3 - RELEVANCE FILTER (case-justified inclusion)**: Methodology entries in INVESTIGATION PROCESSES are CANDIDATE documents, not default-included. For each document type, the default is EXCLUDE; inclusion requires positive justification.
 
-Steps:
-  a. **Premise check**: Every document type has an implicit premise — a circumstance that must exist for the doc to be relevant. Examples of premise mismatches (illustrative, not exhaustive): a doc presuming the insured is a tenant when the case shows ownership; a doc presuming employment/travel when the incident occurred at the insured's home with no work involvement; a doc presuming a third-party witness when no witness is mentioned anywhere in the case context; a doc presuming a financial benefit angle when no such angle is raised. If the case facts CONTRADICT the doc's premise, EXCLUDE the doc type. Contradiction includes BOTH forms:
-     - **Direct contradiction**: case facts state the opposite of the doc's premise (e.g., the case explicitly establishes the insured owns the property when the doc presumes tenancy).
-     - **Implicit contradiction (scenario-level)**: the case context describes a complete scenario where the doc's subject has no place. For example, an incident that occurred entirely at the insured's home with no work involvement, no travel, no third-party witness, and no property transaction implicitly contradicts the premise of any work-related, travel-related, witness-related, or sale-related doc.
-     Both forms count as contradiction — EXCLUDE in both cases.
-  b. **Conditional qualifier**: If INVESTIGATION PROCESSES explicitly states a condition (e.g., "only if there are concerns about ownership"), apply that condition against the case facts. If the condition is not met for the direct party being assessed, exclude. Concerns or findings about associated individuals do not transfer to direct parties.
-  c. **Otherwise include**: If the doc's premise is consistent with the case and any conditional qualifier is met, INCLUDE it. Do not exclude a doc merely because the case context does not affirmatively prove its relevance.
+**Include only if** at least one of the following applies:
+  a. A specific case fact in INITIAL REVIEW or ADDITIONAL INFORMATION ties this doc's subject MATERIALLY to investigating THIS claim — i.e., the doc would help verify a fact, party, value, or event that the investigation actually needs to establish (e.g., the case names a third-party witness → witness contact details; the case raises prior claims history → claims history docs; the case describes claimed items with disputed ownership → evidence of ownership). Incidental mentions of the doc's subject do NOT count — relevance must be material to the investigation's purpose.
+  b. The doc is part of the universal scope of inquiry for the investigation type — i.e., it is standard for every claim of that type regardless of whether the specific case raises it (e.g., for fraud-related investigation types, financial statements and phone records are standard regardless of case mentions).
 
-**Bias toward inclusion (genuine silence only)**: When the case context is genuinely silent on the doc's subject — i.e. the case does not establish a scenario that excludes the doc's premise — INCLUDE it. A redundant document request is acceptable; omitting a relevant doc is not. However, do NOT treat scenario-level contradiction as silence: if the case has fully described an event with no place for the doc's subject, that is implicit contradiction (exclude), not silence (include). The exclusion bar is "case facts CONTRADICT the doc's premise (directly or implicitly)", NOT "case facts do not affirmatively support the doc".
+**Exclude** in all other situations, including:
+  - **Direct contradiction**: case facts state the opposite of the doc's premise (e.g., insured owns property → no tenancy agreement).
+  - **Implicit contradiction**: case fully describes the incident scenario with no place for the doc's subject (e.g., at-home incident with the insured-as-victim and no work component → no work roster; at-home incident with no travel → no rideshare; incident narrative with no third-party witness → no witness contact details).
+  - **Silence without justification**: case is silent on the doc's subject AND the doc is not in the investigation type's universal scope.
+  - **Conditional qualifier not met**: INVESTIGATION PROCESSES states a condition (e.g., "only if there are concerns about ownership") and the condition is not met for the direct party being assessed. Concerns or findings about associated individuals do not transfer to direct parties.
 
-**Methodology framing**: Treat INVESTIGATION PROCESSES as the list of documents commonly requested for this investigation type, not a strict mandatory list. Your job is to identify which entries fit THIS claim. Filter aggressively against contradictions; retain everything else.
+**Tiebreaker (genuine close calls only)**: If you are genuinely uncertain whether a case fact rises to material relevance under (a) — relevance is plausible but not clear-cut — lean toward inclusion. This tiebreaker does NOT apply when the case is fully silent on the doc's subject or when the case scenario excludes it; in those cases, exclude.
+
+**Methodology framing**: Treat INVESTIGATION PROCESSES as the list of candidate documents commonly considered for this investigation type. Your job is to filter this list down to what THIS claim materially requires, plus the investigation type's universal-scope docs. Do not include a doc just because it appears in the methodology.
 
 **RULE 4 - NO DUPLICATES**: Each piece of information must appear under exactly one document type. If the same information could fall under multiple document types, place it under the most specific one and exclude it from the others. Compound aggregator entries titled "other documents", "additional evidence", "other supporting documents" or similar catch-alls that re-aggregate items already requested under another entry are NOT permitted — every required document must live under its own specific entry.
 
@@ -160,20 +162,7 @@ Steps:
    - Did I use the GOLD_STANDARDS section selected by RULE 6 (and not the other section)? If NO → revise.
    - If a matching SME entry exists: did I reuse its wording verbatim with only placeholders replaced? If NO → revise (per RULE 7a). If no SME entry exists: did my fallback draft produce a full instruction-style request matching the SME cadence (not a short label or one-liner)? If NO → revise (per RULE 7b).
    - Am I requesting documents from someone who is NOT a direct party to the claim? If YES → remove that person. Being mentioned in INITIAL REVIEW or ADDITIONAL INFORMATION does not make someone a direct party.
-   - **Per-doc relevance Q&A** — for each doc you are about to include, internally answer the following BEFORE finalising. Apply (b)→(c)→(d)→(e) in order; stop at the first applicable answer.
-       a. What is this doc's PREMISE — the circumstance that must exist for it to be relevant?
-       b. Is the premise DIRECTLY contradicted by a specific case fact? → EXCLUDE.
-       c. Is the premise IMPLICITLY contradicted by the complete scenario described in the case (actors, location, and timeline leave no place for the doc's subject)? → EXCLUDE.
-       d. Is there a specific case fact that AFFIRMS the premise applies? → INCLUDE.
-       e. None of the above — case is genuinely silent on this doc's subject without describing a scenario that excludes it → INCLUDE per bias-toward-inclusion.
-
-       Examples of correct application (illustrative, not exhaustive — drawn from different investigation types):
-         - GOOD exclusion: doc presupposes the insured is a tenant of the risk address, but case explicitly establishes ownership → direct contradiction → exclude.
-         - GOOD exclusion: doc presupposes the insured was travelling or away from a location during the relevant period, but case fully describes the insured's presence at that location with no movement → implicit contradiction → exclude.
-         - BAD exclusion: doc presupposes a financial-motive or banking activity check (standard for the investigation type), but case does not mention bank activity → silence, not contradiction → include.
-         - BAD exclusion: doc presupposes phone activity around the incident, but case does not specifically describe phone use → silence, not contradiction → include.
-
-       Apply RULE 3 conditional-qualifier check separately: if a conditional qualifier is not met for the direct party → exclude it or remove the irrelevant sub-item.
+   - **Justification check (apply RULE 3)**: For each doc, can I point to (a) a specific case fact in INITIAL REVIEW or ADDITIONAL INFORMATION that ties the doc's subject MATERIALLY to this claim, OR (b) the doc being in the investigation type's universal scope of inquiry? If NEITHER applies → exclude. Incidental mentions of the doc's subject do not count as material relevance. If a conditional qualifier in INVESTIGATION PROCESSES is not met for the direct party → exclude.
    - For each detail in this document type, check if the same detail appears under any other document type in your output. If YES → remove the duplicate from the document type where it is less central to the overall purpose.
 
 6. Review the final list and ensure all document types pass the validation gate.
