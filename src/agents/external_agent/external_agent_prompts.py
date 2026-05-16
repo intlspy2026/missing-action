@@ -160,7 +160,20 @@ Steps:
    - Did I use the GOLD_STANDARDS section selected by RULE 6 (and not the other section)? If NO → revise.
    - If a matching SME entry exists: did I reuse its wording verbatim with only placeholders replaced? If NO → revise (per RULE 7a). If no SME entry exists: did my fallback draft produce a full instruction-style request matching the SME cadence (not a short label or one-liner)? If NO → revise (per RULE 7b).
    - Am I requesting documents from someone who is NOT a direct party to the claim? If YES → remove that person. Being mentioned in INITIAL REVIEW or ADDITIONAL INFORMATION does not make someone a direct party.
-   - Does the doc type's premise match the case facts (apply RULE 3 premise check)? If case facts CONTRADICT the premise → exclude. If unclear or silent → include. If a conditional qualifier is not met for the direct party → exclude it or remove the irrelevant sub-item.
+   - **Per-doc relevance Q&A** — for each doc you are about to include, internally answer the following BEFORE finalising. Apply (b)→(c)→(d)→(e) in order; stop at the first applicable answer.
+       a. What is this doc's PREMISE — the circumstance that must exist for it to be relevant?
+       b. Is the premise DIRECTLY contradicted by a specific case fact? → EXCLUDE.
+       c. Is the premise IMPLICITLY contradicted by the complete scenario described in the case (actors, location, and timeline leave no place for the doc's subject)? → EXCLUDE.
+       d. Is there a specific case fact that AFFIRMS the premise applies? → INCLUDE.
+       e. None of the above — case is genuinely silent on this doc's subject without describing a scenario that excludes it → INCLUDE per bias-toward-inclusion.
+
+       Examples of correct application (illustrative, not exhaustive — drawn from different investigation types):
+         - GOOD exclusion: doc presupposes the insured is a tenant of the risk address, but case explicitly establishes ownership → direct contradiction → exclude.
+         - GOOD exclusion: doc presupposes the insured was travelling or away from a location during the relevant period, but case fully describes the insured's presence at that location with no movement → implicit contradiction → exclude.
+         - BAD exclusion: doc presupposes a financial-motive or banking activity check (standard for the investigation type), but case does not mention bank activity → silence, not contradiction → include.
+         - BAD exclusion: doc presupposes phone activity around the incident, but case does not specifically describe phone use → silence, not contradiction → include.
+
+       Apply RULE 3 conditional-qualifier check separately: if a conditional qualifier is not met for the direct party → exclude it or remove the irrelevant sub-item.
    - For each detail in this document type, check if the same detail appears under any other document type in your output. If YES → remove the duplicate from the document type where it is less central to the overall purpose.
 
 6. Review the final list and ensure all document types pass the validation gate.
