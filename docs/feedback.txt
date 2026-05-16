@@ -1,0 +1,31 @@
+The problem — limited articulated criteria for the model to learn from
+
+  The core challenge is that the document filtering involves a lot of SME expertise that is currently tacit — held in SME judgment rather than codified into explicit rules. This makes it hard for the model to
+   filter consistently, because the model only has access to what's written down.
+
+  Property case illustrates this well:
+  - The methodology lists ~16 candidate documents for property theft, without per-doc criteria for when each one specifically applies. It's a flat reference list of "commonly considered" docs.
+  - The case context has rich factual detail (ownership, prior claims, jewellery list, hospital visit, etc.). Which facts should trigger which docs is intuitive to an experienced SME but isn't explicitly
+  mapped anywhere.
+  - SMEs have a clear mental model — "at-home incident with insured-as-victim → no work roster", "ownership established → no tenancy", "no witness in narrative → no witness contacts" — but these inferences
+  are made on the spot from experience, not from a checklist the model can reference.
+
+  When the AI is asked "is work roster relevant for this case?", there isn't a written rule to check against. With the existing guidance ("if in doubt, keep the document"), the model reasonably leans toward
+  inclusion — that's the safe default given ambiguity.
+
+  The SME guidance we have is directional rather than rule-based, which is completely natural at this stage:
+  - "Tailor to the case" — captures the right principle but leaves operational decisions to judgment.
+  - "If confused, keep the document" — sensible default, but doesn't specify when "confusion" applies vs when the case affirmatively contradicts a doc.
+  - "Find a sweet spot" — points to the right balance, but the thresholds for that balance are still developing.
+
+  These are excellent guiding principles — they just aren't yet at the level of rules that can be applied uniformly without judgment.
+
+  The pattern we kept observing:
+  1. SME identifies a wrong inclusion in a specific case
+  2. We try to encode the underlying reason as a rule
+  3. The reason is intuitive to the SME ("this case clearly doesn't involve work") but generalising from one example over- or under-corrects on the next case
+  4. Each iteration improves some cases and regresses others, because the criteria itself lives in tacit knowledge
+
+  A constructive path forward: the most effective next step is probably a collaboration with SMEs to codify per-investigation-type filtering — a lightweight "if case shows X, exclude doc Y" matrix for each of
+   the 20 investigation types. With that codified knowledge available to the prompt (or as a post-processing layer), the model can apply rules consistently rather than guessing at SME intent. Pure prompt
+  engineering has done most of what it can without that explicit knowledge layer in place.
