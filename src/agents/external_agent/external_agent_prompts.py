@@ -32,8 +32,6 @@ BEFORE drafting any concerns, you MUST understand these rules. Violating these r
 
 **RULE 1 - PARTY SCOPE**: Only raise concerns about parties directly involved in the current claim under investigation. Individuals from prior claims, historical associations, or background checks are NOT parties to the current claim unless they are also named on it. Do not raise concerns about individuals who are not direct parties to the current claim. This includes concerns framed as "connections to", "associations with", or "involvement of" non-parties. If someone is not a direct party to the current claim, they must not be the subject of any concern.
 
-A concern whose central substance is an associated or non-direct party — even when framed as "the insured's connection to X", "overlapping contact details with X", or "the insured's association with X" — must NOT be raised in any form. Do not raise it as a standalone concern, and do not bring it in as supporting evidence within another concern. The non-party may appear only as an incidental reference (e.g., a name mentioned in passing) within a concern whose substance is wholly about a direct party.
-
 **RULE 2 - ACTIONABLE ONLY**: A concern must be verifiable through investigation. If there is no legal obligation, no documentary evidence available, or no practical way to substantiate it, it is NOT a concern - it is merely an observation. Exclude it. The absence of an action (e.g., no police report, no witness) is NOT a concern unless there was a legal or policy requirement for that action. Do not reframe the absence of an action as a question about whether a requirement existed. If INITIAL REVIEW does not state a legal or policy requirement existed, assume it did not. An absence-of-action observation MAY be cited as supporting evidence inside a related concern (e.g., "no police attendance" folded into a staged-event concern's anchoring facts). It MUST NOT be a standalone concern, regardless of whether a legal or policy requirement for that action existed.
 
 **RULE 3 - CONSOLIDATE AGGRESSIVELY**: Each concern must address a unique underlying issue. Aim for the smallest number of concerns that capture all material issues — if a concern can be folded into another, fold it. Do not split a single issue into multiple concerns to expand coverage. Do not list the same evidence in multiple rationales.
@@ -61,7 +59,14 @@ A concern whose central substance is an associated or non-direct party — even 
 <TASK>
 Draft key concerns for external investigation based on INITIAL REVIEW and ADDITIONAL INFORMATION.
 
-Key concerns are material issues that could impact coverage, liability, or claim validity. They are NOT general observations from the source documents. Both sources contain a mix of relevant concerns and irrelevant background — your job is to FILTER and consolidate.
+Key concerns are MATERIAL issues that could directly impact coverage, liability, or claim validity for the current claim, centred on facts about direct parties to the current claim.
+
+The following are NOT key concerns and must not appear as standalone entries in your output:
+- **Investigative leads or observations**: identity/contact/address/phone overlaps with associated parties, name variations linked to non-parties, behavioural similarities with non-parties. These are leads for the investigator, not material concerns. They belong as anchoring facts inside a related key concern (e.g., inside a staged-event concern), not as standalone entries.
+- **Absence-of-action observations**: e.g., no police report, no witness statement. These belong as anchoring facts inside a related concern, not as standalone entries.
+- **Supporting evidence for another concern**: anything that strengthens an existing key concern belongs INSIDE that concern's rationale, not as a separate entry.
+
+Both sources contain a mix of relevant concerns and irrelevant background — your job is to FILTER and consolidate.
 
 Steps:
 1. Identify potential issues from INITIAL REVIEW and ADDITIONAL INFORMATION.
