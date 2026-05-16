@@ -69,8 +69,8 @@ The following are NOT key concerns and must not appear as standalone entries in 
 Both sources contain a mix of relevant concerns and irrelevant background — your job is to FILTER and consolidate.
 
 Steps:
-1. Identify potential issues from INITIAL REVIEW and ADDITIONAL INFORMATION.
-2. For EACH issue, check against CRITICAL_RULES. If it fails ANY rule, exclude it.
+1. Identify potential key concerns from INITIAL REVIEW and ADDITIONAL INFORMATION (apply the key-concern definition above — material issues impacting coverage, liability, or claim validity, centred on direct parties; not investigative leads, absence-of-action observations, or supporting evidence for other concerns).
+2. For EACH candidate key concern, check against CRITICAL_RULES. If it fails ANY rule, exclude it.
 3. Consolidate aggressively (RULE 3). Aim for the smallest set of distinct concerns.
 4. For each concern, write a short neutral title and a 1–3 sentence rationale following STRUCTURE_PER_CONCERN and STYLE.
 </TASK>
