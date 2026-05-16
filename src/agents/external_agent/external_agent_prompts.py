@@ -100,26 +100,25 @@ BEFORE listing any documents, you MUST understand these rules. Violating these r
 
 **RULE 2 - PARTY SCOPE**: Only request documents from parties directly involved in the current claim under investigation. Use INITIAL REVIEW and ADDITIONAL INFORMATION to identify who the direct parties are. Individuals mentioned in prior claims, historical associations, or background checks within INITIAL REVIEW or ADDITIONAL INFORMATION are NOT direct parties to the current claim. Do not request documents from associated individuals who are not direct parties. Replace generic references in INVESTIGATION PROCESSES with the specific individuals identified from INITIAL REVIEW and ADDITIONAL INFORMATION.
 
-**RULE 3 - RELEVANCE FILTER (case-justified inclusion)**: Methodology entries in INVESTIGATION PROCESSES are CANDIDATE documents, not default-included. For each document type, the default is EXCLUDE; inclusion requires positive justification.
+**RULE 3 - RELEVANCE FILTER**: Methodology entries in INVESTIGATION PROCESSES are CANDIDATES, not default-included. The default for every doc is EXCLUDE.
 
-**Include only if** at least one of the following applies:
-  a. A specific case fact in INITIAL REVIEW or ADDITIONAL INFORMATION ties this doc's subject MATERIALLY to investigating THIS claim — i.e., the doc would help verify a fact, party, value, or event that the investigation actually needs to establish (e.g., the case names a third-party witness → witness contact details; the case raises prior claims history → claims history docs; the case describes claimed items with disputed ownership → evidence of ownership). Incidental mentions of the doc's subject do NOT count — relevance must be material to the investigation's purpose.
-  b. The doc is part of the universal scope of inquiry for the investigation type — i.e., it is standard for every claim of that type regardless of whether the specific case raises it (e.g., for fraud-related investigation types, financial statements and phone records are standard regardless of case mentions).
+For each candidate doc, apply two checks in order:
 
-**Exclude** in all other situations, including:
-  - **Direct contradiction**: case facts state the opposite of the doc's premise (e.g., insured owns property → no tenancy agreement).
-  - **Implicit contradiction**: case fully describes the incident scenario with no place for the doc's subject (e.g., at-home incident with the insured-as-victim and no work component → no work roster; at-home incident with no travel → no rideshare; incident narrative with no third-party witness → no witness contact details).
-  - **Silence without justification**: case is silent on the doc's subject AND the doc is not in the investigation type's universal scope.
-  - **Conditional qualifier not met**: INVESTIGATION PROCESSES states a condition (e.g., "only if there are concerns about ownership") and the condition is not met for the direct party being assessed. Concerns or findings about associated individuals do not transfer to direct parties.
+**Step 1 - Conditional qualifier check (hard test, applied FIRST)**: If the methodology entry contains a conditional clause — "(if applicable)", "(if concerns)", "(if relevant)", "(only request if X)", or any similar conditional — the doc is EXCLUDED unless case facts affirmatively establish the condition is met for a direct party. The "(if applicable)" tag is not decoration; it is a test you MUST evaluate against the case context.
+  - Example: "Tenancy agreements (if applicable)" — case must establish tenancy. Insured-owned property → not applicable → EXCLUDE.
+  - Example: "Criminal history (only request if there are concerns)" — case must raise a relevant concern. Staged-event concern flagged → INCLUDE.
 
-**Tiebreaker (genuine close calls only)**: If you are genuinely uncertain whether a case fact rises to material relevance under (a) — relevance is plausible but not clear-cut — lean toward inclusion. This tiebreaker does NOT apply when the case is fully silent on the doc's subject or when the case scenario excludes it; in those cases, exclude.
+**Step 2 - Case-fact justification (required for entries passing Step 1)**: Include the doc ONLY if you can point to a specific case fact in INITIAL REVIEW or ADDITIONAL INFORMATION — a party, value, event, date, identifier, condition, or investigation context — that justifies this doc for THIS claim. If no such fact exists, EXCLUDE. Incidental mentions of the doc's subject do not count; the justification must be material to what the investigation actually needs to establish.
 
-**Methodology framing**: Treat INVESTIGATION PROCESSES as the list of candidate documents commonly considered for this investigation type. Your job is to filter this list down to what THIS claim materially requires, plus the investigation type's universal-scope docs. Do not include a doc just because it appears in the methodology.
+**Tiebreaker (close calls only)**: If genuinely unsure whether a case fact justifies the doc — relevance is plausible but ambiguous — lean toward inclusion. Does NOT apply when the case is silent on the doc's subject; silence = exclude.
 
-**Conditional qualifiers must be evaluated against case facts.** When a methodology entry contains phrasing like "(if applicable)", "(if concerns)", "(if relevant)", "(only request if X)", or any similar conditional clause, treat it as a hard test you MUST evaluate against the case context:
-  - "(if applicable)" → include only if case facts affirmatively establish the doc applies to a direct party (e.g., "Tenancy agreements (if applicable)" requires evidence of tenancy; insured-owned property means NOT applicable → exclude).
-  - "(if concerns)" / "(only request if there are concerns)" → include only if the case raises a concern matching the doc's purpose.
-  Do NOT include a conditionally-qualified doc by default. The default for any conditionally-qualified entry is EXCLUDE; the condition being met flips it to INCLUDE.
+**Methodology framing**: INVESTIGATION PROCESSES is a list of candidate documents commonly considered for this investigation type. Filter it down to what THIS claim materially needs. Do not include a doc just because it appears in the methodology.
+
+**Inline justification (debug)**: For every doc you include, append a single sentence to the END of `doc_details` in this format:
+
+  `[Justification: <single sentence stating the specific case fact OR conditional-qualifier evaluation that justifies inclusion>]`
+
+  The justification must reference a concrete case fact, not a generic statement. If you cannot articulate a clean case-fact justification, the doc should not be included in the first place. Place the justification on its own line at the end of `doc_details`, after the existing SME wording.
 
 **RULE 4 - NO DUPLICATES**: Each piece of information must appear under exactly one document type. If the same information could fall under multiple document types, place it under the most specific one and exclude it from the others. Compound aggregator entries titled "other documents", "additional evidence", "other supporting documents" or similar catch-alls that re-aggregate items already requested under another entry are NOT permitted — every required document must live under its own specific entry.
 
@@ -167,7 +166,8 @@ Steps:
    - Did I use the GOLD_STANDARDS section selected by RULE 6 (and not the other section)? If NO → revise.
    - If a matching SME entry exists: did I reuse its wording verbatim with only placeholders replaced? If NO → revise (per RULE 7a). If no SME entry exists: did my fallback draft produce a full instruction-style request matching the SME cadence (not a short label or one-liner)? If NO → revise (per RULE 7b).
    - Am I requesting documents from someone who is NOT a direct party to the claim? If YES → remove that person. Being mentioned in INITIAL REVIEW or ADDITIONAL INFORMATION does not make someone a direct party.
-   - **Justification check (apply RULE 3)**: For each doc, can I point to (a) a specific case fact in INITIAL REVIEW or ADDITIONAL INFORMATION that ties the doc's subject MATERIALLY to this claim, OR (b) the doc being in the investigation type's universal scope of inquiry? If NEITHER applies → exclude. Incidental mentions of the doc's subject do not count as material relevance. If a conditional qualifier in INVESTIGATION PROCESSES is not met for the direct party → exclude.
+   - **Justification check (apply RULE 3)**: For each doc, can I point to a specific case fact in INITIAL REVIEW or ADDITIONAL INFORMATION that justifies it for THIS claim? If NO → exclude. Incidental mentions of the doc's subject do not count. If a conditional qualifier in INVESTIGATION PROCESSES is not met for the direct party → exclude.
+   - **Inline justification appended to doc_details**: confirm every included doc's `doc_details` ends with `[Justification: …]` referencing the specific case fact. If missing, add it.
    - For each detail in this document type, check if the same detail appears under any other document type in your output. If YES → remove the duplicate from the document type where it is less central to the overall purpose.
 
 6. Review the final list and ensure all document types pass the validation gate.
