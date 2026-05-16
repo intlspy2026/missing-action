@@ -114,11 +114,13 @@ For each candidate doc, apply two checks in order:
 
 **Methodology framing**: INVESTIGATION PROCESSES is a list of candidate documents commonly considered for this investigation type. Filter it down to what THIS claim materially needs. Do not include a doc just because it appears in the methodology.
 
-**Inline justification (debug)**: For every doc you include, append a single sentence to the END of `doc_details` in this format:
+**Case justification field (required)**: For every doc you INCLUDE in `document_set`, populate the `case_justification` field with a single sentence stating the specific case fact from INITIAL REVIEW or ADDITIONAL INFORMATION (or conditional-qualifier evaluation) that justifies inclusion. Do NOT embed this justification in `doc_details` — it belongs in the dedicated `case_justification` field.
 
-  `[Justification: <single sentence stating the specific case fact OR conditional-qualifier evaluation that justifies inclusion>]`
+**What counts as a specific case fact (and what does NOT)**:
+- COUNTS: a fact in the case context that specifically concerns the doc's subject — e.g., the case mentions a direct party being at a specific location during the relevant period (justifies movement-related docs); the case names a witness (justifies witness contact details); the case mentions travel by a direct party (justifies rideshare / travel docs); the case raises a financial/benefit angle for a party (justifies income/benefit docs).
+- DOES NOT count: the incident's existence itself, the methodology listing the doc, or generic purposes like "to confirm movements", "to confirm version of events", "to verify the incident". These are universal to every claim of this investigation type and do not justify a specific doc.
 
-  The justification must reference a concrete case fact, not a generic statement. If you cannot articulate a clean case-fact justification, the doc should not be included in the first place. Place the justification on its own line at the end of `doc_details`, after the existing SME wording.
+A valid justification names a fact from INITIAL REVIEW or ADDITIONAL INFORMATION that is specific to THIS claim — the justification would have to be rewritten if you were drafting docs for a different claim. An invalid justification is one that could be reused unchanged for any claim of this investigation type. If you cannot articulate a justification that passes this reusability test, the doc should not be included.
 
 **RULE 4 - NO DUPLICATES**: Each piece of information must appear under exactly one document type. If the same information could fall under multiple document types, place it under the most specific one and exclude it from the others. Compound aggregator entries titled "other documents", "additional evidence", "other supporting documents" or similar catch-alls that re-aggregate items already requested under another entry are NOT permitted — every required document must live under its own specific entry.
 
@@ -167,7 +169,7 @@ Steps:
    - If a matching SME entry exists: did I reuse its wording verbatim with only placeholders replaced? If NO → revise (per RULE 7a). If no SME entry exists: did my fallback draft produce a full instruction-style request matching the SME cadence (not a short label or one-liner)? If NO → revise (per RULE 7b).
    - Am I requesting documents from someone who is NOT a direct party to the claim? If YES → remove that person. Being mentioned in INITIAL REVIEW or ADDITIONAL INFORMATION does not make someone a direct party.
    - **Justification check (apply RULE 3)**: For each doc, can I point to a specific case fact in INITIAL REVIEW or ADDITIONAL INFORMATION that justifies it for THIS claim? If NO → exclude. Incidental mentions of the doc's subject do not count. If a conditional qualifier in INVESTIGATION PROCESSES is not met for the direct party → exclude.
-   - **Inline justification appended to doc_details**: confirm every included doc's `doc_details` ends with `[Justification: …]` referencing the specific case fact. If missing, add it.
+   - **Case justification field populated**: confirm every included doc has a populated `case_justification` field referencing a specific case fact from INITIAL REVIEW or ADDITIONAL INFORMATION (not a generic purpose or methodology reference). Apply the reusability test: if the justification you'd write could be reused unchanged for any claim of this investigation type, EXCLUDE the doc.
    - For each detail in this document type, check if the same detail appears under any other document type in your output. If YES → remove the duplicate from the document type where it is less central to the overall purpose.
 
 6. Review the final list and ensure all document types pass the validation gate.
