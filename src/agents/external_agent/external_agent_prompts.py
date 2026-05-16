@@ -103,22 +103,35 @@ BEFORE listing any documents, you MUST understand these rules. Violating these r
 **RULE 3 - RELEVANCE FILTER (tailored to case context)**: For each document type listed in INVESTIGATION PROCESSES for the given investigation type, decide whether it applies to THIS specific claim by checking the document's premise against the facts in INITIAL REVIEW and ADDITIONAL INFORMATION.
 
 Steps:
-  a. **Premise check**: Every document type has an implicit premise — a circumstance that must exist for the doc to be relevant. Examples of premise mismatches (illustrative, not exhaustive): a doc presuming the insured is a tenant when the case shows ownership; a doc presuming employment/travel when the incident occurred at the insured's home with no work involvement; a doc presuming a third-party witness when no witness is mentioned anywhere in the case context; a doc presuming a financial benefit angle when no such angle is raised. If the case facts CONTRADICT the doc's premise, EXCLUDE the doc type.
+  a. **Premise check**: Every document type has an implicit premise — a circumstance that must exist for the doc to be relevant. Examples of premise mismatches (illustrative, not exhaustive): a doc presuming the insured is a tenant when the case shows ownership; a doc presuming employment/travel when the incident occurred at the insured's home with no work involvement; a doc presuming a third-party witness when no witness is mentioned anywhere in the case context; a doc presuming a financial benefit angle when no such angle is raised. If the case facts CONTRADICT the doc's premise, EXCLUDE the doc type. Contradiction includes BOTH forms:
+     - **Direct contradiction**: case facts state the opposite of the doc's premise (e.g., the case explicitly establishes the insured owns the property when the doc presumes tenancy).
+     - **Implicit contradiction (scenario-level)**: the case context describes a complete scenario where the doc's subject has no place. For example, an incident that occurred entirely at the insured's home with no work involvement, no travel, no third-party witness, and no property transaction implicitly contradicts the premise of any work-related, travel-related, witness-related, or sale-related doc.
+     Both forms count as contradiction — EXCLUDE in both cases.
   b. **Conditional qualifier**: If INVESTIGATION PROCESSES explicitly states a condition (e.g., "only if there are concerns about ownership"), apply that condition against the case facts. If the condition is not met for the direct party being assessed, exclude. Concerns or findings about associated individuals do not transfer to direct parties.
   c. **Otherwise include**: If the doc's premise is consistent with the case and any conditional qualifier is met, INCLUDE it. Do not exclude a doc merely because the case context does not affirmatively prove its relevance.
 
-**Bias toward inclusion**: When you cannot clearly determine whether a doc type applies — either because the case context is silent on the doc's subject or because the premise check is ambiguous — INCLUDE it. A redundant document request is acceptable; omitting a relevant doc is not. The exclusion bar is "case facts CONTRADICT the doc's premise", NOT "case facts do not affirmatively support the doc".
+**Bias toward inclusion (genuine silence only)**: When the case context is genuinely silent on the doc's subject — i.e. the case does not establish a scenario that excludes the doc's premise — INCLUDE it. A redundant document request is acceptable; omitting a relevant doc is not. However, do NOT treat scenario-level contradiction as silence: if the case has fully described an event with no place for the doc's subject, that is implicit contradiction (exclude), not silence (include). The exclusion bar is "case facts CONTRADICT the doc's premise (directly or implicitly)", NOT "case facts do not affirmatively support the doc".
 
 **Methodology framing**: Treat INVESTIGATION PROCESSES as the list of documents commonly requested for this investigation type, not a strict mandatory list. Your job is to identify which entries fit THIS claim. Filter aggressively against contradictions; retain everything else.
 
-**RULE 4 - NO DUPLICATES**: Each piece of information must appear under exactly one document type. If the same information could fall under multiple document types, place it under the most specific one and exclude it from the others. Compound aggregator entries titled "other documents", "additional evidence", "other supporting documents" or similar catch-alls that re-aggregate items already requested under another entry are NOT permitted — every required document must live under its own specific entry. **Each doc_type label must appear AT MOST ONCE in the output.** If multiple sub-items belong under the same parent doc_type, combine them into a single entry and list the sub-items in doc_details — do not emit multiple entries that share the same doc_type label.
+**RULE 4 - NO DUPLICATES**: Each piece of information must appear under exactly one document type. If the same information could fall under multiple document types, place it under the most specific one and exclude it from the others. Compound aggregator entries titled "other documents", "additional evidence", "other supporting documents" or similar catch-alls that re-aggregate items already requested under another entry are NOT permitted — every required document must live under its own specific entry.
+
+**Each underlying document type must appear AT MOST ONCE in the output.** This applies to the SUBSTANCE of the request, not just the exact label. Do not emit two entries that request the same kind of document under slightly different labels (e.g., "Telephone Records" and "Telephone Records - Evidence of Movements" are the same underlying type — combine into one). If the same underlying doc type would serve multiple purposes (e.g., timeline reconstruction AND movement verification), combine the purposes into a single doc_details entry, do not split into separate entries. If multiple sub-items belong under the same parent doc_type, combine them into a single entry and list the sub-items in doc_details — do not emit multiple entries that share the same doc_type label or that semantically duplicate one another.
 
 **RULE 5 - NEUTRAL LANGUAGE**: Do not use: "fraudulent", "fraud", "suspicious", "red flags", "motive", "collusion", "grossly", "high-risk". Refer to the underlying event as "incident" rather than "assault" in both doc_type and doc_details. Describe the incident neutrally (e.g., "the incident on [date] at [location]"); do not preface it with "alleged", "potential", or any qualifier that pre-judges the case. Do not infer intent or wrongdoing in any doc_details.
 
 **RULE 6 - SME SECTION SELECTION**: Determine which SME section in `<GOLD_STANDARDS>` to use from `<INVESTIGATION_TYPE>`. If it includes "Motor", use ONLY MOTOR DOCUMENT STANDARDS. If it includes "Property", use ONLY PROPERTY DOCUMENT STANDARDS. Do NOT mix sections. Do NOT include documents from a section that does not match `<INVESTIGATION_TYPE>`.
 
 **RULE 7 - VERBATIM SME PHRASING (with fallback)**: For every document type included in your output:
-  a. **Primary (SME match exists)**: When a matching entry exists in the GOLD_STANDARDS section selected by RULE 6, doc_details MUST mirror the SME wording verbatim, replacing only the AI-fillable placeholders (X-patterns such as XXX / XXXX / XX to XX / XXXXXXXXXX, and generic anchors such as names, periods, identifiers) with case-specific values from INITIAL REVIEW and ADDITIONAL INFORMATION. You MUST NOT shorten, summarise, paraphrase, simplify, or rewrite the SME wording when an SME entry exists. If uncertain whether your phrasing matches the SME entry, default to the SME phrasing. **Do NOT modify or fill user-supplied placeholders** — leave the literal tokens `<INSERT PERIOD>` and any UPPERCASE/CAPITALISED slots (e.g. `START/END`) exactly as written in the SME entry. These are user-flagged for manual completion and must pass through to the output unchanged.
+  a. **Primary (SME match exists)**: When a matching entry exists in the GOLD_STANDARDS section selected by RULE 6, doc_details MUST mirror the SME wording verbatim, replacing only the AI-fillable placeholders (X-patterns such as XXX / XXXX / XX to XX / XXXXXXXXXX, and generic anchors such as names, periods, identifiers) with case-specific values from INITIAL REVIEW and ADDITIONAL INFORMATION. You MUST NOT shorten, summarise, paraphrase, simplify, or rewrite the SME wording when an SME entry exists. If uncertain whether your phrasing matches the SME entry, default to the SME phrasing.
+
+  **AI-fillable X-pattern handling**: X-patterns (XXX, XXXX, XX to XX, XXXXXXXXXX, and similar runs of X characters) MUST be filled in your output. Do NOT leave any X-pattern in the final doc_details. Substitute as follows:
+     - When the X-pattern represents a TIMEFRAME, compute an EXACT date range from the relative period defined by INVESTIGATION PROCESSES anchored to the incident date from the case context, and output the range in the format "[DD Month YYYY] to [DD Month YYYY]". Examples: "1 week prior to and after the incident on 21 November 2025" → "14 November 2025 to 28 November 2025"; "3-month period surrounding the incident on 21 November 2025" → compute the corresponding 3-month window around that date and output the exact start and end dates. Do NOT output relative phrasings like "3-month period", "1 week prior to and after", or "surrounding the incident" in the final doc_details — convert them to absolute date ranges.
+     - When the X-pattern represents an ENTITY (name, identifier, location, address), replace it with the specific value from the case context.
+     - When the X-pattern represents an ANCHOR (incident date, policy date, etc.), replace it with the date or identifier from the case context.
+     - If you cannot determine an exact value, substitute with the most reasonable relative description grounded in INVESTIGATION PROCESSES and the case context. Leaving an X-pattern unfilled in the output is a critical error.
+
+  **User-supplied placeholders (DO NOT fill)**: Do NOT modify or fill user-supplied placeholders — leave the literal tokens `<INSERT PERIOD>`, `<INSERT NAME>`, and any angle-bracketed `<INSERT …>` or UPPERCASE/CAPITALISED slots (e.g. `START/END`) exactly as written in the SME entry. These are user-flagged for manual completion and must pass through to the output unchanged. Distinguish these from X-patterns: angle-bracketed `<INSERT …>` tokens and UPPERCASE slot names are user-supplied (leave alone); runs of X characters are AI-fillable (must be filled).
   b. **Fallback (no SME match)**: When a document type required by INVESTIGATION PROCESSES has no matching entry in the selected GOLD_STANDARDS section, INCLUDE it using a fallback draft: write a full instruction-style request (e.g., "A copy of …", "Fully itemised …", "Provide …"), grounded in INVESTIGATION PROCESSES and case-specific values from INITIAL REVIEW and ADDITIONAL INFORMATION. Match the cadence, level of detail, and neutral tone of the SME exemplars in the selected section. Do NOT produce short labels or one-line summaries.
 </CRITICAL_RULES>
 
@@ -139,7 +152,7 @@ Steps:
 
 4. For each document type identified in Step 2:
     a. Assess relevance against INITIAL REVIEW and ADDITIONAL INFORMATION (apply RULE 3).
-    b. If relevant, locate the matching SME entry in the GOLD_STANDARDS section selected in Step 1. Apply RULE 7a: reuse the SME wording verbatim, replacing only placeholders (XXX, XXXX, dates, names, identifiers, periods) with case-specific values from Step 3. Preserve timeframes from INVESTIGATION PROCESSES as relative periods (e.g., "3-month period", "1 week prior to and after the incident") rather than converting them into specific date ranges.
+    b. If relevant, locate the matching SME entry in the GOLD_STANDARDS section selected in Step 1. Apply RULE 7a: reuse the SME wording verbatim, replacing only placeholders (XXX, XXXX, dates, names, identifiers, periods) with case-specific values from Step 3. Convert all timeframes from INVESTIGATION PROCESSES into EXACT date ranges anchored to the incident date (e.g., "1 week prior to and after the incident on 21 November 2025" → "14 November 2025 to 28 November 2025"). Do NOT leave timeframes as relative periods in the final output.
     c. If no matching SME entry exists in the selected GOLD_STANDARDS section, apply RULE 7b (fallback): include the document type and draft a full instruction-style doc_details grounded in INVESTIGATION PROCESSES and case context, matching the cadence and detail level of the SME exemplars in the selected section.
 
 5. **Validation gate**: Before including each document type in your output, confirm:
@@ -180,22 +193,6 @@ The ADDITIONAL INFORMATION includes additional notes on the claim, which can inc
 <OUTPUT>
 {format}
 </OUTPUT>
-
-Here are some output examples
-<EXAMPLES>
-Example 1
-Output:
-{{
-  "doc_type": "Bank Statement",
-  "doc_details": "All financial statements for any and all accounts held in your name or jointly with somebody else for the period TBA. Please ensure this includes savings, current and credit card accounts and that the records CONFIDENTIAL appear on the letterhead of the relevant financial institution and ensure the bank details are redacted"
-}}
-Example 2
-Output:
-{{
-  "doc_type": "Vehicle Photo (incident)",
-  "doc_details": "A copy of any photos taken from incident scene this includes, other parties details/ licence, damages to yours and their vehicles. these photos are in the original format and size, please do not rename the photo and attach the photo to the email itself"
-}}
-</EXAMPLES>
 """
 
 ADDITIONAL_ENQUIRIES_DRAFT_PROMPT = """
