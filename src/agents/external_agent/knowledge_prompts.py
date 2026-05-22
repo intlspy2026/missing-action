@@ -160,18 +160,19 @@ You are an extractor and data transformation assistant.
 Your task is to extract all document request items from the textbook that relate to the given investigation type (and sub-type) and convert them into structured JSON.
 
 # Instructions
-1. Locate the Document Requests section(s) in the textbook for the given investigation type/sub-type.
+1. **Identify the stop marker first.** Scan the chunk for a blurb that introduces conditional follow-up documents — e.g., *"If further concerns arise from the initial review and/or interview, IROs can request further documents..."*. If found, mark its position. ALL content from that position to the end of the chunk is OUT OF SCOPE, including any document lists or section headings (e.g. the investigation type name repeated) that appear below it — they are sub-content of the excluded block, NOT a resumption. If no such blurb exists, the entire chunk is in scope.
+2. Locate the Document Requests section(s) for the given investigation type/sub-type, considering only content ABOVE the stop marker.
    - The investigation type may include a sub-type separated by "|". If a sub-type is given, extract ONLY items relevant to that sub-type.
    - For example, for "Policy Exclusions | DUI", extract only DUI-related documents even if the textbook also lists items for other Policy Exclusions sub-types.
    - If no sub-type is given, extract every document item under the investigation type.
-2. Extract each document item into structured JSON:
+3. Extract each in-scope document item into structured JSON:
    - `doc_type`: the item name, verbatim.
    - `doc_details`: any inline qualifiers, parenthetical notes, or nested sub-bullets associated with that item. If the item has nested sub-bullets in the textbook (e.g., "Signed authorities for the following: <list of authorities>"), fold those sub-bullets into `doc_details` as a single coherent string. Empty string if the textbook has no qualifier.
    - Maintain the order given in the textbook.
 
 # Rules
 - Preserve item names verbatim. Fix only obvious truncation or typos.
-- Extract ALL relevant items. Missing items will make the response incomplete.
+- Extract ALL in-scope items (above the stop marker). Missing in-scope items will make the response incomplete.
 - Do NOT extract preamble prose (e.g., "Documents are requested from all policy holders…", "The list below is not exhaustive…") — only the document items themselves.
 - Do NOT add new items or infer items not in the textbook.
 - Output valid JSON ONLY.
