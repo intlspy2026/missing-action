@@ -103,7 +103,7 @@ BEFORE listing any documents, you MUST understand these rules. Violating these r
 
 **RULE 1 - SOURCE RESTRICTION**: Every document type MUST originate from one of two permitted sources:
     a. INVESTIGATION PROCESSES — methodology-driven document types for the given investigation type.
-    b. The claimant's incident account within INITIAL REVIEW — narrative-driven document types (see TASK Step 4).
+    b. The claimant's incident account within INITIAL REVIEW — narrative-driven document types (see TASK Step 3).
 If a document type cannot be traced back to either source, it MUST be excluded.
 
 **RULE 2 - PARTY SCOPE**: Only request documents from parties directly involved in the current claim under investigation. Use INITIAL REVIEW and ADDITIONAL INFORMATION to identify who the direct parties are. Individuals mentioned in prior claims, historical associations, or background checks within INITIAL REVIEW or ADDITIONAL INFORMATION are NOT direct parties to the current claim. Do not request documents from associated individuals who are not direct parties. Replace generic references in INVESTIGATION PROCESSES with the specific individuals identified from INITIAL REVIEW and ADDITIONAL INFORMATION.
@@ -116,10 +116,8 @@ If a document type cannot be traced back to either source, it MUST be excluded.
 
 **RULE 5 - NEUTRAL LANGUAGE**: Do not use: "fraudulent", "fraud", "suspicious", "red flags", "motive", "collusion", "grossly", "high-risk". Refer to the underlying event as "incident" rather than "assault" in both doc_type and doc_details. Describe the incident neutrally (e.g., "the incident on [date] at [location]"); do not preface it with "alleged", "potential", or any qualifier that pre-judges the case. Do not infer intent or wrongdoing in any doc_details.
 
-**RULE 6 - SME SECTION SELECTION**: Determine which SME section in `<GOLD_STANDARDS>` to use from `<INVESTIGATION_TYPE>`. If it includes "Motor", use ONLY MOTOR DOCUMENT STANDARDS. If it includes "Property", use ONLY PROPERTY DOCUMENT STANDARDS. Do not mix sections. Do NOT include documents from a section that does not match `<INVESTIGATION_TYPE>`.
-
-**RULE 7 - VERBATIM SME PHRASING (with fallback)**: For every document type included in your output:
-a. **Primary (SME match exists)**: When a matching entry exists in the GOLD_STANDARDS section selected by RULE 6, doc_details MUST mirror the SME wording verbatim, replacing only the AI-fillable placeholders (X-patterns such as XXX / XXXX / XX to XX / XXXXXXXXXX, and generic anchors such as names, periods, identifiers) with case-specific values from INITIAL REVIEW and ADDITIONAL INFORMATION. You MUST NOT shorten, summarise, paraphrase, simplify, or rewrite the SME wording when an SME entry exists. If uncertain whether your phrasing matches the SME entry, default to the SME phrasing.
+**RULE 6 - VERBATIM SME PHRASING (with fallback)**: For every document type included in your output:
+a. **Primary (SME match exists)**: When a matching entry exists in the provided GOLD_STANDARDS, doc_details MUST mirror the SME wording verbatim, replacing only the AI-fillable placeholders (X-patterns such as XXX / XXXX / XX to XX / XXXXXXXXXX, and generic anchors such as names, periods, identifiers) with case-specific values from INITIAL REVIEW and ADDITIONAL INFORMATION. You MUST NOT shorten, summarise, paraphrase, simplify, or rewrite the SME wording when an SME entry exists. If uncertain whether your phrasing matches the SME entry, default to the SME phrasing.
 
 **AI-fillable X-pattern handling**: X-patterns (XXX, XXXX, XX to XX, XXXXXXXXXX, and similar runs of X characters) MUST be filled in your output. Do NOT leave any X-pattern in the final doc_details. Substitute as follows:
 - When the X-pattern represents a TIMEFRAME, compute an EXACT date range from the relative period defined by INVESTIGATION PROCESSES anchored to the incident date from the case context, and output the range in the format "[DD Month YYYY] to [DD Month YYYY]". Examples: "1 week prior to and after the incident on 21 November 2025" -> "14 November 2025 to 28 November 2025"; "3-month period surrounding the incident on 21 November 2025" -> compute the corresponding 3-month window around that date and output the exact start and end dates. Do NOT output relative phrasings like "3-month period", "1 week prior to and after", or "surrounding the incident" in the final doc_details – convert them to absolute date ranges.
@@ -128,10 +126,10 @@ a. **Primary (SME match exists)**: When a matching entry exists in the GOLD_STAN
 - If you cannot determine an exact value, substitute with the most reasonable relative description grounded in INVESTIGATION PROCESSES and the case context. Leaving an X-pattern unfilled in the output is a critical error.
 
 **User-supplied placeholders (DO NOT fill)**: Do NOT modify or fill user-supplied placeholders – leave the literal tokens `<INSERT PERIOD>`, `<INSERT NAME>`, and any angle-bracketed `<INSERT >` or UPPERCASE/CAPITALISED slots (e.g. `START/END`) exactly as written in the SME entry. These are user-flagged for manual completion and must pass through to the output unchanged. Distinguish these from X-patterns: angle-bracketed `<INSERT _>` tokens and UPPERCASE slot names are user-supplied (leave alone); runs of X characters are AI-fillable (must be filled).
-b. **Fallback (no SME match)**: When a document type has no matching entry in the selected GOLD_STANDARDS section — including ALL narrative-derived document types (see TASK Step 4), which will never have SME entries — INCLUDE it using a fallback draft: write a full instruction-style request (e.g., "A copy of _", "Fully itemised _", "Provide _"), grounded in the relevant source:
+b. **Fallback (no SME match)**: When a document type has no matching entry in the provided GOLD_STANDARDS — including ALL narrative-derived document types (see TASK Step 3), which will never have SME entries — INCLUDE it using a fallback draft: write a full instruction-style request (e.g., "A copy of _", "Fully itemised _", "Provide _"), grounded in the relevant source:
        - For methodology-driven types: ground in INVESTIGATION PROCESSES and case context.
        - For narrative-driven types: ground in the claimant's incident account from INITIAL REVIEW.
-    Match the cadence and neutral tone of the SME exemplars in the selected section. Narrative-driven types may use a slightly looser phrasing standard — procedural detail and exact date ranges are not required — but must still be clear, actionable, and neutral. Do NOT produce short labels or one-line summaries.
+    Match the cadence and neutral tone of the SME exemplars. Narrative-driven types may use a slightly looser phrasing standard — procedural detail and exact date ranges are not required — but must still be clear, actionable, and neutral. Do NOT produce short labels or one-line summaries.
 </CRITICAL_RULES>
 
 <GOLD_STANDARDS>
@@ -143,54 +141,46 @@ b. **Fallback (no SME match)**: When a document type has no matching entry in th
 List down all the document types and document details required for external investigation for provided investigation type:
 
 Steps:
-1. Apply RULE 6 to select the correct SME section in `<GOLD_STANDARDS>` based on `<INVESTIGATION_TYPE>`. This selected section is your phrasing source for the rest of the task.
+1. Read INVESTIGATION PROCESSES. Identify all document types specified for the given investigation type. These are your primary source for methodology-driven document types.
 
-2. Read INVESTIGATION PROCESSES. Identify all document types specified for the given investigation type. These are your primary source for methodology-driven document types.
+2. Read INITIAL REVIEW and ADDITIONAL INFORMATION to extract case-specific values (names of direct parties, dates, locations, incident specifics, periods, identifiers). ADDITIONAL INFORMATION may contain supplementary details (e.g., police reports, engineer reports, incident reports) not captured in INITIAL REVIEW – use these as additional evidence where relevant.
 
-3. Read INITIAL REVIEW and ADDITIONAL INFORMATION to extract case-specific values (names of direct parties, dates, locations, incident specifics, periods, identifiers). ADDITIONAL INFORMATION may contain supplementary details (e.g., police reports, engineer reports, incident reports) not captured in INITIAL REVIEW – use these as additional evidence where relevant.
-
-4. **Derive document types from the claimant's incident account in INITIAL REVIEW**:
+3. **Derive document types from the claimant's incident account in INITIAL REVIEW**:
     a. Scan INITIAL REVIEW to locate the current claim's first-hand account of what happened — the narrative describing the incident as reported by the claimant for THIS claim. This is the claimant's own description of this claim's event — NOT accounts of prior claims, historical incidents, or previous claim lodgements. This narrative may appear under headings such as "Claim Lodgement", "Loss Description", "Circumstances", "What Happened", etc., or without an explicit heading. Use semantic understanding to:
        - Distinguish the current claim's incident narrative from IRO analysis, background checks, policy details, and prior claims history.
        - Distinguish the current claim's lodgement from descriptions of previous claims — prior claims may contain their own loss descriptions; these must NOT be treated as the current claim's incident account.
     b. From this narrative, identify documents needed to independently verify, corroborate, or support the claimant's account. Examples: receipts or proof of purchase for specific items mentioned; records from named venues, establishments, or facilities; communications referenced in the narrative; witness statements from individuals named; medical records from specific providers mentioned; or any documentation the claimant claims to possess.
-    c. Apply all CRITICAL RULES: Party Scope (RULE 2), Relevance Filter (RULE 3 adapted to narrative source), No Duplicates (RULE 4), and Neutral Language (RULE 5). Note: RULE 6 and RULE 7a do not apply to narrative-derived types — they will always use the RULE 7b fallback because SME entries do not exist for case-specific narrative documents.
+    c. Apply all CRITICAL RULES: Party Scope (RULE 2), Relevance Filter (RULE 3 adapted to narrative source), No Duplicates (RULE 4), and Neutral Language (RULE 5). Note: RULE 6a does not apply to narrative-derived types — they will always use the RULE 6b fallback because SME entries do not exist for case-specific narrative documents.
     d. Before including a narrative-derived document type, ensure:
        - It does NOT duplicate a document type from INVESTIGATION PROCESSES. If overlap exists, merge into the methodology-derived entry.
        - It is NOT derived from non-narrative parts of INITIAL REVIEW (IRO analysis, background checks, prior claims, policy details).
        - It is a concrete, obtainable document — not a vague inquiry disguised as a record request.
     e. No fixed quota. A brief narrative may yield zero; a detailed one may yield several.
-    f. For each narrative-derived document type included, draft doc_details using the RULE 7b fallback standard — a clear, actionable instruction-style request grounded in the claimant's narrative, matching the selected SME section's cadence and tone. Slightly looser phrasing is acceptable; short labels or one-line summaries are not.
+    f. For each narrative-derived document type included, draft doc_details using the RULE 6b fallback standard — a clear, actionable instruction-style request grounded in the claimant's narrative, matching the SME cadence and tone. Slightly looser phrasing is acceptable; short labels or one-line summaries are not.
 
-5. For each document type identified in Steps 2 and 4:
+4. For each document type identified in Steps 1 and 3:
     a. Assess relevance against INITIAL REVIEW and ADDITIONAL INFORMATION (apply RULE 3).
-    b. If relevant, locate the matching SME entry in the GOLD_STANDARDS section selected in Step 1. Apply RULE 7a: reuse the SME wording verbatim, replacing only placeholders (XXX, XXXX, dates, names, identifiers, periods) with case-specific values from Step 3. Convert all timeframes from INVESTIGATION PROCESSES into EXACT date ranges anchored to the incident date (e.g., "1 week prior to and after the incident on 21 November 2025" -> "14 November 2025 to 28 November 2025"). Do NOT leave timeframes as relative periods in the final output.
-    c. If no matching SME entry exists in the selected GOLD_STANDARDS section, apply RULE 7b (fallback): include the document type and draft a full instruction-style doc_details. For methodology-driven types, ground in INVESTIGATION PROCESSES and case context. For narrative-driven types, ground in the claimant's incident account matching the cadence and detail level of the SME exemplars in the selected section.
+    b. If relevant, locate the matching SME entry in the provided GOLD_STANDARDS. Apply RULE 6a: reuse the SME wording verbatim, replacing only placeholders (XXX, XXXX, dates, names, identifiers, periods) with case-specific values from Step 2. Convert all timeframes from INVESTIGATION PROCESSES into EXACT date ranges anchored to the incident date (e.g., "1 week prior to and after the incident on 21 November 2025" -> "14 November 2025 to 28 November 2025"). Do NOT leave timeframes as relative periods in the final output.
+    c. If no matching SME entry exists in the provided GOLD_STANDARDS, apply RULE 6b (fallback): include the document type and draft a full instruction-style doc_details. For methodology-driven types, ground in INVESTIGATION PROCESSES and case context. For narrative-driven types, ground in the claimant's incident account matching the cadence and detail level of the SME exemplars.
 
-6. **Validation gate**: Before including each document type in your output, confirm:
-    - Can I point to the specific entry in INVESTIGATION PROCESSES that this document type comes from? OR can I trace it to the claimant's incident account (per TASK Step 4)? If neither -> exclude it.
-    - Did I use the GOLD_STANDARDS section selected by RULE 6 (and not the other section)? If NO -> revise.
-    - If a matching SME entry exists: did I reuse its wording verbatim with only placeholders replaced? If NO -> revise (per RULE 7a). If no SME entry exists: did my fallback draft produce a full instruction-style request matching the SME cadence (not a short label or one-liner)? If NO -> revise (per RULE 7b).
+5. **Validation gate**: Before including each document type in your output, confirm:
+    - Can I point to the specific entry in INVESTIGATION PROCESSES that this document type comes from? OR can I trace it to the claimant's incident account (per TASK Step 3)? If neither -> exclude it.
+    - If a matching SME entry exists: did I reuse its wording verbatim with only placeholders replaced? If NO -> revise (per RULE 6a). If no SME entry exists: did my fallback draft produce a full instruction-style request matching the SME cadence (not a short label or one-liner)? If NO -> revise (per RULE 6b).
     - Am I requesting documents from someone who is NOT a direct party to the claim? If YES -> remove that person. Being mentioned in INITIAL REVIEW or ADDITIONAL INFORMATION does not make someone a direct party.
     - For each detail in this document type, check if the same detail appears under any other document type in your output. If YES -> remove the duplicate from the document type where it is less central to the overall purpose.
 
-7. Review the final list and ensure all document types pass the validation gate.
+6. Review the final list and ensure all document types pass the validation gate.
 </TASK>
 
 <CONTEXT>
 These are the relevant materials for your case:
-
-The INVESTIGATION_TYPE drives SME section selection in GOLD_STANDARDS (apply RULE 6):
-<INVESTIGATION_TYPE>
-{investigation_type}
-</INVESTIGATION_TYPE>
 
 Here is the INVESTIGATION PROCESSES – this is your primary source for methodology-driven document types. Each entry in the array contains the documents for ONE investigation type:
 <INVESTIGATION PROCESSES>
 {knowledge}
 </INVESTIGATION PROCESSES>
 
-The INITIAL REVIEW provides case-specific details for contextualisation and relevance assessment. You may derive additional document types from the claimant's incident account within this section (see TASK Step 4). Do NOT derive new document types from other parts of INITIAL REVIEW:
+The INITIAL REVIEW provides case-specific details for contextualisation and relevance assessment. You may derive additional document types from the claimant's incident account within this section (see TASK Step 3). Do NOT derive new document types from other parts of INITIAL REVIEW:
 <INITIAL REVIEW>
 {initial_review}
 </INITIAL REVIEW>

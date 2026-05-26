@@ -7,6 +7,9 @@ Each constant pair is:
 - `<SECTION>_GOLD_STANDARDS_BLOCK` — same content pre-wrapped in tags, intended
   for the SECTION_FEEDBACK_PROMPT slot which uses an include-or-omit pattern.
 
+Separated by LOB: Motor vs Property. The calling code selects the appropriate
+constant based on the LOB in state.
+
 To update the gold standards, edit the raw constant only; the block constant is
 derived automatically.
 
@@ -20,12 +23,11 @@ Placeholder conventions inside SME entries:
   are SME-flagged for user review and must be left as-is for human follow-up.
 """
 
-DOC_REQUEST_GOLD_STANDARDS = """
-MOTOR DOCUMENT STANDARDS
+MOTOR_DOC_REQUEST_GOLD_STANDARDS = """
 - Purchase Documents: A copy of the purchase documents for the subject vehicle - purchase contract /invoice or purchase receipt and contact details of the previous owner (if private sale).
 - Registration Certificate: A copy of the registration certificate for the subject vehicle, current at the date of loss - if you cannot locate a copy, this can be obtained from your relevant transport department.
 - Telephone Records: Fully itemised telephone call and text records for <INSERT PERIOD> and all numbers held in your or joint names, or which you had access to for the period XXX to XXX. This should be in the original, non-editable format provided by your telephone service provider. For the dates XXXX, please fully itemise all calls and texts made listing the party contacted and reason for the call or text. If you encounter difficulties with your telephone service providers to obtain the above information, please contact the Telecommunications Industry Ombudsman on 1800 062 058 or https://www.tioonline.com.au/consumers/new/.
-- Finance Documents: A copy of the finance documents – this should include the initial finance agreement, term of the loan, repayment history, payout figure requests and approximate payout balance. If finance has been finalised, evidence of the finance release letter from your financier.
+- Finance Documents: A copy of the finance documents — this should include the initial finance agreement, term of the loan, repayment history, payout figure requests and approximate payout balance. If finance has been finalised, evidence of the finance release letter from your financier.
 - Service and Maintenance History: A copy of the service and maintenance history for the subject vehicle, including service reports and receipts through the service provider or parts purchases/tyres replacement and contact details for the service provider.
 - Receipts for Modifications: A copy of receipts for any modifications made to the subject vehicle.
 - Roadworthy Documents: A copy of the roadworthy certificate and/or inspection records for the subject vehicle.
@@ -55,8 +57,9 @@ MOTOR DOCUMENT STANDARDS
 - Keys: Photographs of/Please provide all remaining keys for the subject vehicle.
 - Towing Records: A copy of any towing records, receipts or payments made for the claimed incident.
 - Vehicle Agreement/Contracts: A copy of any relevant agreements of contracts for use of the subject vehicle.
+"""
 
-PROPERTY DOCUMENT STANDARDS
+PROPERTY_DOC_REQUEST_GOLD_STANDARDS = """
 - Telephone Records: Fully itemised telephone call and text records for <INSERT PERIOD> and all numbers held in your or joint names, or which you had access to for the period XXX to XXX. This should be in the original, non-editable format provided by your telephone service provider. For the dates XXXX, please fully itemise all calls and texts made listing the party contacted and reason for the call or text. If you encounter difficulties with your telephone service providers to obtain the above information, please contact the Telecommunications Industry Ombudsman on 1800 062 058 or https://www.tioonline.com.au/consumers/new/.
 - Photographs of Property: A copy of photographs of the risk address prior to the incident in the original format.
 - Photographs of Contents: A copy of photographs of the contents being claimed in the original format.
@@ -98,7 +101,10 @@ PROPERTY DOCUMENT STANDARDS
 - Request to Interview: We request that <INSERT PERIOD> makes themselves available for a recorded interview.
 """
 
-DOC_REQUEST_GOLD_STANDARDS_BLOCK = f"""<GOLD_STANDARDS>
-{DOC_REQUEST_GOLD_STANDARDS}
-</GOLD_STANDARDS>
-"""
+MOTOR_DOC_REQUEST_GOLD_STANDARDS_BLOCK = f"""<GOLD_STANDARDS>
+{MOTOR_DOC_REQUEST_GOLD_STANDARDS}
+</GOLD_STANDARDS>"""
+
+PROPERTY_DOC_REQUEST_GOLD_STANDARDS_BLOCK = f"""<GOLD_STANDARDS>
+{PROPERTY_DOC_REQUEST_GOLD_STANDARDS}
+</GOLD_STANDARDS>"""
