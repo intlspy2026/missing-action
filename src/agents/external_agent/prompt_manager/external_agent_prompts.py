@@ -105,7 +105,11 @@ BEFORE listing any documents, you MUST understand these rules. Violating these r
 
 **RULE 2 - PARTY SCOPE**: Only request documents from parties directly involved in the current claim under investigation. Use INITIAL REVIEW and ADDITIONAL INFORMATION to identify who the direct parties are. Individuals mentioned in prior claims, historical associations, or background checks within INITIAL REVIEW or ADDITIONAL INFORMATION are NOT direct parties to the current claim. Do not request documents from associated individuals who are not direct parties. Replace generic references in INVESTIGATION PROCESSES with the specific individuals identified from INITIAL REVIEW and ADDITIONAL INFORMATION.
 
-**RULE 3 - RELEVANCE FILTER**: From the document types listed in INVESTIGATION PROCESSES for the given investigation type, include those that are relevant to THIS claim based on the facts in INITIAL REVIEW and ADDITIONAL INFORMATION. Exclude a document type when the case facts clearly contradict its subject (e.g., a tenancy agreement when the case establishes ownership) or when a conditional qualifier in the methodology (e.g., "(if applicable)", "(only request if X)") is not met by the case facts. When in doubt, INCLUDE – a redundant request is acceptable; omitting a relevant doc is not.
+**RULE 3 - RELEVANCE FILTER**: For each document type identified from INVESTIGATION PROCESSES, you MUST find a specific factual basis in INITIAL REVIEW or ADDITIONAL INFORMATION that makes it relevant to THIS claim. A document type does not automatically apply just because it appears in the methodology for the investigation type — the case facts must create a need for it. Exclude a document type when:
+    a. The case facts contradict its subject (e.g., tenancy documents when the party owns the property; contract of sale when the party is a tenant).
+    b. The case facts provide no logical connection (e.g., criminal history or background checks when no criminal element or prior offending is alleged; work rosters or timesheets when the incident is not employment-related or attendance timing is not questioned; rideshare, taxi, or transport receipts when the incident occurred at a fixed location and travel is not material).
+    c. A conditional qualifier in the methodology (e.g., "(if applicable)", "(only request if X)") is not met by the case facts.
+    The examples above are illustrative — apply the same reasoning standard to every document type. When in doubt, INCLUDE — but only after you have actively searched for a factual hook.
 
 **RULE 4 - NO DUPLICATES**: Each piece of information must appear under exactly one document type. If the same information could fall under multiple document types, place it under the most specific one and exclude it from the others. Compound aggregator entries titled "other documents", "additional evidence", "other supporting documents" or similar catch-alls that re-aggregate items already requested under another entry are NOT permitted – every required document must live under its own specific entry.
 
@@ -126,10 +130,6 @@ a. **Primary (SME match exists)**: When a matching entry exists in the provided 
 b. **Fallback (no SME match)**: When a document type has no matching entry in the provided GOLD_STANDARDS, INCLUDE it using a fallback draft: write a full instruction-style request (e.g., "A copy of _", "Fully itemised _", "Provide _"), grounded in INVESTIGATION PROCESSES and case context. Match the cadence and neutral tone of the SME exemplars. Do NOT produce short labels or one-line summaries.
 </CRITICAL_RULES>
 
-<GOLD_STANDARDS>
-{gold_standards}
-</GOLD_STANDARDS>
-
 <TASK>
 **YOUR TASK**
 List down all the document types and document details required for external investigation for provided investigation type:
@@ -145,6 +145,7 @@ Steps:
     c. If no matching SME entry exists in the provided GOLD_STANDARDS, apply RULE 6b (fallback): include the document type and draft a full instruction-style doc_details grounded in INVESTIGATION PROCESSES and case context.
 
 4. **Validation gate**: Before including each document type in your output, confirm:
+    - Can I point to a specific fact in INITIAL REVIEW or ADDITIONAL INFORMATION that makes this document type relevant to this claim? If I cannot articulate a fact-based connection, exclude it.
     - Can I point to the specific entry in INVESTIGATION PROCESSES that this document type comes from? If not -> exclude it.
     - If a matching SME entry exists: did I reuse its wording verbatim with only placeholders replaced? If NO -> revise (per RULE 6a). If no SME entry exists: did my fallback draft produce a full instruction-style request matching the SME cadence (not a short label or one-liner)? If NO -> revise (per RULE 6b).
     - Am I requesting documents from someone who is NOT a direct party to the claim? If YES -> remove that person. Being mentioned in INITIAL REVIEW or ADDITIONAL INFORMATION does not make someone a direct party.
@@ -171,6 +172,10 @@ The ADDITIONAL INFORMATION includes additional notes on the claim, which can inc
 {additional_info}
 </ADDITIONAL INFORMATION>
 </CONTEXT>
+
+<GOLD_STANDARDS>
+{gold_standards}
+</GOLD_STANDARDS>
 
 <OUTPUT>
 {format}
