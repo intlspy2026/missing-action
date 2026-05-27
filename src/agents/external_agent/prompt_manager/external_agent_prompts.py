@@ -109,7 +109,7 @@ BEFORE listing any documents, you MUST understand these rules. Violating these r
     a. The case facts contradict its subject (e.g., tenancy documents when the party owns the property; contract of sale when the party is a tenant).
     b. The case facts provide no logical connection (e.g., criminal history or background checks when no criminal element or prior offending is alleged; work rosters or timesheets when the incident is not employment-related or attendance timing is not questioned; rideshare, taxi, or transport receipts when the incident occurred at a fixed location and travel is not material).
     c. A conditional qualifier in the methodology (e.g., "(if applicable)", "(only request if X)") is not met by the case facts.
-    The examples above are illustrative — apply the same reasoning standard to every document type. When in doubt, INCLUDE — but only after you have actively searched for a factual hook.
+    The examples above are illustrative — apply the same reasoning standard to every document type. If you cannot identify a specific fact in INITIAL REVIEW or ADDITIONAL INFORMATION that makes the document type relevant to this case, EXCLUDE it.
 
 **RULE 4 - NO DUPLICATES**: Each piece of information must appear under exactly one document type. If the same information could fall under multiple document types, place it under the most specific one and exclude it from the others. Compound aggregator entries titled "other documents", "additional evidence", "other supporting documents" or similar catch-alls that re-aggregate items already requested under another entry are NOT permitted – every required document must live under its own specific entry.
 
