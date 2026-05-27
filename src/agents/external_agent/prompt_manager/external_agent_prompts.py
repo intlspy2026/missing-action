@@ -188,7 +188,7 @@ You are deriving document types from the claimant's incident account in INITIAL 
 - **Standalone Entry**: Each new entry must have its own distinct doc_type. Do NOT fold a narrative-derived document need into an existing methodology entry by expanding that entry's doc_details scope.
 - **Neutral Language**: Do not use "fraudulent", "fraud", "suspicious", "red flags", "motive", "collusion", "grossly", "high-risk". Refer to the underlying event as "incident". Do not preface with "alleged" or "potential".
 - **Source Guardrail**: Derive SOLELY from the claimant's first-hand narrative — including their description of the incident AND any circumstances, arrangements, or explanations given. Do NOT derive from IRO analysis, background check results, interview transcript references, mandatory search results, policy verification details, or prior claims history. If the source is not the claimant's own words in their incident account, EXCLUDE it.
-- **RULE 6b Fallback**: No SME entries exist for narrative types. Draft full instruction-style doc_details grounded in the claimant's narrative, matching the tone of a concise senior-investigator brief. Short labels or one-liners are unacceptable.
+- **Narrative Drafting**: No SME entries exist for narrative types. Draft full instruction-style doc_details grounded in the claimant's narrative, matching the tone of a concise senior-investigator brief. Short labels or one-liners are unacceptable.
 </CRITICAL_RULES>
 
 <METHODOLOGY_DOCS>
@@ -201,7 +201,7 @@ These document types have already been derived from INVESTIGATION PROCESSES. Use
 2. Locate the claimant's first-hand account of this claim in INITIAL REVIEW — the narrative describing what happened, as reported by the claimant for THIS claim. This is NOT IRO analysis, background checks, or prior claims history.
 3. From this narrative, derive document types needed to independently verify any material assertion or detail — including the incident itself, and any circumstances, arrangements, or explanations given (e.g., a service was engaged, a location was visited, an item was purchased, someone was present). Examples: receipts for items mentioned; records from any business, service provider, venue, or facility cited — whether named or only implied (e.g., service logs, booking confirmations, invoices); communications referenced; witness statements from named individuals; medical records from mentioned providers; or any documentation the claimant claims to possess.
 4. When the narrative cites an explanation for a circumstance or decision, identify what records from the entity or party cited — even if only implied — would independently verify that explanation.
-5. For each derived document type, check all CRITICAL RULES. If a type substantively duplicates a METHODOLOGY_DOCS entry, skip it. If it is a concrete, obtainable document from the claimant's own narrative, create a NEW standalone entry with its own distinct doc_type and a full instruction-style doc_details (RULE 6b). If it is vague, irrelevant, or from a non-narrative source, exclude it.
+5. For each derived document type, check all CRITICAL RULES. If a type substantively duplicates a METHODOLOGY_DOCS entry, skip it. If it is a concrete, obtainable document from the claimant's own narrative, create a NEW standalone entry with its own distinct doc_type and a full instruction-style doc_details (Narrative Drafting rule). If it is vague, irrelevant, or from a non-narrative source, exclude it.
 </TASK>
 
 <CONTEXT>
