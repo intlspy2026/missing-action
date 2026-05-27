@@ -135,6 +135,7 @@ Steps:
     - Can I point to the specific entry in INVESTIGATION PROCESSES that this document type comes from? If not -> exclude it.
     - Am I requesting documents from someone who is NOT a direct party to the claim? If YES -> remove that person. Being mentioned in INITIAL REVIEW or ADDITIONAL INFORMATION does not make someone a direct party.
     - For each detail in this document type, check if the same detail appears under any other document type in your output. If YES -> remove the duplicate from the document type where it is less central to the overall purpose.
+    - If this document type is a catch-all that lists sub-items (e.g., work roster, rideshare receipts, witness contact details), assess EACH sub-item individually against RULE 3. If any sub-item has no factual hook in INITIAL REVIEW or ADDITIONAL INFORMATION, strip it from the doc_details — do not include the entire catch-all entry just because one sub-item is relevant.
 
 5. Review the final list and ensure all document types pass the validation gate.
 
