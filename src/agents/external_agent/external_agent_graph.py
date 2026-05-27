@@ -16,7 +16,8 @@ from agents.external_agent.prompt_manager.knowledge_prompts import (
 from agents.external_agent.prompt_manager.external_agent_prompts import (
     EXTERNAL_AGENT_SYSTEM_PROMPT,
     KEY_CONCERNS_DRAFT_PROMPT,
-    DOC_REQUEST_DRAFT_PROMPT,
+    DOC_REQUEST_RELEVANCE_PROMPT,
+    DOC_REQUEST_SME_PROMPT,
     NARRATIVE_DOC_REQUEST_DRAFT_PROMPT,
     ADDITIONAL_ENQUIRIES_DRAFT_PROMPT,
     INTERVIEW_PLAN_DRAFT_PROMPT,
@@ -1176,25 +1177,55 @@ def get_graph(llm: BaseChatModel) -> StateGraph:
                 indent=2,
             )
 
-            # --- Methodology call ---
-            methodology_prompt = DOC_REQUEST_DRAFT_PROMPT.format(
+            # --- Call 1: Relevance filter ---
+            writer(prepare_thinking_message(
+                EXTERNAL_AGENT_NAME, "Filtering relevant document types..."))
+
+            relevance_prompt = DOC_REQUEST_RELEVANCE_PROMPT.format(
                 initial_review=initial_review,
                 additional_info=additional_info,
                 knowledge=knowledge_json,
-                gold_standards=gold_standards,
                 format=parser.get_format_instructions(),
             )
-            methodology_prompts = [SystemMessage(content=system_prompt),
-                                  HumanMessage(content=methodology_prompt)]
-            methodology_response = llm.invoke(
-                input=methodology_prompts,
+            relevance_prompts = [SystemMessage(content=system_prompt),
+                                HumanMessage(content=relevance_prompt)]
+            relevance_response = llm.invoke(
+                input=relevance_prompts,
                 temperature=0.0,
                 max_tokens=4000,
                 response_format={"type": "json_object"},
             )
-            methodology_content = methodology_response.content if isinstance(
-                methodology_response.content, str) else methodology_response.content[0]["text"]
-            methodology_docs = parser.parse(methodology_content)
+            relevance_content = relevance_response.content if isinstance(
+                relevance_response.content, str) else relevance_response.content[0]["text"]
+            relevance_docs = parser.parse(relevance_content)
+
+            # --- Call 2: SME wording ---
+            writer(prepare_thinking_message(
+                EXTERNAL_AGENT_NAME, "Applying SME-standard wording..."))
+
+            prev_version_json = json.dumps(
+                relevance_docs.model_dump(exclude_none=True),
+                indent=2,
+            )
+
+            sme_prompt = DOC_REQUEST_SME_PROMPT.format(
+                prev_version=prev_version_json,
+                gold_standards=gold_standards,
+                initial_review=initial_review,
+                additional_info=additional_info,
+                format=parser.get_format_instructions(),
+            )
+            sme_prompts = [SystemMessage(content=system_prompt),
+                           HumanMessage(content=sme_prompt)]
+            sme_response = llm.invoke(
+                input=sme_prompts,
+                temperature=0.0,
+                max_tokens=4000,
+                response_format={"type": "json_object"},
+            )
+            sme_content = sme_response.content if isinstance(
+                sme_response.content, str) else sme_response.content[0]["text"]
+            methodology_docs = parser.parse(sme_content)
 
             # Format methodology doc types for narrative dedup reference
             methodology_doc_list = "\n".join(

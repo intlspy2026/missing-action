@@ -87,9 +87,9 @@ Steps:
 """
 
 
-DOC_REQUEST_DRAFT_PROMPT = """
+DOC_REQUEST_RELEVANCE_PROMPT = """
 <ROLE>
-You are drafting an investigation brief listing documents for an external investigator to obtain. Your output is a request list – NOT a finding, justification, or commentary on the claim. Match the tone and length of a concise senior-investigator brief.
+You are identifying which document types from INVESTIGATION PROCESSES are relevant to THIS claim. Your output is a filtered list — NOT the final investigation brief. A separate step will apply SME-standard wording to your selections. Do NOT attempt to finalize doc_details with SME phrasing.
 </ROLE>
 
 <STYLE>
@@ -116,23 +116,11 @@ BEFORE listing any documents, you MUST understand these rules. Violating these r
 **Each underlying document type must appear AT MOST ONCE in the output.** This applies to the SUBSTANCE of the request, not just the exact label. Do not emit two entries that request the same kind of document under slightly different labels (e.g., "Telephone Records" and "Telephone Records - Evidence of Movements" are the same underlying type – combine into one). If the same underlying doc type would serve multiple purposes (e.g., timeline reconstruction AND movement verification), combine the purposes into a single doc_details entry, do not split into separate entries. If multiple sub-items belong under the same parent doc_type, combine them into a single entry and list the sub-items in doc_details – do not emit multiple entries that share the same doc_type label or that semantically duplicate one another.
 
 **RULE 5 - NEUTRAL LANGUAGE**: Do not use: "fraudulent", "fraud", "suspicious", "red flags", "motive", "collusion", "grossly", "high-risk". Refer to the underlying event as "incident" rather than "assault" in both doc_type and doc_details. Describe the incident neutrally (e.g., "the incident on [date] at [location]"); do not preface it with "alleged", "potential", or any qualifier that pre-judges the case. Do not infer intent or wrongdoing in any doc_details.
-
-**RULE 6 - VERBATIM SME PHRASING (with fallback)**: For every document type included in your output:
-a. **Primary (SME match exists)**: When a matching entry exists in the provided GOLD_STANDARDS, doc_details MUST mirror the SME wording verbatim, replacing only the AI-fillable placeholders (X-patterns such as XXX / XXXX / XX to XX / XXXXXXXXXX, and generic anchors such as names, periods, identifiers) with case-specific values from INITIAL REVIEW and ADDITIONAL INFORMATION. You MUST NOT shorten, summarise, paraphrase, simplify, or rewrite the SME wording when an SME entry exists. If uncertain whether your phrasing matches the SME entry, default to the SME phrasing.
-
-**AI-fillable X-pattern handling**: X-patterns (XXX, XXXX, XX to XX, XXXXXXXXXX, and similar runs of X characters) MUST be filled in your output. Do NOT leave any X-pattern in the final doc_details. Substitute as follows:
-- When the X-pattern represents a TIMEFRAME, compute an EXACT date range from the relative period defined by INVESTIGATION PROCESSES anchored to the incident date from the case context, and output the range in the format "[DD Month YYYY] to [DD Month YYYY]". Examples: "1 week prior to and after the incident on 21 November 2025" -> "14 November 2025 to 28 November 2025"; "3-month period surrounding the incident on 21 November 2025" -> compute the corresponding 3-month window around that date and output the exact start and end dates. Do NOT output relative phrasings like "3-month period", "1 week prior to and after", or "surrounding the incident" in the final doc_details – convert them to absolute date ranges.
-- When the X-pattern represents an ENTITY (name, identifier, location, address), replace it with the specific value from the case context.
-- When the X-pattern represents an ANCHOR (incident date, policy date, etc.), replace it with the date or identifier from the case context.
-- If you cannot determine an exact value, substitute with the most reasonable relative description grounded in INVESTIGATION PROCESSES and the case context. Leaving an X-pattern unfilled in the output is a critical error.
-
-**User-supplied placeholders (DO NOT fill)**: Do NOT modify or fill user-supplied placeholders – leave the literal tokens `<INSERT PERIOD>`, `<INSERT NAME>`, and any angle-bracketed `<INSERT >` or UPPERCASE/CAPITALISED slots (e.g. `START/END`) exactly as written in the SME entry. These are user-flagged for manual completion and must pass through to the output unchanged. Distinguish these from X-patterns: angle-bracketed `<INSERT _>` tokens and UPPERCASE slot names are user-supplied (leave alone); runs of X characters are AI-fillable (must be filled).
-b. **Fallback (no SME match)**: When a document type has no matching entry in the provided GOLD_STANDARDS, INCLUDE it using a fallback draft: write a full instruction-style request (e.g., "A copy of _", "Fully itemised _", "Provide _"), grounded in INVESTIGATION PROCESSES and case context. Match the cadence and neutral tone of the SME exemplars. Do NOT produce short labels or one-line summaries.
 </CRITICAL_RULES>
 
 <TASK>
 **YOUR TASK**
-List down all the document types and document details required for external investigation for provided investigation type:
+Filter the document types from INVESTIGATION PROCESSES to include only those relevant to THIS claim:
 
 Steps:
 1. Read INVESTIGATION PROCESSES. Identify all document types specified for the given investigation type. These are your primary source for methodology-driven document types.
@@ -140,18 +128,17 @@ Steps:
 2. Read INITIAL REVIEW and ADDITIONAL INFORMATION to extract case-specific values (names of direct parties, dates, locations, incident specifics, periods, identifiers). ADDITIONAL INFORMATION may contain supplementary details (e.g., police reports, engineer reports, incident reports) not captured in INITIAL REVIEW – use these as additional evidence where relevant.
 
 3. For each document type identified in Step 1:
-    a. Assess relevance against INITIAL REVIEW and ADDITIONAL INFORMATION (apply RULE 3).
-    b. If relevant, locate the matching SME entry in the provided GOLD_STANDARDS. Apply RULE 6a: reuse the SME wording verbatim, replacing only placeholders (XXX, XXXX, dates, names, identifiers, periods) with case-specific values from Step 2. Convert all timeframes from INVESTIGATION PROCESSES into EXACT date ranges anchored to the incident date (e.g., "1 week prior to and after the incident on 21 November 2025" -> "14 November 2025 to 28 November 2025"). Do NOT leave timeframes as relative periods in the final output.
-    c. If no matching SME entry exists in the provided GOLD_STANDARDS, apply RULE 6b (fallback): include the document type and draft a full instruction-style doc_details grounded in INVESTIGATION PROCESSES and case context.
+    a. Assess relevance against INITIAL REVIEW and ADDITIONAL INFORMATION (apply RULE 3). Exclude any document type that fails the relevance filter.
 
 4. **Validation gate**: Before including each document type in your output, confirm:
     - Can I point to a specific fact in the narrative content of INITIAL REVIEW or ADDITIONAL INFORMATION — not the investigation type label — that makes this document type relevant to this claim? If I cannot articulate a fact-based connection, exclude it.
     - Can I point to the specific entry in INVESTIGATION PROCESSES that this document type comes from? If not -> exclude it.
-    - If a matching SME entry exists: did I reuse its wording verbatim with only placeholders replaced? If NO -> revise (per RULE 6a). If no SME entry exists: did my fallback draft produce a full instruction-style request matching the SME cadence (not a short label or one-liner)? If NO -> revise (per RULE 6b).
     - Am I requesting documents from someone who is NOT a direct party to the claim? If YES -> remove that person. Being mentioned in INITIAL REVIEW or ADDITIONAL INFORMATION does not make someone a direct party.
     - For each detail in this document type, check if the same detail appears under any other document type in your output. If YES -> remove the duplicate from the document type where it is less central to the overall purpose.
 
 5. Review the final list and ensure all document types pass the validation gate.
+
+For each included document type, output the doc_type and doc_details as they appear in INVESTIGATION PROCESSES — do NOT rewrite or finalize the wording. A later step will apply SME-standard phrasing.
 </TASK>
 
 <CONTEXT>
@@ -162,7 +149,7 @@ Here is the INVESTIGATION PROCESSES – this is your primary source for methodol
 {knowledge}
 </INVESTIGATION PROCESSES>
 
-The INITIAL REVIEW provides case-specific details for contextualisation and relevance assessment. You may derive additional document types from the claimant's incident account within this section (see TASK Step 3). Do NOT derive new document types from other parts of INITIAL REVIEW:
+The INITIAL REVIEW provides case-specific details for contextualisation and relevance assessment. Do NOT derive new document types from other parts of INITIAL REVIEW:
 <INITIAL REVIEW>
 {initial_review}
 </INITIAL REVIEW>
@@ -173,13 +160,84 @@ The ADDITIONAL INFORMATION includes additional notes on the claim, which can inc
 </ADDITIONAL INFORMATION>
 </CONTEXT>
 
-<GOLD_STANDARDS>
-{gold_standards}
-</GOLD_STANDARDS>
+<OUTPUT>
+{format}
+</OUTPUT>
+"""
+
+DOC_REQUEST_SME_PROMPT = """
+<ROLE>
+You are applying SME-standard wording to a pre-filtered list of document types. Your output is the final investigation document request brief. Do NOT add or remove document types — the set is fixed.
+</ROLE>
+
+<STYLE>
+- **No source attribution**: do not name the source system, database, or check provider the fact came from (e.g., Autoedge, Motor Web, Caspar – list is illustrative, not exhaustive). State only the request itself; the upstream system is not part of the doc_details even if INITIAL REVIEW or ADDITIONAL INFORMATION mentions it.
+- **Tone**: neutral and request-focused. State what is being requested, not why an issue is suspected. Do not justify the request with case-specific concerns.
+- **Group parties together**: when the same document type applies to multiple direct parties, list them together in a single entry (e.g., "for Mr X and Mrs Y"). Do not create one entry per person.
+</STYLE>
+
+<CRITICAL_RULES>
+BEFORE finalizing any documents, you MUST understand these rules. Violating these rules is a critical error.
+
+**RULE 1 - FIXED SET**: Do NOT add new document types and do NOT remove any from PREVIOUS VERSION. The set of document types is final — your only task is to apply the correct SME-standard wording to each one.
+
+**RULE 2 - NEUTRAL LANGUAGE**: Do not use: "fraudulent", "fraud", "suspicious", "red flags", "motive", "collusion", "grossly", "high-risk". Refer to the underlying event as "incident" rather than "assault" in both doc_type and doc_details. Describe the incident neutrally (e.g., "the incident on [date] at [location]"); do not preface it with "alleged", "potential", or any qualifier that pre-judges the case. Do not infer intent or wrongdoing in any doc_details.
+
+**RULE 3 - VERBATIM SME PHRASING (with fallback)**: For every document type in PREVIOUS VERSION:
+a. **Primary (SME match exists)**: When a matching entry exists in the provided GOLD_STANDARDS, doc_details MUST mirror the SME wording verbatim, replacing only the AI-fillable placeholders (X-patterns such as XXX / XXXX / XX to XX / XXXXXXXXXX, and generic anchors such as names, periods, identifiers) with case-specific values from INITIAL REVIEW and ADDITIONAL INFORMATION. You MUST NOT shorten, summarise, paraphrase, simplify, or rewrite the SME wording when an SME entry exists. If uncertain whether your phrasing matches the SME entry, default to the SME phrasing.
+
+**AI-fillable X-pattern handling**: X-patterns (XXX, XXXX, XX to XX, XXXXXXXXXX, and similar runs of X characters) MUST be filled in your output. Do NOT leave any X-pattern in the final doc_details. Substitute as follows:
+- When the X-pattern represents a TIMEFRAME, compute an EXACT date range from the relative period defined by the PREVIOUS VERSION doc_details anchored to the incident date from the case context, and output the range in the format "[DD Month YYYY] to [DD Month YYYY]". Examples: "1 week prior to and after the incident on 21 November 2025" -> "14 November 2025 to 28 November 2025"; "3-month period surrounding the incident on 21 November 2025" -> compute the corresponding 3-month window around that date and output the exact start and end dates. Do NOT output relative phrasings like "3-month period", "1 week prior to and after", or "surrounding the incident" in the final doc_details – convert them to absolute date ranges.
+- When the X-pattern represents an ENTITY (name, identifier, location, address), replace it with the specific value from the case context.
+- When the X-pattern represents an ANCHOR (incident date, policy date, etc.), replace it with the date or identifier from the case context.
+- If you cannot determine an exact value, substitute with the most reasonable relative description grounded in the PREVIOUS VERSION doc_details and the case context. Leaving an X-pattern unfilled in the output is a critical error.
+
+**User-supplied placeholders (DO NOT fill)**: Do NOT modify or fill user-supplied placeholders – leave the literal tokens `<INSERT PERIOD>`, `<INSERT NAME>`, and any angle-bracketed `<INSERT >` or UPPERCASE/CAPITALISED slots (e.g. `START/END`) exactly as written in the SME entry. These are user-flagged for manual completion and must pass through to the output unchanged. Distinguish these from X-patterns: angle-bracketed `<INSERT _>` tokens and UPPERCASE slot names are user-supplied (leave alone); runs of X characters are AI-fillable (must be filled).
+b. **Fallback (no SME match)**: When a document type has no matching entry in the provided GOLD_STANDARDS, INCLUDE it using a fallback draft: write a full instruction-style request (e.g., "A copy of _", "Fully itemised _", "Provide _"), grounded in the PREVIOUS VERSION doc_details and case context. Match the cadence and neutral tone of the SME exemplars. Do NOT produce short labels or one-line summaries.
+</CRITICAL_RULES>
+
+<TASK>
+**YOUR TASK**
+Apply SME-standard wording to each document type in PREVIOUS VERSION:
+
+Steps:
+1. Read PREVIOUS VERSION to understand which document types have been selected.
+2. Read INITIAL REVIEW and ADDITIONAL INFORMATION to extract case-specific values (names of direct parties, dates, locations, incident specifics, periods, identifiers).
+3. For each document type in PREVIOUS VERSION:
+    a. Locate the matching entry in the provided GOLD_STANDARDS. Apply RULE 3a: reuse the SME wording verbatim, replacing only AI-fillable placeholders and generic anchors with case-specific values from Step 2. Convert all timeframes in the SME wording into EXACT date ranges anchored to the incident date.
+    b. If no matching SME entry exists in GOLD_STANDARDS, apply RULE 3b (fallback): draft a full instruction-style doc_details grounded in the PREVIOUS VERSION doc_details and case context.
+4. For each entry, validate:
+    - If a matching SME entry exists: did I reuse its wording verbatim with only placeholders replaced? If NO -> revise.
+    - If no SME entry exists: did my fallback draft produce a full instruction-style request (not a short label or one-liner)? If NO -> revise.
+    - Am I using neutral language (RULE 2)?
+5. Preserve the exact doc_type from PREVIOUS VERSION unchanged. Do NOT add or remove any entries.
+</TASK>
 
 <OUTPUT>
 {format}
 </OUTPUT>
+
+<CONTEXT>
+You are applying SME-standard wording to the following pre-filtered document types:
+
+<PREVIOUS VERSION>
+{prev_version}
+</PREVIOUS VERSION>
+
+<GOLD_STANDARDS>
+{gold_standards}
+</GOLD_STANDARDS>
+
+The INITIAL REVIEW provides case-specific details for contextualisation and X-pattern filling:
+<INITIAL REVIEW>
+{initial_review}
+</INITIAL REVIEW>
+
+The ADDITIONAL INFORMATION includes additional notes on the claim:
+<ADDITIONAL INFORMATION>
+{additional_info}
+</ADDITIONAL INFORMATION>
+</CONTEXT>
 """
 
 NARRATIVE_DOC_REQUEST_DRAFT_PROMPT = """
