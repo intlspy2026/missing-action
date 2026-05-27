@@ -105,11 +105,26 @@ BEFORE listing any documents, you MUST understand these rules. Violating these r
 
 **RULE 2 - PARTY SCOPE**: Only request documents from parties directly involved in the current claim under investigation. Use INITIAL REVIEW and ADDITIONAL INFORMATION to identify who the direct parties are. Individuals mentioned in prior claims, historical associations, or background checks within INITIAL REVIEW or ADDITIONAL INFORMATION are NOT direct parties to the current claim. Do not request documents from associated individuals who are not direct parties. Replace generic references in INVESTIGATION PROCESSES with the specific individuals identified from INITIAL REVIEW and ADDITIONAL INFORMATION.
 
-**RULE 3 - RELEVANCE FILTER**: For each document type identified from INVESTIGATION PROCESSES, you MUST find a specific factual basis in INITIAL REVIEW or ADDITIONAL INFORMATION that makes it relevant to THIS claim. A document type does not automatically apply just because it appears in the methodology for the investigation type — the case facts must create a need for it. Exclude a document type when:
-    a. The case facts contradict its subject (e.g., tenancy documents when the party owns the property; contract of sale when the party is a tenant).
-    b. The case facts provide no logical connection (e.g., criminal history or background checks when no criminal element or prior offending is alleged; work rosters or timesheets when the incident is not employment-related or attendance timing is not questioned; rideshare, taxi, or transport receipts when the incident occurred at a fixed location and travel is not material; toll statements when the incident location is fixed and no toll-based travel is mentioned; insurance claims history when no prior claims exist for the insured in INITIAL REVIEW — prior policies or third-party claims do not imply the insured has external claims; any document type whose SME entry contains a conditional qualifier like "(only request if there are concerns)" and no such concern appears in the case facts).
-    c. A conditional qualifier in the methodology (e.g., "(if applicable)", "(only request if X)") is not met by the case facts.
-    The examples above are illustrative — apply the same reasoning standard to every document type. If you cannot identify a specific fact in INITIAL REVIEW or ADDITIONAL INFORMATION that makes the document type relevant to this case, EXCLUDE it. The investigation type label itself is NOT a factual basis — the hook must come from the narrative content of the case.
+**RULE 3 - RELEVANCE FILTER (INCLUDE-ONLY)**: You START from the position that EVERY document type from INVESTIGATION PROCESSES is EXCLUDED. A document type is INCLUDED ONLY when you can point to a SPECIFIC FACT in the narrative content of INITIAL REVIEW or ADDITIONAL INFORMATION that directly creates a need for that document. Presence in the methodology is necessary but NOT sufficient — the investigation type label itself is NOT a factual basis. Exclude a document type when:
+
+    a. **Contradiction**: The case facts contradict the document's subject (e.g., tenancy documents when the party owns the property; contract of sale when the party is a tenant).
+
+    b. **No factual basis**: You cannot identify a specific sentence in INITIAL REVIEW or ADDITIONAL INFORMATION that directly justifies the request. Absence of evidence IS evidence of irrelevance. The investigation type label is NOT a factual basis — the hook must come from the narrative content of the case.
+
+    c. **Conditional qualifier unmet**: A conditional qualifier in the methodology (e.g., "(if applicable)", "(only request if X)", "(only request if there are concerns)") is not met by the case facts.
+
+    The following document types appear frequently in methodologies but are almost always EXCLUDED. You MUST check each one against the fact threshold below before including. If you cannot find the stated fact, EXCLUDE:
+
+    HARD EXCLUSIONS:
+    1. Work rosters, timesheets, or employment records: INCLUDE ONLY if the incident was employment-related (occurred during work hours, at a workplace, or attendance/timing is explicitly questioned in case facts).
+    2. Insurance claims history: INCLUDE ONLY if INITIAL REVIEW explicitly records prior claims for the INSURED. Prior policies, inactive policies, or third-party claims are NOT the insured's prior claims.
+    3. Criminal history or background checks: INCLUDE ONLY if INITIAL REVIEW or ADDITIONAL INFORMATION alleges a criminal element, prior offending, or law enforcement involvement beyond the current incident.
+    4. Rideshare, taxi, or transport receipts: INCLUDE ONLY if travel to/from the incident location is explicitly material to the claim. Exclude when the incident occurred at a fixed location and travel routing is not disputed.
+    5. Toll statements: INCLUDE ONLY if toll-based travel is explicitly relevant to the claim's routing or timing.
+    6. Tenancy/rental documents: INCLUDE ONLY when the party is a tenant. Exclude for owner-occupiers.
+    7. Contract of sale: INCLUDE ONLY when the party is a buyer or seller. Exclude for tenants.
+
+    If a document type DOES appear in the HARD EXCLUSIONS list above AND you cannot find the stated fact in INITIAL REVIEW or ADDITIONAL INFORMATION, you MUST EXCLUDE it. Do not rationalise: absence of evidence IS evidence of irrelevance.
 
 **RULE 4 - NO DUPLICATES**: Each piece of information must appear under exactly one document type. If the same information could fall under multiple document types, place it under the most specific one and exclude it from the others. Compound aggregator entries titled "other documents", "additional evidence", "other supporting documents" or similar catch-alls that re-aggregate items already requested under another entry are NOT permitted – every required document must live under its own specific entry.
 
@@ -123,12 +138,15 @@ BEFORE listing any documents, you MUST understand these rules. Violating these r
 Filter the document types from INVESTIGATION PROCESSES to include only those relevant to THIS claim:
 
 Steps:
+0. **Default exclude**: Mark EVERY document type from INVESTIGATION PROCESSES as EXCLUDED. You will only move a document type to INCLUDED if you find a specific fact-based hook in Steps 1-2.
+
 1. Read INVESTIGATION PROCESSES. Identify all document types specified for the given investigation type. These are your primary source for methodology-driven document types.
 
 2. Read INITIAL REVIEW and ADDITIONAL INFORMATION to extract case-specific values (names of direct parties, dates, locations, incident specifics, periods, identifiers). ADDITIONAL INFORMATION may contain supplementary details (e.g., police reports, engineer reports, incident reports) not captured in INITIAL REVIEW – use these as additional evidence where relevant.
 
 3. For each document type identified in Step 1:
-    a. Assess relevance against INITIAL REVIEW and ADDITIONAL INFORMATION (apply RULE 3). Exclude any document type that fails the relevance filter.
+    a. FIRST, check the HARD EXCLUSIONS list in RULE 3. If the document type matches one of those categories AND you cannot find the stated fact in INITIAL REVIEW or ADDITIONAL INFORMATION, mark it EXCLUDED and move to the next type. Do NOT waste time on types that clearly fail the hard exclusions.
+    b. THEN, assess relevance against INITIAL REVIEW and ADDITIONAL INFORMATION (apply RULE 3b). Only move from EXCLUDED to INCLUDED if you can cite a specific sentence.
 
 4. **Validation gate**: Before including each document type in your output, confirm:
     - Can I point to a specific fact in the narrative content of INITIAL REVIEW or ADDITIONAL INFORMATION — not the investigation type label — that makes this document type relevant to this claim? If I cannot articulate a fact-based connection, exclude it.
