@@ -7,6 +7,11 @@ from agents.external_agent.prompt_manager.knowledge_prompts import (
     KNOWLEDGE_RETRIEVAL_TASK_PROMPT,
     SECTION_KNOWLEDGE_REPORT_SYSTEM_PROMPT,
     SECTION_KNOWLEDGE_REPORT_PROMPT,
+    DOC_REQUEST_PARSER_SYSTEM_PROMPT,
+    DOC_REQUEST_PARSER_PROMPT,
+    ENQUIRIES_PARSER_SYSTEM_PROMPT,
+    ENQUIRIES_PARSER_PROMPT,
+    DEDUP_PROMPT,
 )
 from agents.external_agent.prompt_manager.external_agent_prompts import (
     EXTERNAL_AGENT_SYSTEM_PROMPT,
@@ -16,6 +21,12 @@ from agents.external_agent.prompt_manager.external_agent_prompts import (
     INTERVIEW_PLAN_DRAFT_PROMPT,
     SECTION_FEEDBACK_PROMPT,
     SECTION_FEEDBACK_KNOWLEDGE_BLOCK,
+)
+from agents.external_agent.prompt_manager.standards import (
+    MOTOR_DOC_REQUEST_GOLD_STANDARDS,
+    MOTOR_DOC_REQUEST_GOLD_STANDARDS_BLOCK,
+    PROPERTY_DOC_REQUEST_GOLD_STANDARDS,
+    PROPERTY_DOC_REQUEST_GOLD_STANDARDS_BLOCK,
 )
 # --- Commented out: unused imports ---
 # from agents.external_agent.prompt_manager.interview_strategy_prompts import INTERVIEW_STRATEGY_SYSTEM_PROMPT, INTERVIEW_STRATEGY_DRAFT_PROMPT, INTERVIEW_STRATEGY_FEEDBACK_PROMPT
@@ -118,14 +129,15 @@ def get_graph(llm: BaseChatModel) -> StateGraph:
         {hitl_artifact if hitl_artifact else "<empty>"}
 
         Classify intent:
-        - "accept": user accepts OR the artifact has been provided back with no human response text.
-        - "feedback": user gives feedback/instructions to revise.
+        - "accept": user accepts OR the artifact has been provided back with no human response text OR the artifact's reviewed section came back empty AND the user's text declines to add anything (e.g. "no", "no need", "skip", "nothing to add", "leave empty", "that's fine").
+        - "feedback": user gives feedback that mentions which section, concern, document, enquiry, or item the change applies to — even loosely (e.g. "change John to Jerry in phone records" names a section, so apply it everywhere within that section).
+        - "ambiguous": user gives feedback with no indication of WHERE to apply it — no section, no item, no context clue (e.g. "change the date from 22 Apr to 25 May" gives no location). In this case, write a clarifying question in task_summary asking the user which section or item they want updated.
         - "unrelated": user asks something unrelated.
 
         Summarise the task:
-        - If the intent is unrelated, or if there is no human response text, leave the task as ""
-        - Otherwise, write a short paragraph that states the next task.
-        - Start the task_summary with "Task: "
+        - If the intent is "unrelated" or there is no human response text, leave task_summary as "".
+        - If the intent is "ambiguous", write a short clarifying question asking the user to specify exactly where they want the change applied. Do NOT start with "Task: ".
+        - Otherwise, write a short paragraph that states the next task. Start with "Task: ".
 
         {parser.get_format_instructions()}
         Return JSON only.
@@ -165,11 +177,14 @@ def get_graph(llm: BaseChatModel) -> StateGraph:
 
     def _resolve_hitl_artifact(state: "ExternalAgentState", pending_step: str, incoming_artifact: dict | None, *, intent: str = "") -> Any:
         """
-        If the frontend didn't send an artifact (common for feedback-only resumes),
-        fall back to the last generated output stored in state for the relevant step.
-        For section review steps on accept, parse incoming form payload through the
-        appropriate parser. For feedback, always return the previous state output —
-        the user is providing text feedback, not editing the form.
+        Resolve the FE-submitted form payload into a canonical section object.
+
+        Parses on both accept and feedback: even when the user provides text
+        feedback, FE-side edits (NA-drops, in-form changes) must be merged into
+        the previous version so downstream regeneration sees what's on screen.
+
+        Falls back to the previous state value when no artifact is sent or parsing
+        produces empty/invalid output.
         """
         incoming_artifact = incoming_artifact or {}
 
@@ -183,8 +198,8 @@ def get_graph(llm: BaseChatModel) -> StateGraph:
         if pending_step in step_to_parser:
             parser_fn, state_key = step_to_parser[pending_step]
             previous = state.get(state_key)
-            # Only parse form submission on accept; for feedback return previous as-is
-            if intent == "accept" and incoming_artifact:
+            # Parse on accept and feedback so FE edits/NA-drops survive into state.
+            if incoming_artifact and intent in ("accept", "feedback"):
                 try:
                     parsed = parser_fn(incoming_artifact, previous=previous)
                     # If parsing produced empty output but previous has content,
@@ -235,7 +250,6 @@ def get_graph(llm: BaseChatModel) -> StateGraph:
                 return node_name
 
         return "assemble_plan"
-
 
     def _parse_investigation_type_to_filters(lob: str, inv_type: str) -> dict:
         """
@@ -446,6 +460,239 @@ def get_graph(llm: BaseChatModel) -> StateGraph:
             response.content, str) else response.content[0]["text"]
         return parser.parse(content)
 
+    # ------------------------------------
+    # Chunk-based per-section retrieval (delta-table path)
+    # ------------------------------------
+
+    # Maps the item_key arg to the Pydantic schema attribute that holds the
+    # list of items, and the field on each item used as its dedup text.
+    _SECTION_META = {
+        "doc_list": {"items_attr": "document_set", "text_field": "doc_type"},
+        "enquiry_list": {"items_attr": "enquiries_set", "text_field": "enquiry"},
+    }
+
+    _DEFAULT_STAGE_BY_SECTION = {
+        "doc_request": "document request",
+        "additional_enquiries": "additional enquiries",
+    }
+
+    # SME-driven overrides: certain (lob, fraud_type) combinations file their
+    # textbook content under non-default stages. Keys use lowercased fraud_type
+    # for case-insensitive matching. Sections not listed fall back to the
+    # default stage above.
+    _STAGE_OVERRIDES: dict[tuple[str, str], dict[str, str]] = {
+        ("Property", "policy exclusions: escape of liquid"): {
+            "doc_request": "interviews",
+        },
+        ("Property", "policy exclusions: deliberate/reckless"): {
+            "doc_request": "ea appointment",
+            "additional_enquiries": "ea appointment",
+        },
+        ("Motor", "dui"): {
+            "additional_enquiries": "external agent appointment",
+        },
+        ("Motor", "reckless"): {
+            "doc_request": "external agent appointment",
+            "additional_enquiries": "external agent appointment",
+        },
+        ("Motor", "motor sports"): {
+            "doc_request": "external agent appointment",
+            "additional_enquiries": "external agent appointment",
+        },
+    }
+
+    def _resolve_stage(lob: str, fraud_type: str, section: str) -> str:
+        override = _STAGE_OVERRIDES.get((lob, fraud_type.lower()), {})
+        return override.get(section, _DEFAULT_STAGE_BY_SECTION[section])
+
+    async def _retrieve_section_chunks_async(
+        state: "ExternalAgentState",
+        *,
+        section: str,
+        parser_system_prompt: str,
+        parser_prompt_template: str,
+        output_schema,
+        item_key: str,
+        skip_on_empty: bool = False,
+    ) -> tuple[list[dict], list[str]]:
+        """
+        Chunk-based retrieval for sections sourced from the textbook delta table
+        (doc_request, additional_enquiries).
+
+        For each investigation_type:
+          1. Resolve the textbook stage for (lob, fraud_type, section) — defaults
+             come from `_DEFAULT_STAGE_BY_SECTION`, with SME-driven overrides in
+             `_STAGE_OVERRIDES` (e.g. Motor DUI's additional_enquiries lives
+             under "external agent appointment", not "additional enquiries").
+          2. Filter `df` by lob + fraud_type + resolved stage.
+          3. Concatenate chunk_data → combined_chunks.
+          4. LLM-parse combined_chunks into `output_schema`.
+          5. Append {"investigation_type": <inv_type>, item_key: <parsed>} to knowledge_output.
+
+        When multiple investigation_types are selected, run DEDUP_PROMPT across the
+        combined item set and strip duplicates (cross-set only).
+
+        When `skip_on_empty=True`, inv_types with no matching chunks are appended
+        to the returned skipped list instead of raising — letting the caller emit
+        a user-facing message for those inv_types and continue with whatever
+        knowledge was retrieved for the rest.
+
+        Returns:
+          (knowledge_output, skipped_inv_types) — `knowledge_output` is the list of
+          per-inv_type parsed entries; `skipped_inv_types` is the list of inv_types
+          that had no chunks (only populated when `skip_on_empty=True`).
+
+        Raises:
+          ValueError: when state lacks lob/investigation_type, when no chunks match
+                      a (lob, fraud_type, stage) combination and `skip_on_empty` is
+                      False, or when dedup fails.
+        """
+        lob = state.get("lob", "")
+        investigation_types = state.get("investigation_type", []) or []
+        if not investigation_types or not lob:
+            raise ValueError(
+                f"lob or investigation_type has not been passed in state: {state}")
+
+        meta = _SECTION_META[item_key]
+        items_attr = meta["items_attr"]
+        text_field = meta["text_field"]
+
+        parser = PydanticOutputParser(pydantic_object=output_schema)
+        knowledge_output: list[dict] = []
+        skipped_inv_types: list[str] = []
+
+        for inv_type in investigation_types:
+            fraud_type = inv_type.split("|", 1)[0].strip()
+            stage = _resolve_stage(lob, fraud_type, section)
+            filtered_df = df[
+                (df["lob"] == lob) &
+                (df["fraud_type"] == fraud_type) &
+                (df["stage"].apply(lambda stages: stage in stages))
+            ].copy()
+
+            if filtered_df.empty:
+                if skip_on_empty:
+                    skipped_inv_types.append(inv_type)
+                    continue
+                raise ValueError(
+                    f"No textbook information found for lob={lob}, "
+                    f"fraud_type={fraud_type}, stage={stage}"
+                )
+
+            chunks = filtered_df["chunk_data"].dropna().tolist()
+            combined_chunks = "\n\n".join(chunks)
+
+            parser_prompts = [
+                SystemMessage(content=parser_system_prompt),
+                HumanMessage(content=parser_prompt_template.format(
+                    investigation_type=inv_type,
+                    chunks=combined_chunks,
+                    format=parser.get_format_instructions(),
+                )),
+            ]
+
+            parser_response = await asyncio.to_thread(
+                llm.invoke,
+                input=parser_prompts,
+                temperature=0.0,
+                max_tokens=16384,
+                response_format={"type": "json_object"},
+            )
+            content = parser_response.content if isinstance(
+                parser_response.content, str) else parser_response.content[0]["text"]
+            parsed = parser.parse(content)
+
+            # Chunks existed but the LLM parser yielded no items for this
+            # inv_type (commonly because the sub-type filter inside the parser
+            # prompt found nothing applicable). Treat the same as no-chunks.
+            if not getattr(parsed, items_attr):
+                if skip_on_empty:
+                    skipped_inv_types.append(inv_type)
+                    continue
+                raise ValueError(
+                    f"Parser produced empty {items_attr} for lob={lob}, "
+                    f"fraud_type={fraud_type}, stage={stage}, inv_type={inv_type}"
+                )
+
+            knowledge_output.append({
+                "investigation_type": inv_type,
+                item_key: parsed,
+            })
+
+        if len(knowledge_output) > 1:
+            _dedup_section_items(
+                knowledge_output,
+                item_key=item_key,
+                items_attr=items_attr,
+                text_field=text_field,
+                item_type_label=_DEFAULT_STAGE_BY_SECTION[section],
+            )
+
+        return knowledge_output, skipped_inv_types
+
+    def _dedup_section_items(
+        knowledge_output: list[dict],
+        *,
+        item_key: str,
+        items_attr: str,
+        text_field: str,
+        item_type_label: str,
+    ) -> None:
+        """
+        Run DEDUP_PROMPT over items across investigation-type sets and remove
+        duplicates (cross-set only). Mutates each set's items list in-place.
+
+        Raises on LLM failure or unparseable response.
+        """
+        id_to_item_set: dict[str, str] = {}
+        formatted_blocks: list[str] = []
+
+        for set_idx, knowledge_item in enumerate(knowledge_output):
+            set_id = f"S{set_idx + 1:03d}"
+            items = getattr(knowledge_item[item_key], items_attr)
+            prompt_items = []
+            for item_idx, item in enumerate(items):
+                iid = f"{set_id}_I{item_idx + 1:03d}"
+                id_to_item_set[iid] = set_id
+                prompt_items.append({
+                    "item_id": iid,
+                    "item_set_id": set_id,
+                    "text": getattr(item, text_field),
+                })
+            formatted_blocks.append(
+                f"### SET: {set_id}\n" + json.dumps(prompt_items, indent=2)
+            )
+
+        dedup_prompt = DEDUP_PROMPT.format(
+            item_type=item_type_label,
+            items="\n\n".join(formatted_blocks),
+        )
+
+        dedup_response = llm.invoke(
+            input=[HumanMessage(content=dedup_prompt)],
+            temperature=0.0,
+            max_tokens=16384,
+            response_format={"type": "json_object"},
+        )
+        dedup_content = dedup_response.content if isinstance(
+            dedup_response.content, str) else dedup_response.content[0]["text"]
+        dedup_result = json.loads(dedup_content)
+
+        duplicate_ids: set[str] = set()
+        for group in dedup_result.get("duplicate_groups", []):
+            for dup_id in group.get("duplicate_item_ids", []):
+                duplicate_ids.add(dup_id)
+
+        for set_idx, knowledge_item in enumerate(knowledge_output):
+            set_id = f"S{set_idx + 1:03d}"
+            container = knowledge_item[item_key]
+            items = getattr(container, items_attr)
+            kept = [
+                item for item_idx, item in enumerate(items)
+                if f"{set_id}_I{item_idx + 1:03d}" not in duplicate_ids
+            ]
+            setattr(container, items_attr, kept)
+
     # --- Commented out: replaced by per-section _retrieve_section_knowledge helper ---
     # async def retrieve_knowledge_async(state: "ExternalAgentState") -> Command:
     #     runtime, writer, messages = _get_ctx(state)
@@ -549,8 +796,12 @@ def get_graph(llm: BaseChatModel) -> StateGraph:
 
         hitl = _frontend_input(runtime)
         hitl_text = (hitl.get("text") or "").strip()
-        incoming_artifact = hitl.get("custom_inputs", {}).get(
-            "artifact").get("form_data") or {}
+        artifact_payload = hitl.get("custom_inputs", {}).get("artifact", {}) or {}
+        incoming_artifact = (
+            artifact_payload.get("current_form_data")
+            or artifact_payload.get("form_data")
+            or {}
+        )
         prev_task = prev_decision.task_summary if prev_decision else ""
 
         hitl_decision = _classify_hitl(hitl_text, incoming_artifact, prev_task)
@@ -583,11 +834,50 @@ def get_graph(llm: BaseChatModel) -> StateGraph:
                 },
             )
 
+        if intent == "ambiguous":
+            clarifying_question = hitl_decision.task_summary
+            new_hitl_task = prepare_hitl_task(
+                agent_name=EXTERNAL_AGENT_NAME,
+                text=clarifying_question,
+                context="User provided ambiguous feedback. Awaiting a more specific response before applying changes.",
+                state={} if use_checkpointer else {
+                    **state, "messages": messages + [AIMessage(clarifying_question)]},
+                artifact=hitl_artifact,
+            )
+
+            writer(prepare_thinking_message(EXTERNAL_AGENT_NAME,
+                   "Feedback is ambiguous; asking clarifying question."))
+            return Command(
+                goto="route_interrupt",
+                update={
+                    "hitl_task": new_hitl_task,
+                    "hitl_decision": hitl_decision,
+                    "hitl_artifact": hitl_artifact,
+                    "messages": messages + [AIMessage(f"HITL decision: ambiguous (step={pending_step})")],
+                },
+            )
+
         custom_message = prepare_thinking_message(
             EXTERNAL_AGENT_NAME, f"Decision is {intent}, proceeding... \n{task_summary}")
         writer(custom_message)
 
         goto = _route_from_pending_step(pending_step)
+
+        # Persist FE-edited version into the canonical state slot so section
+        # nodes can read it directly without re-deriving from hitl_artifact.
+        # Guard with isinstance: if resolution didn't yield a valid section
+        # object, leave canonical state untouched.
+        step_to_state_key = {
+            "key_concerns_review": "key_concerns",
+            "doc_request_review": "doc_request",
+            "enquiries_review": "additional_enquiries",
+            "interview_plan_review": "interview_plan",
+        }
+        canonical_update: dict = {}
+        sk = step_to_state_key.get(pending_step)
+        if sk and isinstance(hitl_artifact, (KeyConcernSet, DocRequestSet,
+                                             AdditionalEnquiriesSet, InterviewQuestionSets)):
+            canonical_update[sk] = hitl_artifact
 
         return Command(
             goto=goto,
@@ -596,6 +886,7 @@ def get_graph(llm: BaseChatModel) -> StateGraph:
                 "hitl_decision": hitl_decision,
                 "hitl_artifact": hitl_artifact,
                 "hitl_task": None,
+                **canonical_update,
                 "messages": messages + [AIMessage(f"HITL decision: {intent} (step={pending_step}, task={task_summary})")],
             },
         )
@@ -614,12 +905,13 @@ def get_graph(llm: BaseChatModel) -> StateGraph:
             brand = hitl_artifact.get("brand")
             lob = hitl_artifact.get("lob")
             investigation_type = hitl_artifact.get("investigation_type")
-            investigation_scope = hitl_artifact.get("investigation_scope")
+            # investigation_scope = hitl_artifact.get("investigation_scope")
             initial_review = hitl_artifact.get("initial_review")
             additional_info = hitl_artifact.get("additional_info")
-            selected_sections = hitl_artifact.get("selected_sections", ["doc_request", "additional_enquiries"])
+            selected_sections = hitl_artifact.get(
+                "selected_sections", ["doc_request", "additional_enquiries"])
 
-            if claim_id and investigation_type and investigation_scope and initial_review:
+            if claim_id and investigation_type and initial_review:
                 return Command(
                     goto="dispatch_sections",
                     update={
@@ -693,27 +985,15 @@ def get_graph(llm: BaseChatModel) -> StateGraph:
         runtime, writer, messages = _get_ctx(state)
 
         decision = state.get("hitl_decision")
-        hitl_artifact = state.get("hitl_artifact") or {}
         feedback = decision.task_summary if decision and decision.intent == "feedback" else ""
         selected_sections = state.get("selected_sections", []) or []
 
-        # --- Accept path: persist and move to next section ---
+        # --- Accept path: state["key_concerns"] is already canonical (written by route_interrupt) ---
         if decision and decision.intent == "accept":
-            if isinstance(hitl_artifact, KeyConcernSet):
-                accepted = hitl_artifact
-            elif hitl_artifact and isinstance(hitl_artifact, dict):
-                try:
-                    accepted = KeyConcernSet(**hitl_artifact)
-                except Exception:
-                    accepted = state.get("key_concerns")
-            else:
-                accepted = state.get("key_concerns")
-
             goto = _next_section("key_concerns", selected_sections)
             return Command(
                 goto=goto,
                 update={
-                    "key_concerns": accepted,
                     "hitl_decision": None,
                     "hitl_artifact": None,
                     "pending_step": None,
@@ -729,7 +1009,8 @@ def get_graph(llm: BaseChatModel) -> StateGraph:
         # --- Feedback path: regenerate from previous output + feedback ---
         if feedback:
             prev_output = state.get("key_concerns")
-            prev_version_json = prev_output.model_dump_json(indent=2, exclude_none=True) if prev_output else "{}"
+            prev_version_json = prev_output.model_dump_json(
+                indent=2, exclude_none=True) if prev_output else "{}"
 
             writer(prepare_thinking_message(
                 EXTERNAL_AGENT_NAME, "Revising key concerns based on feedback..."))
@@ -741,6 +1022,8 @@ def get_graph(llm: BaseChatModel) -> StateGraph:
                 initial_review=initial_review,
                 additional_info=additional_info,
                 knowledge_block="",
+                gold_standards_block="",
+                investigation_type_block="",
                 format=parser.get_format_instructions(),
             )
         else:
@@ -795,27 +1078,15 @@ def get_graph(llm: BaseChatModel) -> StateGraph:
         runtime, writer, messages = _get_ctx(state)
 
         decision = state.get("hitl_decision")
-        hitl_artifact = state.get("hitl_artifact") or {}
         feedback = decision.task_summary if decision and decision.intent == "feedback" else ""
         selected_sections = state.get("selected_sections", []) or []
 
-        # --- Accept path ---
+        # --- Accept path: state["doc_request"] is already canonical (written by route_interrupt) ---
         if decision and decision.intent == "accept":
-            if isinstance(hitl_artifact, DocRequestSet):
-                accepted = hitl_artifact
-            elif hitl_artifact and isinstance(hitl_artifact, dict):
-                try:
-                    accepted = DocRequestSet(**hitl_artifact)
-                except Exception:
-                    accepted = state.get("doc_request")
-            else:
-                accepted = state.get("doc_request")
-
             goto = _next_section("doc_request", selected_sections)
             return Command(
                 goto=goto,
                 update={
-                    "doc_request": accepted,
                     "hitl_decision": None,
                     "hitl_artifact": None,
                     "pending_step": None,
@@ -829,17 +1100,29 @@ def get_graph(llm: BaseChatModel) -> StateGraph:
         parser = PydanticOutputParser(pydantic_object=DocRequestSet)
         knowledge_json = None
 
+        lob = state.get("lob", "")
+        if lob == "Motor":
+            gold_standards = MOTOR_DOC_REQUEST_GOLD_STANDARDS
+            gold_standards_block = MOTOR_DOC_REQUEST_GOLD_STANDARDS_BLOCK
+        elif lob == "Property":
+            gold_standards = PROPERTY_DOC_REQUEST_GOLD_STANDARDS
+            gold_standards_block = PROPERTY_DOC_REQUEST_GOLD_STANDARDS_BLOCK
+        else:
+            raise ValueError(f"Unsupported LOB: {lob}. Expected 'Motor' or 'Property'.")
+
         # --- Feedback path ---
         if feedback:
             prev_output = state.get("doc_request")
-            prev_version_json = prev_output.model_dump_json(indent=2, exclude_none=True) if prev_output else "{}"
+            prev_version_json = prev_output.model_dump_json(
+                indent=2, exclude_none=True) if prev_output else "{}"
 
             writer(prepare_thinking_message(
                 EXTERNAL_AGENT_NAME, "Revising document requests based on feedback..."))
 
             # Reuse cached knowledge from draft path
             cached_knowledge = state.get("doc_request_knowledge") or ""
-            knowledge_block = SECTION_FEEDBACK_KNOWLEDGE_BLOCK.format(knowledge=cached_knowledge) if cached_knowledge else ""
+            knowledge_block = SECTION_FEEDBACK_KNOWLEDGE_BLOCK.format(
+                knowledge=cached_knowledge) if cached_knowledge else ""
 
             prompt = SECTION_FEEDBACK_PROMPT.format(
                 section_name="document requests",
@@ -848,40 +1131,44 @@ def get_graph(llm: BaseChatModel) -> StateGraph:
                 initial_review=initial_review,
                 additional_info=additional_info,
                 knowledge_block=knowledge_block,
+                gold_standards_block=gold_standards_block,
+                investigation_type_block="",
                 format=parser.get_format_instructions(),
             )
         else:
-            # --- Draft path (existing logic) ---
-            knowledge_endpoint = runtime.context["resources_endpoint_name"]
-
+            # --- Draft path: chunk-based retrieval from delta table ---
             writer(prepare_thinking_message(
-                EXTERNAL_AGENT_NAME, "Retrieving knowledge for document requests..."))
+                EXTERNAL_AGENT_NAME, "Retrieving document request knowledge from textbook..."))
 
-            raw_knowledge = await _retrieve_section_knowledge(
-                task_key="doc_requests",
-                task_def=RETRIEVAL_TASKS["doc_requests"],
-                state=state,
-                knowledge_endpoint=knowledge_endpoint,
-            )
-
-            writer(prepare_thinking_message(
-                EXTERNAL_AGENT_NAME, "Synthesising document request knowledge..."))
-
-            investigation_types = state.get("investigation_type", []) or []
-            synthesized = _synthesize_section_knowledge(
-                section_name="document requests",
-                knowledge_set=raw_knowledge,
-                investigation_types=investigation_types,
+            per_inv_type, _ = await _retrieve_section_chunks_async(
+                state,
+                section="doc_request",
+                parser_system_prompt=DOC_REQUEST_PARSER_SYSTEM_PROMPT,
+                parser_prompt_template=DOC_REQUEST_PARSER_PROMPT,
                 output_schema=DocRequestSet,
+                item_key="doc_list",
             )
 
             writer(prepare_thinking_message(
                 EXTERNAL_AGENT_NAME, "Drafting document requests..."))
 
-            knowledge_json = synthesized.model_dump_json(indent=2, exclude_none=True)
+            investigation_types = state.get("investigation_type", []) or []
+            knowledge_json = json.dumps(
+                [
+                    {
+                        "investigation_type": entry["investigation_type"],
+                        "doc_list": entry["doc_list"].model_dump(exclude_none=True),
+                    }
+                    for entry in per_inv_type
+                ],
+                indent=2,
+            )
+
             prompt = DOC_REQUEST_DRAFT_PROMPT.format(
                 initial_review=initial_review,
+                additional_info=additional_info,
                 knowledge=knowledge_json,
+                gold_standards=gold_standards,
                 format=parser.get_format_instructions(),
             )
 
@@ -936,27 +1223,15 @@ def get_graph(llm: BaseChatModel) -> StateGraph:
         runtime, writer, messages = _get_ctx(state)
 
         decision = state.get("hitl_decision")
-        hitl_artifact = state.get("hitl_artifact") or {}
         feedback = decision.task_summary if decision and decision.intent == "feedback" else ""
         selected_sections = state.get("selected_sections", []) or []
 
-        # --- Accept path ---
+        # --- Accept path: state["additional_enquiries"] is already canonical (written by route_interrupt) ---
         if decision and decision.intent == "accept":
-            if isinstance(hitl_artifact, AdditionalEnquiriesSet):
-                accepted = hitl_artifact
-            elif hitl_artifact and isinstance(hitl_artifact, dict):
-                try:
-                    accepted = AdditionalEnquiriesSet(**hitl_artifact)
-                except Exception:
-                    accepted = state.get("additional_enquiries")
-            else:
-                accepted = state.get("additional_enquiries")
-
             goto = _next_section("additional_enquiries", selected_sections)
             return Command(
                 goto=goto,
                 update={
-                    "additional_enquiries": accepted,
                     "hitl_decision": None,
                     "hitl_artifact": None,
                     "pending_step": None,
@@ -969,17 +1244,20 @@ def get_graph(llm: BaseChatModel) -> StateGraph:
         system_prompt = EXTERNAL_AGENT_SYSTEM_PROMPT
         parser = PydanticOutputParser(pydantic_object=AdditionalEnquiriesSet)
         knowledge_json = None
+        skipped_inv_types: list[str] = []
 
         # --- Feedback path ---
         if feedback:
             prev_output = state.get("additional_enquiries")
-            prev_version_json = prev_output.model_dump_json(indent=2, exclude_none=True) if prev_output else "{}"
+            prev_version_json = prev_output.model_dump_json(
+                indent=2, exclude_none=True) if prev_output else "{}"
 
             writer(prepare_thinking_message(
                 EXTERNAL_AGENT_NAME, "Revising additional enquiries based on feedback..."))
 
             cached_knowledge = state.get("enquiries_knowledge") or ""
-            knowledge_block = SECTION_FEEDBACK_KNOWLEDGE_BLOCK.format(knowledge=cached_knowledge) if cached_knowledge else ""
+            knowledge_block = SECTION_FEEDBACK_KNOWLEDGE_BLOCK.format(
+                knowledge=cached_knowledge) if cached_knowledge else ""
 
             prompt = SECTION_FEEDBACK_PROMPT.format(
                 section_name="additional enquiries",
@@ -988,55 +1266,76 @@ def get_graph(llm: BaseChatModel) -> StateGraph:
                 initial_review=initial_review,
                 additional_info=additional_info,
                 knowledge_block=knowledge_block,
+                gold_standards_block="",
+                investigation_type_block="",
                 format=parser.get_format_instructions(),
             )
         else:
-            # --- Draft path (existing logic) ---
-            knowledge_endpoint = runtime.context["resources_endpoint_name"]
-
+            # --- Draft path: chunk-based retrieval from delta table ---
             writer(prepare_thinking_message(
-                EXTERNAL_AGENT_NAME, "Retrieving knowledge for additional enquiries..."))
+                EXTERNAL_AGENT_NAME, "Retrieving additional enquiries knowledge from textbook..."))
 
-            raw_knowledge = await _retrieve_section_knowledge(
-                task_key="additional_enquiries",
-                task_def=RETRIEVAL_TASKS["additional_enquiries"],
-                state=state,
-                knowledge_endpoint=knowledge_endpoint,
-            )
-
-            writer(prepare_thinking_message(
-                EXTERNAL_AGENT_NAME, "Synthesising additional enquiries knowledge..."))
-
-            investigation_types = state.get("investigation_type", []) or []
-            synthesized = _synthesize_section_knowledge(
-                section_name="additional enquiries",
-                knowledge_set=raw_knowledge,
-                investigation_types=investigation_types,
+            per_inv_type, skipped_inv_types = await _retrieve_section_chunks_async(
+                state,
+                section="additional_enquiries",
+                parser_system_prompt=ENQUIRIES_PARSER_SYSTEM_PROMPT,
+                parser_prompt_template=ENQUIRIES_PARSER_PROMPT,
                 output_schema=AdditionalEnquiriesSet,
+                item_key="enquiry_list",
+                skip_on_empty=True,
             )
 
-            writer(prepare_thinking_message(
-                EXTERNAL_AGENT_NAME, "Drafting additional enquiries..."))
+            if not per_inv_type:
+                # Short-circuit: every inv_type had empty knowledge. Skip the
+                # drafting LLM and emit an empty section.
+                prompt = None
+            else:
+                writer(prepare_thinking_message(
+                    EXTERNAL_AGENT_NAME, "Drafting additional enquiries..."))
 
-            knowledge_json = synthesized.model_dump_json(indent=2, exclude_none=True)
-            prompt = ADDITIONAL_ENQUIRIES_DRAFT_PROMPT.format(
-                initial_review=initial_review,
-                knowledge=knowledge_json,
-                format=parser.get_format_instructions(),
+                knowledge_json = json.dumps(
+                    [
+                        {
+                            "investigation_type": entry["investigation_type"],
+                            "enquiry_list": entry["enquiry_list"].model_dump(exclude_none=True),
+                        }
+                        for entry in per_inv_type
+                    ],
+                    indent=2,
+                )
+                prompt = ADDITIONAL_ENQUIRIES_DRAFT_PROMPT.format(
+                    initial_review=initial_review,
+                    additional_info=additional_info,
+                    knowledge=knowledge_json,
+                    format=parser.get_format_instructions(),
+                )
+
+        if prompt is None:
+            parsed = AdditionalEnquiriesSet(enquiries_set=[])
+        else:
+            prompts = [SystemMessage(content=system_prompt),
+                       HumanMessage(content=prompt)]
+
+            response = llm.invoke(
+                input=prompts,
+                temperature=0.0,
+                max_tokens=4000,
+                response_format={"type": "json_object"},
             )
+            content = response.content if isinstance(
+                response.content, str) else response.content[0]["text"]
+            parsed: AdditionalEnquiriesSet = parser.parse(content)
 
-        prompts = [SystemMessage(content=system_prompt),
-                   HumanMessage(content=prompt)]
-
-        response = llm.invoke(
-            input=prompts,
-            temperature=0.0,
-            max_tokens=4000,
-            response_format={"type": "json_object"},
-        )
-        content = response.content if isinstance(
-            response.content, str) else response.content[0]["text"]
-        parsed: AdditionalEnquiriesSet = parser.parse(content)
+        # Notify user about inv_types with no textbook coverage AFTER drafting
+        # so the right-hand section already shows any enquiries that were
+        # produced for the inv_types that did have knowledge.
+        if skipped_inv_types:
+            inv_type_list = ", ".join(skipped_inv_types)
+            writer(prepare_hitl_task(
+                agent_name=EXTERNAL_AGENT_NAME,
+                text=f"No additional enquiry required for {inv_type_list} — feel free to add any enquiry by providing the details, or accept as-is.",
+                context="Informational notice: textbook contains no additional enquiries for the listed investigation type(s).",
+            ))
 
         # Send to HITL review
         artifact = build_form_enquiries(parsed)
@@ -1075,25 +1374,13 @@ def get_graph(llm: BaseChatModel) -> StateGraph:
         runtime, writer, messages = _get_ctx(state)
 
         decision = state.get("hitl_decision")
-        hitl_artifact = state.get("hitl_artifact") or {}
         feedback = decision.task_summary if decision and decision.intent == "feedback" else ""
 
-        # --- Accept path (interview_plan is always last → assemble_plan) ---
+        # --- Accept path: state["interview_plan"] is already canonical (written by route_interrupt) ---
         if decision and decision.intent == "accept":
-            if isinstance(hitl_artifact, InterviewQuestionSets):
-                accepted = hitl_artifact
-            elif hitl_artifact and isinstance(hitl_artifact, dict):
-                try:
-                    accepted = InterviewQuestionSets(**hitl_artifact)
-                except Exception:
-                    accepted = state.get("interview_plan")
-            else:
-                accepted = state.get("interview_plan")
-
             return Command(
                 goto="assemble_plan",
                 update={
-                    "interview_plan": accepted,
                     "hitl_decision": None,
                     "hitl_artifact": None,
                     "pending_step": None,
@@ -1110,13 +1397,15 @@ def get_graph(llm: BaseChatModel) -> StateGraph:
         # --- Feedback path ---
         if feedback:
             prev_output = state.get("interview_plan")
-            prev_version_json = prev_output.model_dump_json(indent=2, exclude_none=True) if prev_output else "{}"
+            prev_version_json = prev_output.model_dump_json(
+                indent=2, exclude_none=True) if prev_output else "{}"
 
             writer(prepare_thinking_message(
                 EXTERNAL_AGENT_NAME, "Revising interview plan based on feedback..."))
 
             cached_knowledge = state.get("interview_plan_knowledge") or ""
-            knowledge_block = SECTION_FEEDBACK_KNOWLEDGE_BLOCK.format(knowledge=cached_knowledge) if cached_knowledge else ""
+            knowledge_block = SECTION_FEEDBACK_KNOWLEDGE_BLOCK.format(
+                knowledge=cached_knowledge) if cached_knowledge else ""
 
             prompt = SECTION_FEEDBACK_PROMPT.format(
                 section_name="interview plan",
@@ -1125,6 +1414,8 @@ def get_graph(llm: BaseChatModel) -> StateGraph:
                 initial_review=initial_review,
                 additional_info=additional_info,
                 knowledge_block=knowledge_block,
+                gold_standards_block="",
+                investigation_type_block="",
                 format=parser.get_format_instructions(),
             )
         else:
@@ -1160,7 +1451,8 @@ def get_graph(llm: BaseChatModel) -> StateGraph:
                     investigation_types=investigation_types,
                     output_schema=InterviewQuestionSets,
                 )
-                knowledge_json = synthesized.model_dump_json(indent=2, exclude_none=True)
+                knowledge_json = synthesized.model_dump_json(
+                    indent=2, exclude_none=True)
             else:
                 knowledge_json = ""
 
@@ -1288,9 +1580,12 @@ def get_graph(llm: BaseChatModel) -> StateGraph:
         # interview_plan = state.get("interview_plan")
 
         plan = ExternalAgentPlan(
-            concern_set=key_concerns if key_concerns else KeyConcernSet(concern_set=[]),
-            document_set=doc_request if doc_request else DocRequestSet(document_set=[]),
-            enquiry_set=additional_enquiries if additional_enquiries else AdditionalEnquiriesSet(enquiries_set=[]),
+            concern_set=key_concerns if key_concerns else KeyConcernSet(
+                concern_set=[]),
+            document_set=doc_request if doc_request else DocRequestSet(
+                document_set=[]),
+            enquiry_set=additional_enquiries if additional_enquiries else AdditionalEnquiriesSet(
+                enquiries_set=[]),
             # interview_plan=interview_plan,
             version=1,
             created_at=datetime.utcnow().isoformat(),
@@ -1316,7 +1611,9 @@ def get_graph(llm: BaseChatModel) -> StateGraph:
         final_plan = state.get("external_agent_plan")
         claim_id = state.get("claim_id")
 
-        artifact = build_form_final(claim_id, final_plan) if final_plan else {}
+        selected_sections = state.get("selected_sections", [])
+        artifact = build_form_final(
+            claim_id, final_plan, selected_sections) if final_plan else {}
 
         return Command(
             update={

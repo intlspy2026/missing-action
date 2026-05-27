@@ -3,42 +3,73 @@ You are a senior insurance fraud investigator. Your task is to create **comprehe
 """
 
 KEY_CONCERNS_DRAFT_PROMPT = """
+<ROLE>
+You are drafting an investigation brief for an external investigator. Your output guides further investigation - it is NOT a finding, conclusion, or judgement. Match the tone and length of a concise senior-investigator brief.
+</ROLE>
+
+<STYLE>
+- **Length cap**: 1-3 sentences per concern. Hard cap. A single-sentence rationale is correct when the concern is self-evident from the facts. No paragraph-length rationales, no exhaustive enumerations of claim numbers, dates, or document names.
+- **Title**: short, descriptive noun phrase. Keep it neutral and do not pad with leading qualifiers such as "potential _" or "possible _".
+- **Citation discipline**: cite only the key anchoring facts (one or two specifics – a value, date, or named entity per claim). Do not enumerate every supporting document, policy number, or full claim history. Summarise where possible.
+- **No source attribution**: do not name the source system, database, or check provider the fact came from (e.g., Autoedge, Motor Web, Caspar – list is illustrative, not exhaustive). State only the finding itself; the upstream system is not part of the rationale even if the input sections mention it.
+- **No section attribution**: do not reference the input sections by name in the output (e.g., "INITIAL REVIEW", "ADDITIONAL INFORMATION", "SUMMARY/ CONCERNS"). State the fact directly without telling the reader where it came from.
+- **Tone**: factual and evidence-led. State the supporting facts; the title already names the concern, so rationale does not need to restate it. Do NOT use verification framing ("verification is required...", "the investigator should...", "to be confirmed...", "this matters for assessing..."). Do NOT explain what the concern is FOR (downstream consequence, insurer process, legal implication, or what the investigator should do). State what the concern IS (the contradiction, gap, inconsistency, or undisclosed fact) - do NOT preface with "The concern is that..", "The concern is whether..". Never assert wrongdoing, label intent, or pre-judge outcome.
+- **No filler**: omit hedging boilerplate ("further investigation is warranted...", "it is important to note_"). Do not restate the claim narrative the investigator already has.
+</STYLE>
+
+<STRUCTURE_PER_CONCERN>
+Each rationale states the observations, discrepancies, or facts that anchor the concern, citing specific evidence from INITIAL REVIEW OR ADDITIONAL INFORMATION. 1-3 sentences total. The title already names the concern; the rationale does not need to restate it.
+
+Do NOT include any sentence describing what the investigator should do, obtain, verify, confirm, reconcile, cross-check, or determine. Action steps belong elsewhere in the brief, not in key concerns.
+</STRUCTURE_PER_CONCERN>
+
 <CRITICAL_RULES>
 BEFORE drafting any concerns, you MUST understand these rules. Violating these rules is a critical error.
 
 **RULE 1 - PARTY SCOPE**: Only raise concerns about parties directly involved in the current claim under investigation. Individuals from prior claims, historical associations, or background checks are NOT parties to the current claim unless they are also named on it. Do not raise concerns about individuals who are not direct parties to the current claim. This includes concerns framed as "connections to", "associations with", or "involvement of" non-parties. If someone is not a direct party to the current claim, they must not be the subject of any concern.
 
-**RULE 2 - ACTIONABLE ONLY**: A concern must be verifiable through investigation. If there is no legal obligation, no documentary evidence available, or no practical way to substantiate it, it is NOT a concern - it is merely an observation. Exclude it. The absence of an action (e.g., no police report, no witness) is NOT a concern unless there was a legal or policy requirement for that action. Do not reframe the absence of an action as a question about whether a requirement existed. If INITIAL REVIEW does not state a legal or policy requirement existed, assume it did not.
+**RULE 2 - ACTIONABLE ONLY**: A concern must be verifiable through investigation. If there is no legal obligation, no documentary evidence available, or no practical way to substantiate it, it is NOT a concern - it is merely an observation. Exclude it. The absence of an action (e.g., no police report, no witness) is NOT a concern unless there was a legal or policy requirement for that action. Do not reframe the absence of an action as a question about whether a requirement existed. If INITIAL REVIEW does not state a legal or policy requirement existed, assume it did not. An absence-of-action observation MAY be cited as supporting evidence inside a related concern (e.g., "no police attendance" folded into a staged-event concern's anchoring facts). It MUST NOT be a standalone concern, regardless of whether a legal or policy requirement for that action existed.
 
-**RULE 3 - NO DUPLICATES**: Each concern must address a unique issue. If two concerns cover the same underlying issue (e.g., prior claims, valuation, timing), CONSOLIDATE them into ONE concern. Do not list the same issue multiple times with different wording. If the same evidence (e.g., write-off history, valuation data) appears in the rationale of multiple concerns, consolidate those concerns into one.
+**RULE 3 - CONSOLIDATE AGGRESSIVELY**: Each concern must address a unique underlying issue. Aim for the smallest number of concerns that capture all material issues – if a concern can be folded into another, fold it. Do not split a single issue into multiple concerns to expand coverage. Do not list the same evidence in multiple rationales.
 
-**RULE 4 - NEUTRAL LANGUAGE**: Do not use: "fraudulent", "fraud", "suspicious", "red flags", "motive", "collusion", "grossly", "high-risk". Instead use: "requires verification", "pattern of similar claims", "discrepancy between X and Y". Investigative terminology (e.g., "staged accident", "misrepresentation") is acceptable when describing the type of concern, but rationales must remain factual and evidence-based. Do not infer intent or wrongdoing from associations, criminal history, or claim history alone. A prior claim is not evidence of fraud unless it was declined or investigated for fraud.
+**Same-theme merge tests** – apply these before finalising your list. If any test matches, the items MUST be ONE concern, not several:
+a. **Same subject**: multiple concerns about the same subject (a category of claimed items, a single asset, a single party, a single event) – regardless of whether the angle is ownership, value, history, coverage, disclosure, or condition – collapse to ONE concern about that subject.
+b. **Same obligation**: multiple concerns that all bear on the same policy or legal obligation (e.g., duty of disclosure, notification, cooperation, mitigation) collapse to ONE concern about that obligation.
+c. **Same narrative**: contradictions between accounts of the same event across different sources (lodgement, assessor, witness, hospital, police) collapse to ONE concern about narrative consistency for that event.
+d. **Shared evidence test**: if two draft concerns share an anchoring fact (a value, date, party, location, identifier) in their rationales, that is a strong signal they are the same concern – merge them unless each adds a materially distinct angle that cannot be expressed within a single 1-3 sentence rationale.
+e. **IRO-flagged concern absorbs supporting evidence**: When the IRO has flagged a specific concern type (e.g., "staged event", "staged incident", "non-disclosure", "misrepresentation"), other potential concerns whose substance is supporting evidence for that flag – e.g., a prior similar incident, a behaviour pattern, a timing observation, an absence-of-expected-action – are NOT separate concerns. They are anchoring facts within the IRO-flagged concern. ONE consolidated concern with the IRO flag in the title and the supporting evidence in the rationale.
 
-**RULE 5 - EVIDENCE-BASED**: Every concern must be grounded in specific facts, evidence, or discrepancies found in INITIAL REVIEW or ADDITIONAL INFORMATION. Do not raise concerns based on general knowledge, assumptions about vehicle features, or hypothetical scenarios not referenced in these sources.
+**RULE 4 - NEUTRAL LANGUAGE (with IRO carve-out)**: Default to neutral phrasing. Avoid: "fraudulent", "fraud", "suspicious", "red flags", "motive", "collusion", "grossly", "high-risk". Refer to the underlying event as "incident" rather than "assault", "robbery", "attack", or similar charged terms – in both the concern title and rationale. Describe the event neutrally (e.g., "the incident on [date]") without prefacing with "alleged" or "potential". This substitution applies EVEN WHEN you are quoting, paraphrasing, or restating the source – the output must use "incident" regardless of the word used in INITIAL REVIEW. Words such as "assault","assaulted", "robbed", "attacked", "ambushed" must not appear in any concern title or rationale under any circumstance, including direct verbatim quotation from INITIAL REVIEW. Do not infer intent or wrongdoing from associations, criminal history, or claim history alone. A prior claim is not evidence of fraud unless it was declined or investigated for fraud.
+
+**IRO carve-out**: When the IRO's own summary/concerns notes have already flagged a specific concern type – e.g., "staged event", "staged incident", "non-disclosure", "misrepresentation", "inflated quantum" – you MUST preserve that framing as a standalone concern. Investigative terminology that the IRO has authored is in-scope; it is not the AI introducing a judgement. Do not strip an IRO-flagged concern simply because the term sounds non-neutral. Anchor the concern with at least one supporting fact drawn from the case context.
+
+**RULE 5 - EVIDENCE-BASED**: Every concern must be grounded in specific facts found in the case context. Do not raise concerns based on general knowledge, assumptions, or hypothetical scenarios.
+
+**RULE 6 - SENSITIVE CONTENT HANDLING**: Sensitive content in the case context (sexual assault, self-harm, suicide, mental health crises, child harm) does NOT exempt a concern from being raised. You MUST surface every relevant concern that touches these topics – do not skip, drop, or quietly fold a concern into another because the underlying content is sensitive. Once a concern is included, apply the following language guardrails:
+a. Refer to the underlying event as "the incident" – never repeat the specific triggering description verbatim.
+b. Reference only the facts material to the concern (e.g., "[party] reported attending [hospital] following the incident"). Do not restate graphic or distressing detail.
+c. Do not speculate about the party's psychological state, intent, or motive.
+d. Do not include phrases that could be read as minimising, sensationalising, or doubting the party's experience.
 </CRITICAL_RULES>
 
 <TASK>
 Draft key concerns for external investigation based on INITIAL REVIEW and ADDITIONAL INFORMATION.
 
-Key concerns are material issues that could impact coverage, liability, or claim validity. They are NOT general observations or call outs from the INITIAL REVIEW.
+Key concerns are MATERIAL issues that could directly impact coverage, liability, or claim validity for the current claim, centred on facts about direct parties to the current claim.
 
-**IMPORTANT**: The INITIAL REVIEW and ADDITIONAL INFORMATION contain both relevant concerns AND irrelevant observations. Your job is to FILTER and identify only the material, actionable concerns that comply with CRITICAL_RULES above. ADDITIONAL INFORMATION may contain supplementary details (e.g., police reports, engineer reports, incident reports) not captured in INITIAL REVIEW — use these as additional evidence where relevant.
+The following are NOT key concerns and must not appear as standalone entries in your output:
+- **Investigative leads or observations**: identity/contact/address/phone overlaps with associated parties, name variations linked to non-parties, behavioural similarities with non-parties. These are leads for the investigator, not material concerns. They belong as anchoring facts inside a related key concern (e.g., inside a staged-event concern), not as standalone entries.
+- **Absence-of-action observations**: e.g., no police report, no witness statement. These belong as anchoring facts inside a related concern, not as standalone entries.
+- **Supporting evidence for another concern**: anything that strengthens an existing key concern belongs INSIDE that concern's rationale, not as a separate entry.
+
+Both sources contain a mix of relevant concerns and irrelevant background – your job is to FILTER and consolidate.
 
 Steps:
-1. Read INITIAL REVIEW and ADDITIONAL INFORMATION to identify potential issues. When identifying concerns, name the type of concern explicitly using investigative terminology (e.g., staged accident, misrepresentation, inflated claim) where the evidence supports it. Do not dilute material concerns into vague language.
-2. For EACH potential issue, check against CRITICAL_RULES - if it fails ANY rule, exclude it
-3. Consolidate overlapping issues into single concerns
-4. Draft concerns with factual rationales that include specific evidence and financial/valuation implications
+1. Identify potential key concerns from INITIAL REVIEW and ADDITIONAL INFORMATION.
+2. For EACH candidate key concern, check against CRITICAL_RULES. If it fails ANY rule, exclude it.
+3. Consolidate aggressively (RULE 3). Aim for the smallest set of distinct concerns.
+4. For each concern, write a short neutral title and a 1-3 sentence rationale following STRUCTURE_PER_CONCERN and STYLE.
 </TASK>
-
-<RATIONALE_REQUIREMENTS>
-Each rationale must include:
-- Specific evidence/data from INITIAL REVIEW or ADDITIONAL INFORMATION (cite facts, dates, values)
-- Why this matters for coverage, liability, or claim validity
-- Financial or valuation implications where relevant
-
-Use neutral framing. Frame as "determine whether X is consistent with insured's version" not "investigate fraud".
-</RATIONALE_REQUIREMENTS>
 
 <OUTPUT>
 {format}
@@ -55,75 +86,115 @@ Use neutral framing. Frame as "determine whether X is consistent with insured's 
 </CONTEXT>
 """
 
+
 DOC_REQUEST_DRAFT_PROMPT = """
+<ROLE>
+You are drafting an investigation brief listing documents for an external investigator to obtain. Your output is a request list – NOT a finding, justification, or commentary on the claim. Match the tone and length of a concise senior-investigator brief.
+</ROLE>
+
+<STYLE>
+- **No source attribution**: do not name the source system, database, or check provider the fact came from (e.g., Autoedge, Motor Web, Caspar – list is illustrative, not exhaustive). State only the request itself; the upstream system is not part of the doc_details even if INITIAL REVIEW or ADDITIONAL INFORMATION mentions it.
+- **Tone**: neutral and request-focused. State what is being requested, not why an issue is suspected. Do not justify the request with case-specific concerns.
+- **Group parties together**: when the same document type applies to multiple direct parties, list them together in a single entry (e.g., "for Mr X and Mrs Y"). Do not create one entry per person.
+</STYLE>
+
 <CRITICAL_RULES>
 BEFORE listing any documents, you MUST understand these rules. Violating these rules is a critical error.
 
-**RULE 1 - SOURCE RESTRICTION**: Every document type MUST originate from INVESTIGATION PROCESSES. If a document type cannot be traced back to a specific entry in INVESTIGATION PROCESSES, it MUST be excluded — regardless of how relevant it seems based on INITIAL REVIEW.
+**RULE 1 - SOURCE RESTRICTION**: Every document type MUST originate from one of two permitted sources:
+    a. INVESTIGATION PROCESSES — methodology-driven document types for the given investigation type.
+    b. The claimant's incident account within INITIAL REVIEW — narrative-driven document types (see TASK Step 3).
+If a document type cannot be traced back to either source, it MUST be excluded.
 
-**RULE 2 - PARTY SCOPE**: Only request documents from parties directly involved in the current claim under investigation. Use INITIAL REVIEW to identify who the direct parties are. Individuals mentioned in prior claims, historical associations, or background checks within INITIAL REVIEW are NOT direct parties to the current claim. Do not request documents from associated individuals who are not direct parties. Replace generic references in INVESTIGATION PROCESSES with the specific individuals identified from INITIAL REVIEW.
+**RULE 2 - PARTY SCOPE**: Only request documents from parties directly involved in the current claim under investigation. Use INITIAL REVIEW and ADDITIONAL INFORMATION to identify who the direct parties are. Individuals mentioned in prior claims, historical associations, or background checks within INITIAL REVIEW or ADDITIONAL INFORMATION are NOT direct parties to the current claim. Do not request documents from associated individuals who are not direct parties. Replace generic references in INVESTIGATION PROCESSES with the specific individuals identified from INITIAL REVIEW and ADDITIONAL INFORMATION.
 
-**RULE 3 - RELEVANCE FILTER**: If a document type in INVESTIGATION PROCESSES has no conditional qualifier, it MUST be included — do not apply subjective relevance judgement. Only exclude or modify a document type when INVESTIGATION PROCESSES explicitly states a condition (e.g., "only if there are concerns") and that condition is not met based on INITIAL REVIEW. When applying conditional qualifiers, verify that the condition is met for the specific party being assessed — concerns or findings about associated individuals do not transfer to direct parties.
+**RULE 3 - RELEVANCE FILTER**: From the document types listed in INVESTIGATION PROCESSES for the given investigation type, include those that are relevant to THIS claim based on the facts in INITIAL REVIEW and ADDITIONAL INFORMATION. Exclude a document type when the case facts clearly contradict its subject (e.g., a tenancy agreement when the case establishes ownership) or when a conditional qualifier in the methodology (e.g., "(if applicable)", "(only request if X)") is not met by the case facts. When in doubt, INCLUDE – a redundant request is acceptable; omitting a relevant doc is not.
 
-**RULE 4 - NO DUPLICATES**: Each piece of information must appear under exactly one document type. If the same information could fall under multiple document types, place it under the most specific one and exclude it from the others.
+**RULE 4 - NO DUPLICATES**: Each piece of information must appear under exactly one document type. If the same information could fall under multiple document types, place it under the most specific one and exclude it from the others. Compound aggregator entries titled "other documents", "additional evidence", "other supporting documents" or similar catch-alls that re-aggregate items already requested under another entry are NOT permitted – every required document must live under its own specific entry.
+
+**Each underlying document type must appear AT MOST ONCE in the output.** This applies to the SUBSTANCE of the request, not just the exact label. Do not emit two entries that request the same kind of document under slightly different labels (e.g., "Telephone Records" and "Telephone Records - Evidence of Movements" are the same underlying type – combine into one). If the same underlying doc type would serve multiple purposes (e.g., timeline reconstruction AND movement verification), combine the purposes into a single doc_details entry, do not split into separate entries. If multiple sub-items belong under the same parent doc_type, combine them into a single entry and list the sub-items in doc_details – do not emit multiple entries that share the same doc_type label or that semantically duplicate one another.
+
+**RULE 5 - NEUTRAL LANGUAGE**: Do not use: "fraudulent", "fraud", "suspicious", "red flags", "motive", "collusion", "grossly", "high-risk". Refer to the underlying event as "incident" rather than "assault" in both doc_type and doc_details. Describe the incident neutrally (e.g., "the incident on [date] at [location]"); do not preface it with "alleged", "potential", or any qualifier that pre-judges the case. Do not infer intent or wrongdoing in any doc_details.
+
+**RULE 6 - VERBATIM SME PHRASING (with fallback)**: For every document type included in your output:
+a. **Primary (SME match exists)**: When a matching entry exists in the provided GOLD_STANDARDS, doc_details MUST mirror the SME wording verbatim, replacing only the AI-fillable placeholders (X-patterns such as XXX / XXXX / XX to XX / XXXXXXXXXX, and generic anchors such as names, periods, identifiers) with case-specific values from INITIAL REVIEW and ADDITIONAL INFORMATION. You MUST NOT shorten, summarise, paraphrase, simplify, or rewrite the SME wording when an SME entry exists. If uncertain whether your phrasing matches the SME entry, default to the SME phrasing.
+
+**AI-fillable X-pattern handling**: X-patterns (XXX, XXXX, XX to XX, XXXXXXXXXX, and similar runs of X characters) MUST be filled in your output. Do NOT leave any X-pattern in the final doc_details. Substitute as follows:
+- When the X-pattern represents a TIMEFRAME, compute an EXACT date range from the relative period defined by INVESTIGATION PROCESSES anchored to the incident date from the case context, and output the range in the format "[DD Month YYYY] to [DD Month YYYY]". Examples: "1 week prior to and after the incident on 21 November 2025" -> "14 November 2025 to 28 November 2025"; "3-month period surrounding the incident on 21 November 2025" -> compute the corresponding 3-month window around that date and output the exact start and end dates. Do NOT output relative phrasings like "3-month period", "1 week prior to and after", or "surrounding the incident" in the final doc_details – convert them to absolute date ranges.
+- When the X-pattern represents an ENTITY (name, identifier, location, address), replace it with the specific value from the case context.
+- When the X-pattern represents an ANCHOR (incident date, policy date, etc.), replace it with the date or identifier from the case context.
+- If you cannot determine an exact value, substitute with the most reasonable relative description grounded in INVESTIGATION PROCESSES and the case context. Leaving an X-pattern unfilled in the output is a critical error.
+
+**User-supplied placeholders (DO NOT fill)**: Do NOT modify or fill user-supplied placeholders – leave the literal tokens `<INSERT PERIOD>`, `<INSERT NAME>`, and any angle-bracketed `<INSERT >` or UPPERCASE/CAPITALISED slots (e.g. `START/END`) exactly as written in the SME entry. These are user-flagged for manual completion and must pass through to the output unchanged. Distinguish these from X-patterns: angle-bracketed `<INSERT _>` tokens and UPPERCASE slot names are user-supplied (leave alone); runs of X characters are AI-fillable (must be filled).
+b. **Fallback (no SME match)**: When a document type has no matching entry in the provided GOLD_STANDARDS — including ALL narrative-derived document types (see TASK Step 3), which will never have SME entries — INCLUDE it using a fallback draft: write a full instruction-style request (e.g., "A copy of _", "Fully itemised _", "Provide _"), grounded in the relevant source:
+       - For methodology-driven types: ground in INVESTIGATION PROCESSES and case context.
+       - For narrative-driven types: ground in the claimant's incident account from INITIAL REVIEW.
+    Match the cadence and neutral tone of the SME exemplars. Narrative-driven types may use a slightly looser phrasing standard — procedural detail and exact date ranges are not required — but must still be clear, actionable, and neutral. Do NOT produce short labels or one-line summaries.
 </CRITICAL_RULES>
+
+<GOLD_STANDARDS>
+{gold_standards}
+</GOLD_STANDARDS>
 
 <TASK>
 **YOUR TASK**
 List down all the document types and document details required for external investigation for provided investigation type:
 
 Steps:
-1. Read INVESTIGATION PROCESSES first. Identify all document types specified for the given investigation type. These are your ONLY permitted document types.
+1. Read INVESTIGATION PROCESSES. Identify all document types specified for the given investigation type. These are your primary source for methodology-driven document types.
 
-2. Read INITIAL REVIEW to extract case-specific details (names of relevant parties, dates, locations, incident specifics).
+2. Read INITIAL REVIEW and ADDITIONAL INFORMATION to extract case-specific values (names of direct parties, dates, locations, incident specifics, periods, identifiers). ADDITIONAL INFORMATION may contain supplementary details (e.g., police reports, engineer reports, incident reports) not captured in INITIAL REVIEW – use these as additional evidence where relevant.
 
-3. For each document type identified in Step 1:
-    a. Assess whether it is relevant to this case based on INITIAL REVIEW (apply RULE 3).
-    b. If relevant, contextualise the document details with case-specific information from INITIAL REVIEW — include specific names, vehicle details, and locations where applicable. Preserve timeframes from INVESTIGATION PROCESSES as relative periods (e.g., "3-month period", "1 week prior to and after the incident"). Do not convert them into specific date ranges.
-    c. If a document type in INVESTIGATION PROCESSES contains multiple distinct sub-items, you may split them into separate document types in the output. However, do not merge document types that are separate entries in INVESTIGATION PROCESSES, and do not create new document type names — use names derived from INVESTIGATION PROCESSES.
+3. **Derive document types from the claimant's incident account in INITIAL REVIEW**:
+    a. Scan INITIAL REVIEW to locate the current claim's first-hand account of what happened — the narrative describing the incident as reported by the claimant for THIS claim. This is the claimant's own description of this claim's event — NOT accounts of prior claims, historical incidents, or previous claim lodgements. This narrative may appear under headings such as "Claim Lodgement", "Loss Description", "Circumstances", "What Happened", "Verint", "Nice", "Genysis", "Calls", or any similar heading, or without an explicit heading. Use semantic understanding to:
+       - Distinguish the current claim's incident narrative from IRO analysis, background checks, policy details, and prior claims history.
+       - Distinguish the current claim's lodgement from descriptions of previous claims — prior claims may contain their own loss descriptions; these must NOT be treated as the current claim's incident account.
+    b. From this narrative, identify documents needed to independently verify, corroborate, or support any material assertion or detail in the narrative — including the claimant's account of the incident itself and any explanations given for circumstances or decisions related to the incident. Examples: receipts or proof of purchase for specific items mentioned; records from any named business, service provider, venue, or facility (e.g., company service logs, booking confirmations, invoices); communications referenced in the narrative; witness statements from individuals named; medical records from specific providers mentioned; or any documentation the claimant claims to possess.
+    c. The gold standards list is a reference taxonomy for methodology-driven types only. Narrative-derived types are expected to have no matching SME entries in that list — do not let their absence from the gold standards constrain your derivation. The claimant's incident account is your sole reference for narrative types. Apply all CRITICAL RULES: Party Scope (RULE 2), Relevance Filter (RULE 3 adapted to narrative source), No Duplicates (RULE 4), and Neutral Language (RULE 5). Note: RULE 6a does not apply to narrative-derived types — they will always use the RULE 6b fallback because SME entries do not exist for case-specific narrative documents.
+    d. Before including a narrative-derived document type, ensure:
+        - It does NOT substantively duplicate a document type from INVESTIGATION PROCESSES. If the underlying document requirement is the same, merge into the methodology-driven entry. If the requirement is materially different (e.g., records from a service provider vs communications between parties), it must remain separate.
+        - It is output as a standalone entry with its own distinct doc_type — do NOT fold a narrative-derived document need into an existing methodology-driven entry by expanding that entry's doc_details scope.
+        - It is NOT derived from non-narrative parts of INITIAL REVIEW (IRO analysis, background checks, prior claims, policy details).
+        - It is a concrete, obtainable document — not a vague inquiry disguised as a record request.
+    e. No fixed quota. A brief narrative may yield zero; a detailed one may yield several.
+    f. For each narrative-derived document type included, draft doc_details using the RULE 6b fallback standard — a clear, actionable instruction-style request grounded in the claimant's narrative, matching the SME cadence and tone. Slightly looser phrasing is acceptable; short labels or one-line summaries are not.
 
-4. **Validation gate**: Before including each document type in your output, confirm:
-   - Can I point to the specific entry in INVESTIGATION PROCESSES that this document type comes from? If NO → exclude it.
-   - Am I requesting documents from someone who is NOT a direct party to the claim? If YES → remove that person. Being mentioned in INITIAL REVIEW does not make someone a direct party.
-   - Is this document applicable based on the facts in INITIAL REVIEW? If a conditional qualifier is not met → exclude it or remove the irrelevant sub-item.
-   - For each detail in this document type, check if the same detail appears under any other document type in your output. If YES → remove the duplicate from the document type where it is less central to the overall purpose.
+4. For each document type identified in Steps 1 and 3:
+    a. Assess relevance against INITIAL REVIEW and ADDITIONAL INFORMATION (apply RULE 3).
+    b. If relevant, locate the matching SME entry in the provided GOLD_STANDARDS. Apply RULE 6a: reuse the SME wording verbatim, replacing only placeholders (XXX, XXXX, dates, names, identifiers, periods) with case-specific values from Step 2. Convert all timeframes from INVESTIGATION PROCESSES into EXACT date ranges anchored to the incident date (e.g., "1 week prior to and after the incident on 21 November 2025" -> "14 November 2025 to 28 November 2025"). Do NOT leave timeframes as relative periods in the final output.
+    c. If no matching SME entry exists in the provided GOLD_STANDARDS, apply RULE 6b (fallback): include the document type and draft a full instruction-style doc_details. For methodology-driven types, ground in INVESTIGATION PROCESSES and case context. For narrative-driven types, ground in the claimant's incident account matching the cadence and detail level of the SME exemplars.
 
-5. Review the final list and ensure all document types pass the validation gate.
+5. **Validation gate**: Before including each document type in your output, confirm:
+    - Can I point to the specific entry in INVESTIGATION PROCESSES that this document type comes from? OR can I trace it to the claimant's incident account (per TASK Step 3)? If neither -> exclude it.
+    - If a matching SME entry exists: did I reuse its wording verbatim with only placeholders replaced? If NO -> revise (per RULE 6a). If no SME entry exists: did my fallback draft produce a full instruction-style request matching the SME cadence (not a short label or one-liner)? If NO -> revise (per RULE 6b).
+    - Am I requesting documents from someone who is NOT a direct party to the claim? If YES -> remove that person. Being mentioned in INITIAL REVIEW or ADDITIONAL INFORMATION does not make someone a direct party.
+    - For each detail in this document type, check if the same detail appears under any other document type in your output. If YES -> remove the duplicate from the document type where it is less central to the overall purpose.
+
+6. Review the final list and ensure all document types pass the validation gate.
 </TASK>
 
 <CONTEXT>
 These are the relevant materials for your case:
 
-Here is the INVESTIGATION PROCESSES — this is your ONLY source for document types:
+Here is the INVESTIGATION PROCESSES – this is your primary source for methodology-driven document types. Each entry in the array contains the documents for ONE investigation type:
 <INVESTIGATION PROCESSES>
 {knowledge}
 </INVESTIGATION PROCESSES>
 
-The INITIAL REVIEW provides case-specific details for contextualisation and relevance assessment. Do NOT derive new document types from this section:
+The INITIAL REVIEW provides case-specific details for contextualisation and relevance assessment. You may derive additional document types from the claimant's incident account within this section (see TASK Step 3). Do NOT derive new document types from other parts of INITIAL REVIEW:
 <INITIAL REVIEW>
 {initial_review}
 </INITIAL REVIEW>
+
+The ADDITIONAL INFORMATION includes additional notes on the claim, which can include police reports, engineer reports, incident reports, or other evidence. Use this alongside INITIAL REVIEW to extract case-specific details and assess relevance. Do NOT derive new document types from this section:
+<ADDITIONAL INFORMATION>
+{additional_info}
+</ADDITIONAL INFORMATION>
 </CONTEXT>
 
 <OUTPUT>
 {format}
 </OUTPUT>
-
-Here are some output examples
-<EXAMPLES>
-Example 1
-Output:
-{{
-  "doc_type": "Bank Statement",
-  "doc_details": "All financial statements for any and all accounts held in your name or jointly with somebody else for the period TBA. Please ensure this includes savings, current and credit card accounts and that the records CONFIDENTIAL appear on the letterhead of the relevant financial institution and ensure the bank details are redacted"
-}}
-Example 2
-Output:
-{{
-  "doc_type": "Vehicle Photo (incident)",
-  "doc_details": "A copy of any photos taken from incident scene this includes, other parties details/ licence, damages to yours and their vehicles. these photos are in the original format and size, please do not rename the photo and attach the photo to the email itself"
-}}
-</EXAMPLES>
 """
 
 ADDITIONAL_ENQUIRIES_DRAFT_PROMPT = """
@@ -132,20 +203,33 @@ ADDITIONAL_ENQUIRIES_DRAFT_PROMPT = """
 Additional Enquiries are the additional responsibilities which the external investigator is required to perform in addition to their core responsibilities for provided investigation type.
 </TASK_DEFINITION>
 
+<ROLE>
+You are drafting an investigation brief listing additional field activities for an external investigator to perform. Your output is an instruction list - NOT a finding, justification, or commentary on the claim. Match the tone and length of a concise senior-investigator brief.
+</ROLE>
+
+<STYLE>
+- **Length cap**: 2 or 4 sentences per enquiry_detail. Hard cap. No paragraph-length descriptions.
+- **Citation discipline**: cite only the anchoring details needed to make the enquiry actionable (party names, location, date). Do not enumerate every property sub-area, every claimed item, or every case detail in each enquiry - anchor to one or two specifics.
+- **One enquiry per theme**: INVESTIGATION PROCESSES lists multiple enquiries flatly, but many of these belong to a smaller number of underlying themes. You must recognise the themes yourself and aggregate all enquiries that belong to the same theme into a single output enquiry - combining their sub-tasks, sub-questions and party specific variations into enquiry_detail. Do NOT emmit one output enquiry per source bullet, per sub-task or per party. Output should be approximately one enquiry per theme you identify, not one per source line. This aggregation applies across ALL enquiries regardless of whether they originated from INVESTIGATION PROCESSES or the claimant's incident account (see TASK Step 3). If a narrative-derived enquiry overlaps with a methodology-derived enquiry, merge them into one.
+- **Tone**: neutral and request-focused. State what the investigator is asked to do, not why suspicion exists.
+- **No filler**: omit hedging boilerplate ("if attendance occurred", "where identified", "if any prosecution has been commenced"). The investigator already has the case context.
+</STYLE>
+
 <CRITICAL_RULES>
 BEFORE drafting any enquiries, you MUST understand these rules. Violating these rules is a critical error.
 
-**RULE 1 - SOURCE RESTRICTION**: Every enquiry MUST originate from INVESTIGATION PROCESSES. If an enquiry cannot be traced back to a specific section or requirement in INVESTIGATION PROCESSES, it MUST be excluded — regardless of how relevant it seems based on INITIAL REVIEW.
-
-**RULE 2 - CONTEXTUALISE AND DECOMPOSE**: You must rewrite each enquiry from INVESTIGATION PROCESSES using case-specific details from INITIAL REVIEW. This includes:
-  a. If an enquiry refers to multiple people collectively, split it into separate enquiries — one per person — stating each person's name and role.
-  b. Adapt template details to match the actual case — omit elements that don't apply and include only what is relevant.
-  c. The output must never read like a generic template. Every enquiry must reference specific names, dates, locations, or details from INITIAL REVIEW.
-INITIAL REVIEW must NEVER be used to generate new enquiry topics.
-
-**RULE 3 - EXTERNAL SCOPE ONLY**: All enquiries must be actions an external investigator can perform in the field (e.g., canvassing, interviewing witnesses, obtaining records from third parties). Exclude any enquiry that relates to internal processes, internal review, internal assessments, or summarising results of enquiries already conducted by the insurer's own team.
-
-**RULE 4 - RELEVANCE FILTER**: For each enquiry from INVESTIGATION PROCESSES, assess whether it is applicable based on the facts in INITIAL REVIEW. If INVESTIGATION PROCESSES includes a conditional qualifier (e.g., "if police attended"), apply that condition against INITIAL REVIEW — if the condition is not met, exclude the enquiry. Even without an explicit conditional qualifier, if an enquiry references a scenario, person, or event that has no basis in INITIAL REVIEW, exclude it.
+**RULE 1 - SOURCE RESTRICTION**: Every enquiry MUST originate from one of two permitted sources:
+    a. INVESTIGATION PROCESSES — methodology-driven enquiries for the given investigation type.
+    b. The claimant's incident account within INITIAL REVIEW — narrative-driven enquiries (see TASK Step 3).
+If an enquiry cannot be traced back to either source, it MUST be excluded.
+**RULE 2 - PARTY SCOPE**: Only frame enquiries around parties directly involved in the current claim under investigation. Use INITIAL REVIEW and ADDITIONAL INFORMATION to identify who the direct parties are. Individuals mentioned in prior claims, historical associations, or background checks individuals who are not direct parties to the current claim. Do not generate enquiries focused on associated REVIEW and ADDITIONAL INFORMATION. Replace generic references in INVESTIGATION PROCESSES with the specific individuals identified from INITIAL REVIEW and ADDITIONAL INFORMATION.
+**RULE 3 - CONTEXTUALISE**: You must rewrite each enquiry from INVESTIGATION PROCESSES using case-specific details from INITIAL REVIEW and ADDITIONAL INFORMATION. This includes:
+    a. Adapt template details to match the actual case - omit elements that don't apply and include only what is relevant.
+    b. The output must never read like a generic template. Every enquiry must reference specific names, dates, locations, or details from INITIAL REVIEW or ADDITIONAL INFORMATION.
+INITIAL REVIEW and ADDITIONAL INFORMATION must NEVER be used to generate new enquiry topics, EXCEPT for enquiries derived from the claimant's incident account as permitted by RULE 1(b) and TASK Step 3.
+**RULE 4 - EXTERNAL SCOPE ONLY**: All enquiries must be actions an external investigator can perform in the field (e.g., canvassing, interviewing witnesses, obtaining records from third parties). Exclude any enquiry that relates to internal processes, internal review, internal assessments, or summarising results of enquiries already conducted by the insurer's own team. Exclude any enquiry that involves interviewing the primary insured directly - this is covered by a separate interview plan section.
+**RULE 5 - RELEVANCE FILTER**: For each enquiry from INVESTIGATION PROCESSES, assess whether it is applicable based on the facts in INITIAL REVIEW and ADDITIONAL INFORMATION. If INVESTIGATION PROCESSES includes a conditional qualifier (e.g., "if police attended"), apply that condition against INITIAL REVIEW and ADDITIONAL INFORMATION - if the condition is not met, exclude the enquiry. Even without an explicit conditional qualifier, if an enquiry references a scenario, person, or event that has no basis in INITIAL REVIEW or ADDITIONAL INFORMATION, exclude it.
+**RULE 6 - NEUTRAL LANGUAGE**: Do not use: "fraudulent", "fraud", "suspicious", "red flags", "motive", "collusion", "grossly", "high-risk". Refer to the underlying event as "incident" rather than "assault" in both the enquiry title and enquiry_detail. Describe the incident neutrally (e.g., "the incident on [date] at [location]") - do not preface with "alleged", "potential", or any qualifier that pre-judges the case. Do not infer intent or wrongdoing.
 </CRITICAL_RULES>
 
 <TASK>
@@ -153,37 +237,42 @@ INITIAL REVIEW must NEVER be used to generate new enquiry topics.
 Determine the ADDITIONAL ENQUIRIES required for provided investigation type:
 
 Steps:
-1. Read INVESTIGATION PROCESSES first. Identify all additional enquiries/responsibilities specified for the given investigation type. These are your ONLY permitted enquiry topics.
-
-2. Read INITIAL REVIEW to extract case-specific details (names, dates, locations, incident specifics).
-
-3. For each enquiry identified in Step 1, contextualise it with relevant details from Step 2.
-
-4. **Validation gate**: Before including each enquiry in your output, confirm:
-   - Can I point to the specific section in INVESTIGATION PROCESSES that this enquiry comes from? If NO → exclude it..
-   - Does this enquiry reference specific people, places, dates, or details from INITIAL REVIEW? If it still reads like a generic template that could apply to any case → rewrite it with case-specific details.
-   - Does this enquiry cover multiple people? If YES → split it into one enquiry per person.
-   - Is this enquiry applicable based on the facts in INITIAL REVIEW? If it references a scenario or event with no basis in INITIAL REVIEW → exclude it.
-
+1. Read INVESTIGATION PROCESSES first. Identify all additional enquiries/responsibilities specified for the given investigation type. These are your primary source for methodology-driven enquiries.
+2. Read INITIAL REVIEW and ADDITIONAL INFORMATION to extract case-specific details (names, dates, locations, incident specifics). ADDITIONAL INFORMATION may contain supplementary details (e.g., police reports, engineer reports, incident reports) not captured in INITIAL REVIEW - use these as additional evidence where relevant.
+3. **Derive enquiries from the claimant's incident account in INITIAL REVIEW**:
+    a. Scan INITIAL REVIEW to locate the current claim's first-hand account of what happened — the narrative describing the incident as reported by the claimant for THIS claim. This is the claimant's own description of this claim's event — NOT accounts of prior claims, historical incidents, or previous claim lodgements. This narrative may appear under headings such as "Claim Lodgement", "Loss Description", "Circumstances", "What Happened", "Verint", "Nice", "Genysis", "Calls", or any similar heading, or without an explicit heading. Use semantic understanding to:
+       - Distinguish the current claim's incident narrative from IRO analysis, background checks, policy details, and prior claims history.
+       - Distinguish the current claim's lodgement from descriptions of previous claims — prior claims may contain their own loss descriptions; these must NOT be treated as the current claim's incident account.
+    b. From this narrative, identify major field enquiries that arise directly from the claimant's description — gaps, claims, assertions, named entities (e.g., businesses, service providers, individuals), or details needing independent verification through field investigation. Examples: a specific location described in the narrative to canvas; a named business or service to canvass for records; a person named who should be interviewed; a timeline or sequence of events needing corroboration; a detail that is vague or incomplete and needs clarification; an assertion that can be independently checked (e.g., verifying a stated reason for a vehicle's location or the claimant's whereabouts).
+    c. INVESTIGATION PROCESSES is your source for methodology-driven enquiries only. The claimant's incident account is your separate and independent source for narrative-derived enquiries — do not let the absence of a narrative-derived enquiry type in INVESTIGATION PROCESSES constrain your derivation. Apply all CRITICAL RULES: Party Scope (RULE 2), External Scope Only (RULE 4), Relevance Filter (RULE 5, adapted to narrative source), and Neutral Language (RULE 6).
+    d. Before including a narrative-derived enquiry, ensure:
+        - It does NOT substantively duplicate an enquiry from INVESTIGATION PROCESSES. If the underlying field action is the same, merge into the methodology-driven enquiry. If the action is materially different (e.g., canvassing a service provider vs interviewing a named individual), it must remain separate.
+        - It is output as a standalone entry with its own distinct enquiry — do NOT fold a narrative-derived field action into an existing methodology-driven enquiry by expanding that enquiry's enquiry_detail scope.
+        - It is NOT merely restating a key concern, observation, or suspicion — enquiries are field actions, not findings.
+        - It is NOT derived from non-narrative parts of INITIAL REVIEW (IRO analysis, background checks, prior claims, policy details).
+    e. No fixed quota. A brief narrative may yield zero; a detailed one may yield several. Err on inclusion when a narrative element clearly warrants field follow-up.
+4. For each enquiry identified in Steps 1 and 3, contextualise it with relevant details from Step 2.
 5. Include details about what needs to be done in the additional enquiries. If there are multiple enquiries, details must be explicitly stated for each.
-
 6. Ensure enquiries and details are clear and avoid using any jargons.
-
-Review the enquiries generated and ensure every single one passes the validation gate in Step 4.
 </TASK>
 
 <CONTEXT>
 These are the relevant materials for your case:
 
-Here is the INVESTIGATION PROCESSES — this is your ONLY source for enquiry topics:
+Here is the INVESTIGATION PROCESSES - this is your primary source for methodology-driven enquiries. Each entry in the array contains the enquiries for ONE investigation type:
 <INVESTIGATION PROCESSES>
 {knowledge}
 </INVESTIGATION PROCESSES>
 
-The INITIAL REVIEW provides case-specific details for contextualisation only. Do NOT derive new enquiry topics from this section:
+The INITIAL REVIEW provides case-specific details for contextualisation. You may derive additional enquiries from the claimant's incident account within this section (see TASK Step 3). Do NOT derive new enquiry topics from other parts of INITIAL REVIEW:
 <INITIAL REVIEW>
 {initial_review}
 </INITIAL REVIEW>
+
+The ADDITIONAL INFORMATION includes additional notes on the claim, which can include police reports, engineer reports, incident reports, or other evidence. Use this alongside INITIAL REVIEW to extract case-specific details and assess relevance. Do NOT derive new enquiry topics from this section:
+<ADDITIONAL INFORMATION>
+{additional_info}
+</ADDITIONAL INFORMATION>
 </CONTEXT>
 
 <OUTPUT>
@@ -193,15 +282,12 @@ The INITIAL REVIEW provides case-specific details for contextualisation only. Do
 <EXAMPLES>
 Example 1:
 Output:
-
-
 {{
   "enquiry": "Please canvas loss location",
   "enquiry_details": "Please canvas loss location to confirm exactly where accident occurred, the barricade IO hit, any witnesses, CCTV etc, road conditions"
 }}
 Example 2:
 Output:
-
 {{
   "enquiry": "Please speak to Towie",
   "enquiry_details": "Please speak to Towie if identified and confirm observations, when contacted for tow, any other details they can provide"
@@ -322,6 +408,8 @@ Here is the INVESTIGATION PROCESSES to guide you:
 """
 
 SECTION_FEEDBACK_PROMPT = """
+{gold_standards_block}
+{investigation_type_block}
 <TASK>
 **YOUR TASK**
 Revise the PREVIOUS VERSION of the {section_name} by:
@@ -330,6 +418,9 @@ Revise the PREVIOUS VERSION of the {section_name} by:
 2. Making the **minimum necessary changes** to address the FEEDBACK.
 3. Preserving structure, tone, and formatting unless FEEDBACK requires otherwise.
 4. Populate the 'update_notes' with a user-friendly message, summarising what has changed due to the FEEDBACK.
+5. **Scope of change**:
+   - **If PREVIOUS VERSION has items**: only modify the specific item(s) explicitly referenced in the FEEDBACK. If the FEEDBACK names a specific section, concern, document, or enquiry, apply the change ONLY to that item. All other items MUST remain identical to the PREVIOUS VERSION — do not apply the change elsewhere even if the same value appears in multiple places.
+   - **If PREVIOUS VERSION is empty** (no items): the FEEDBACK is your sole source for items. Create new items from scratch, grounded in the FEEDBACK content — use the user's wording as closely as the schema allows; restructure only to fit the required fields. Match the tone of a concise senior-investigator brief: neutral, request-focused, no fraud-language, no source attribution. Rules 2 and 3 (minimum changes, preserve structure) do not apply when there is nothing to preserve.
 
 If FEEDBACK is ambiguous, interpret it conservatively and document the intent through improved clarity rather than added scope.
 </TASK>
