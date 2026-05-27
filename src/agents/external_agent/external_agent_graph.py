@@ -17,6 +17,7 @@ from agents.external_agent.prompt_manager.external_agent_prompts import (
     EXTERNAL_AGENT_SYSTEM_PROMPT,
     KEY_CONCERNS_DRAFT_PROMPT,
     DOC_REQUEST_DRAFT_PROMPT,
+    NARRATIVE_DOC_REQUEST_DRAFT_PROMPT,
     ADDITIONAL_ENQUIRIES_DRAFT_PROMPT,
     INTERVIEW_PLAN_DRAFT_PROMPT,
     SECTION_FEEDBACK_PROMPT,
@@ -1135,6 +1136,17 @@ def get_graph(llm: BaseChatModel) -> StateGraph:
                 investigation_type_block="",
                 format=parser.get_format_instructions(),
             )
+            prompts = [SystemMessage(content=system_prompt),
+                       HumanMessage(content=prompt)]
+            response = llm.invoke(
+                input=prompts,
+                temperature=0.0,
+                max_tokens=4000,
+                response_format={"type": "json_object"},
+            )
+            content = response.content if isinstance(
+                response.content, str) else response.content[0]["text"]
+            parsed: DocRequestSet = parser.parse(content)
         else:
             # --- Draft path: chunk-based retrieval from delta table ---
             writer(prepare_thinking_message(
@@ -1164,26 +1176,58 @@ def get_graph(llm: BaseChatModel) -> StateGraph:
                 indent=2,
             )
 
-            prompt = DOC_REQUEST_DRAFT_PROMPT.format(
+            # --- Methodology call ---
+            methodology_prompt = DOC_REQUEST_DRAFT_PROMPT.format(
                 initial_review=initial_review,
                 additional_info=additional_info,
                 knowledge=knowledge_json,
                 gold_standards=gold_standards,
                 format=parser.get_format_instructions(),
             )
+            methodology_prompts = [SystemMessage(content=system_prompt),
+                                  HumanMessage(content=methodology_prompt)]
+            methodology_response = llm.invoke(
+                input=methodology_prompts,
+                temperature=0.0,
+                max_tokens=4000,
+                response_format={"type": "json_object"},
+            )
+            methodology_content = methodology_response.content if isinstance(
+                methodology_response.content, str) else methodology_response.content[0]["text"]
+            methodology_docs = parser.parse(methodology_content)
 
-        prompts = [SystemMessage(content=system_prompt),
-                   HumanMessage(content=prompt)]
+            # Format methodology doc types for narrative dedup reference
+            methodology_doc_list = "\n".join(
+                f"- {dr.doc_type}"
+                for dr in methodology_docs.document_set
+            ) if methodology_docs.document_set else "(none)"
 
-        response = llm.invoke(
-            input=prompts,
-            temperature=0.0,
-            max_tokens=4000,
-            response_format={"type": "json_object"},
-        )
-        content = response.content if isinstance(
-            response.content, str) else response.content[0]["text"]
-        parsed: DocRequestSet = parser.parse(content)
+            # --- Narrative call ---
+            writer(prepare_thinking_message(
+                EXTERNAL_AGENT_NAME, "Deriving narrative-driven document types..."))
+
+            narrative_prompt = NARRATIVE_DOC_REQUEST_DRAFT_PROMPT.format(
+                methodology_docs=methodology_doc_list,
+                initial_review=initial_review,
+                format=parser.get_format_instructions(),
+            )
+            narrative_prompts = [SystemMessage(content=system_prompt),
+                                HumanMessage(content=narrative_prompt)]
+            narrative_response = llm.invoke(
+                input=narrative_prompts,
+                temperature=0.0,
+                max_tokens=4000,
+                response_format={"type": "json_object"},
+            )
+            narrative_content = narrative_response.content if isinstance(
+                narrative_response.content, str) else narrative_response.content[0]["text"]
+            narrative_docs = parser.parse(narrative_content)
+
+            # Merge methodology + narrative
+            parsed = DocRequestSet(
+                document_set=methodology_docs.document_set + narrative_docs.document_set,
+                version=1,
+            )
 
         # Send to HITL review
         artifact = build_form_doc_request(parsed)

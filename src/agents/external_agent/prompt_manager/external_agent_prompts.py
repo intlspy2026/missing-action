@@ -101,10 +101,7 @@ You are drafting an investigation brief listing documents for an external invest
 <CRITICAL_RULES>
 BEFORE listing any documents, you MUST understand these rules. Violating these rules is a critical error.
 
-**RULE 1 - SOURCE RESTRICTION**: Every document type MUST originate from one of two permitted sources:
-    a. INVESTIGATION PROCESSES — methodology-driven document types for the given investigation type.
-    b. The claimant's incident account within INITIAL REVIEW — narrative-driven document types (see TASK Step 3).
-If a document type cannot be traced back to either source, it MUST be excluded.
+**RULE 1 - SOURCE RESTRICTION**: Every document type MUST originate from INVESTIGATION PROCESSES — the methodology for the given investigation type. If a document type cannot be traced back to INVESTIGATION PROCESSES, it MUST be excluded.
 
 **RULE 2 - PARTY SCOPE**: Only request documents from parties directly involved in the current claim under investigation. Use INITIAL REVIEW and ADDITIONAL INFORMATION to identify who the direct parties are. Individuals mentioned in prior claims, historical associations, or background checks within INITIAL REVIEW or ADDITIONAL INFORMATION are NOT direct parties to the current claim. Do not request documents from associated individuals who are not direct parties. Replace generic references in INVESTIGATION PROCESSES with the specific individuals identified from INITIAL REVIEW and ADDITIONAL INFORMATION.
 
@@ -126,10 +123,7 @@ a. **Primary (SME match exists)**: When a matching entry exists in the provided 
 - If you cannot determine an exact value, substitute with the most reasonable relative description grounded in INVESTIGATION PROCESSES and the case context. Leaving an X-pattern unfilled in the output is a critical error.
 
 **User-supplied placeholders (DO NOT fill)**: Do NOT modify or fill user-supplied placeholders – leave the literal tokens `<INSERT PERIOD>`, `<INSERT NAME>`, and any angle-bracketed `<INSERT >` or UPPERCASE/CAPITALISED slots (e.g. `START/END`) exactly as written in the SME entry. These are user-flagged for manual completion and must pass through to the output unchanged. Distinguish these from X-patterns: angle-bracketed `<INSERT _>` tokens and UPPERCASE slot names are user-supplied (leave alone); runs of X characters are AI-fillable (must be filled).
-b. **Fallback (no SME match)**: When a document type has no matching entry in the provided GOLD_STANDARDS — including ALL narrative-derived document types (see TASK Step 3), which will never have SME entries — INCLUDE it using a fallback draft: write a full instruction-style request (e.g., "A copy of _", "Fully itemised _", "Provide _"), grounded in the relevant source:
-       - For methodology-driven types: ground in INVESTIGATION PROCESSES and case context.
-       - For narrative-driven types: ground in the claimant's incident account from INITIAL REVIEW.
-    Match the cadence and neutral tone of the SME exemplars. Narrative-driven types may use a slightly looser phrasing standard — procedural detail and exact date ranges are not required — but must still be clear, actionable, and neutral. Do NOT produce short labels or one-line summaries.
+b. **Fallback (no SME match)**: When a document type has no matching entry in the provided GOLD_STANDARDS, INCLUDE it using a fallback draft: write a full instruction-style request (e.g., "A copy of _", "Fully itemised _", "Provide _"), grounded in INVESTIGATION PROCESSES and case context. Match the cadence and neutral tone of the SME exemplars. Do NOT produce short labels or one-line summaries.
 </CRITICAL_RULES>
 
 <GOLD_STANDARDS>
@@ -145,32 +139,18 @@ Steps:
 
 2. Read INITIAL REVIEW and ADDITIONAL INFORMATION to extract case-specific values (names of direct parties, dates, locations, incident specifics, periods, identifiers). ADDITIONAL INFORMATION may contain supplementary details (e.g., police reports, engineer reports, incident reports) not captured in INITIAL REVIEW – use these as additional evidence where relevant.
 
-3. **Derive document types from the claimant's incident account in INITIAL REVIEW**:
-    a. Scan INITIAL REVIEW to locate the current claim's first-hand account of what happened — the narrative describing the incident as reported by the claimant for THIS claim. This is the claimant's own description of this claim's event — NOT accounts of prior claims, historical incidents, or previous claim lodgements. This narrative may appear under headings such as "Claim Lodgement", "Loss Description", "Circumstances", "What Happened", "Verint", "Nice", "Genysis", "Calls", or any similar heading, or without an explicit heading. Use semantic understanding to:
-       - Distinguish the current claim's incident narrative from IRO analysis, background checks, policy details, and prior claims history.
-       - Distinguish the current claim's lodgement from descriptions of previous claims — prior claims may contain their own loss descriptions; these must NOT be treated as the current claim's incident account.
-    b. From this narrative, identify documents needed to independently verify, corroborate, or support any material assertion or detail in the narrative — including the claimant's account of the incident itself and any explanations given for circumstances or decisions related to the incident. Examples: receipts or proof of purchase for specific items mentioned; records from any named business, service provider, venue, or facility (e.g., company service logs, booking confirmations, invoices); communications referenced in the narrative; witness statements from individuals named; medical records from specific providers mentioned; or any documentation the claimant claims to possess.
-    c. The gold standards list is a reference taxonomy for methodology-driven types only. Narrative-derived types are expected to have no matching SME entries in that list — do not let their absence from the gold standards constrain your derivation. The claimant's incident account is your sole reference for narrative types. Apply all CRITICAL RULES: Party Scope (RULE 2), Relevance Filter (RULE 3 adapted to narrative source), No Duplicates (RULE 4), and Neutral Language (RULE 5). Note: RULE 6a does not apply to narrative-derived types — they will always use the RULE 6b fallback because SME entries do not exist for case-specific narrative documents.
-    d. Before including a narrative-derived document type, ensure:
-        - It does NOT substantively duplicate a document type from INVESTIGATION PROCESSES. If the underlying document requirement is the same, merge into the methodology-driven entry. If the requirement is materially different (e.g., records from a service provider vs communications between parties), it must remain separate.
-        - It is output as a NEW standalone entry ONLY if the underlying document requirement is substantively different from all existing methodology-driven entries (per the test above). If the need overlaps with an existing entry's purpose, merge into that entry; otherwise, create a new entry with its own distinct doc_type. Do NOT stretch an existing entry's doc_details to cover a fundamentally different document requirement.
-        - It is derived SOLELY from the claimant's first-hand incident account — the narrative located in Step 3a. It is NOT derived from IRO analysis, background check results, interview transcript references, mandatory search results, policy verification details, prior claims history, or any other non-narrative section of INITIAL REVIEW. If the source is anything other than the claimant's own description of this claim's event, EXCLUDE it.
-        - It is a concrete, obtainable document — not a vague inquiry disguised as a record request.
-    e. No fixed quota. A brief narrative may yield zero; a detailed one may yield several.
-    f. For each narrative-derived document type included, draft doc_details using the RULE 6b fallback standard — a clear, actionable instruction-style request grounded in the claimant's narrative, matching the SME cadence and tone. Slightly looser phrasing is acceptable; short labels or one-line summaries are not.
-
-4. For each document type identified in Steps 1 and 3:
+3. For each document type identified in Step 1:
     a. Assess relevance against INITIAL REVIEW and ADDITIONAL INFORMATION (apply RULE 3).
     b. If relevant, locate the matching SME entry in the provided GOLD_STANDARDS. Apply RULE 6a: reuse the SME wording verbatim, replacing only placeholders (XXX, XXXX, dates, names, identifiers, periods) with case-specific values from Step 2. Convert all timeframes from INVESTIGATION PROCESSES into EXACT date ranges anchored to the incident date (e.g., "1 week prior to and after the incident on 21 November 2025" -> "14 November 2025 to 28 November 2025"). Do NOT leave timeframes as relative periods in the final output.
-    c. If no matching SME entry exists in the provided GOLD_STANDARDS, apply RULE 6b (fallback): include the document type and draft a full instruction-style doc_details. For methodology-driven types, ground in INVESTIGATION PROCESSES and case context. For narrative-driven types, ground in the claimant's incident account matching the cadence and detail level of the SME exemplars.
+    c. If no matching SME entry exists in the provided GOLD_STANDARDS, apply RULE 6b (fallback): include the document type and draft a full instruction-style doc_details grounded in INVESTIGATION PROCESSES and case context.
 
-5. **Validation gate**: Before including each document type in your output, confirm:
-    - Can I point to the specific entry in INVESTIGATION PROCESSES that this document type comes from? OR can I trace it to the claimant's incident account (per TASK Step 3)? If neither -> exclude it.
+4. **Validation gate**: Before including each document type in your output, confirm:
+    - Can I point to the specific entry in INVESTIGATION PROCESSES that this document type comes from? If not -> exclude it.
     - If a matching SME entry exists: did I reuse its wording verbatim with only placeholders replaced? If NO -> revise (per RULE 6a). If no SME entry exists: did my fallback draft produce a full instruction-style request matching the SME cadence (not a short label or one-liner)? If NO -> revise (per RULE 6b).
     - Am I requesting documents from someone who is NOT a direct party to the claim? If YES -> remove that person. Being mentioned in INITIAL REVIEW or ADDITIONAL INFORMATION does not make someone a direct party.
     - For each detail in this document type, check if the same detail appears under any other document type in your output. If YES -> remove the duplicate from the document type where it is less central to the overall purpose.
 
-6. Review the final list and ensure all document types pass the validation gate.
+5. Review the final list and ensure all document types pass the validation gate.
 </TASK>
 
 <CONTEXT>
@@ -190,6 +170,44 @@ The ADDITIONAL INFORMATION includes additional notes on the claim, which can inc
 <ADDITIONAL INFORMATION>
 {additional_info}
 </ADDITIONAL INFORMATION>
+</CONTEXT>
+
+<OUTPUT>
+{format}
+</OUTPUT>
+"""
+
+NARRATIVE_DOC_REQUEST_DRAFT_PROMPT = """
+<ROLE>
+You are deriving document types from the claimant's incident account in INITIAL REVIEW. Your output supplements a separate methodology-driven list that has already been generated from INVESTIGATION PROCESSES.
+</ROLE>
+
+<CRITICAL_RULES>
+- **Party Scope**: Only request documents from parties directly involved in the current claim.
+- **No Duplicates**: Check each derived document type against the METHODOLOGY_DOCS below. If the underlying document requirement is substantively the same as an existing methodology entry, skip it. Only create a NEW entry if the requirement is materially different.
+- **Standalone Entry**: Each new entry must have its own distinct doc_type. Do NOT fold a narrative-derived document need into an existing methodology entry by expanding that entry's doc_details scope.
+- **Neutral Language**: Do not use "fraudulent", "fraud", "suspicious", "red flags", "motive", "collusion", "grossly", "high-risk". Refer to the underlying event as "incident". Do not preface with "alleged" or "potential".
+- **Source Guardrail**: Derive SOLELY from the claimant's first-hand narrative — including their description of the incident AND any circumstances, arrangements, or explanations given. Do NOT derive from IRO analysis, background check results, interview transcript references, mandatory search results, policy verification details, or prior claims history. If the source is not the claimant's own words in their incident account, EXCLUDE it.
+- **RULE 6b Fallback**: No SME entries exist for narrative types. Draft full instruction-style doc_details grounded in the claimant's narrative, matching the tone of a concise senior-investigator brief. Short labels or one-liners are unacceptable.
+</CRITICAL_RULES>
+
+<METHODOLOGY_DOCS>
+These document types have already been derived from INVESTIGATION PROCESSES. Use this list ONLY for dedup — do NOT derive new types from it.
+{methodology_docs}
+</METHODOLOGY_DOCS>
+
+<TASK>
+1. Read the METHODOLOGY_DOCS to understand what has already been requested.
+2. Locate the claimant's first-hand account of this claim in INITIAL REVIEW — the narrative describing what happened, as reported by the claimant for THIS claim. This is NOT IRO analysis, background checks, or prior claims history.
+3. From this narrative, derive document types needed to independently verify any material assertion or detail — including the incident itself, and any circumstances, arrangements, or explanations given (e.g., a service was engaged, a location was visited, an item was purchased, someone was present). Examples: receipts for items mentioned; records from any business, service provider, venue, or facility cited — whether named or only implied (e.g., service logs, booking confirmations, invoices); communications referenced; witness statements from named individuals; medical records from mentioned providers; or any documentation the claimant claims to possess.
+4. When the narrative cites an explanation for a circumstance or decision, identify what records from the entity or party cited — even if only implied — would independently verify that explanation.
+5. For each derived document type, check all CRITICAL RULES. If a type substantively duplicates a METHODOLOGY_DOCS entry, skip it. If it is a concrete, obtainable document from the claimant's own narrative, create a NEW standalone entry with its own distinct doc_type and a full instruction-style doc_details (RULE 6b). If it is vague, irrelevant, or from a non-narrative source, exclude it.
+</TASK>
+
+<CONTEXT>
+<INITIAL REVIEW>
+{initial_review}
+</INITIAL REVIEW>
 </CONTEXT>
 
 <OUTPUT>
