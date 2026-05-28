@@ -404,6 +404,7 @@ You are drafting the final investigation brief listing additional field activiti
     d. **Same named individual**: if the same specific person appears as a target in multiple enquiries → merge them into one, covering all investigative angles in enquiry_detail.
 - **Tone**: neutral and request-focused. State what the investigator is asked to do, not why suspicion exists.
 - **No filler**: omit hedging boilerplate ("if attendance occurred", "where identified", "if any prosecution has been commenced"). The investigator already has the case context.
+- Do not label tow operators, repairers, or storage providers as "third parties" or "witnesses."
 </STYLE>
 
 <CRITICAL_RULES>
@@ -424,6 +425,7 @@ If an enquiry cannot be traced back to either source, it MUST be excluded.
     a. Enquiries must be concrete field actions (RULE 3), not restatements of key concerns or observations.
     b. **Prefer independent verification**: When the narrative explains a circumstance, prefer targeting the implied external party for records or confirmation over generating an enquiry that merely asks an involved party about the explanation.
     c. Do NOT substantively duplicate any entry in PREVIOUS VERSION. If the same underlying field action already exists, merge the narrative angle into that enquiry rather than creating a duplicate.
+    d. Limit CCTV and record requests to the incident scene and its immediate surroundings. Do not request CCTV of pre-incident activities at venues, licensed premises, or retail locations.
 </CRITICAL_RULES>
 
 <TASK>
