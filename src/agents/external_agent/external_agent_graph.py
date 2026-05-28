@@ -1542,7 +1542,7 @@ def get_graph(llm: BaseChatModel) -> StateGraph:
         # Notify user about inv_types with no textbook coverage AFTER drafting
         # so the right-hand section already shows any enquiries that were
         # produced for the inv_types that did have knowledge.
-        if skipped_inv_types:
+        if skipped_inv_types and not per_inv_type:
             inv_type_list = ", ".join(skipped_inv_types)
             writer(prepare_hitl_task(
                 agent_name=EXTERNAL_AGENT_NAME,
