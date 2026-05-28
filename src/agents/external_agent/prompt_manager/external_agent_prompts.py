@@ -433,20 +433,9 @@ Finalise the additional enquiries by deriving narrative-driven enquiries, mergin
 Steps:
 1. Read PREVIOUS VERSION to understand the methodology-driven enquiries already filtered and contextualised for this case. These are your foundation — every entry must be reflected in your final output (either as-is or merged into a theme-aggregated entry).
 
-2. Read INITIAL REVIEW to extract case-specific details and to locate the claimant's incident account.
+2. Read INITIAL REVIEW and locate the claimant's incident account — the narrative describing what happened as reported by the claimant for THIS claim. Use semantic understanding to distinguish it from IRO analysis, background checks, policy details, and prior claims history including their own loss descriptions.
 
-3. **Derive enquiries from the claimant's incident account in INITIAL REVIEW**:
-    a. Scan INITIAL REVIEW to locate the current claim's first-hand account of what happened — the narrative describing the incident as reported by the claimant for THIS claim. This is the claimant's own description of this claim's event — NOT accounts of prior claims, historical incidents, or previous claim lodgements. This narrative may appear under headings such as "Claim Lodgement", "Loss Description", "Circumstances", "What Happened", "Verint", "Nice", "Genysis", "Calls", or any similar heading, or without an explicit heading. Use semantic understanding to:
-       - Distinguish the current claim's incident narrative from IRO analysis, background checks, policy details, and prior claims history.
-       - Distinguish the current claim's lodgement from descriptions of previous claims — prior claims may contain their own loss descriptions; these must NOT be treated as the current claim's incident account.
-    b. From this narrative, identify major field enquiries that arise directly from the claimant's description — gaps, claims, assertions, named or implied entities (e.g., businesses, service providers, individuals), or details needing independent verification through field investigation. Examples: a specific location described in the narrative to canvas; a business or service to canvass for records — whether named or only implied; a person named who should be interviewed; a timeline or sequence of events needing corroboration; a detail that is vague or incomplete and needs clarification; an assertion that can be independently checked.
-    c. Apply all CRITICAL RULES: Party Scope (RULE 2), External Scope Only (RULE 3), Neutral Language (RULE 4), and Narrative Guardrails (RULE 5).
-    d. Before finalising a narrative-derived enquiry, ensure:
-       - It does NOT substantively duplicate an enquiry from PREVIOUS VERSION. If the underlying field action is the same, merge into the methodology-driven enquiry. If the action is materially different (e.g., canvassing a service provider vs interviewing a named individual), it must remain separate.
-       - It is output as a standalone entry with its own distinct enquiry — do NOT fold a narrative-derived field action into an existing methodology-driven enquiry by expanding that enquiry's enquiry_detail scope.
-       - It is NOT merely restating a key concern, observation, or suspicion — enquiries are field actions, not findings.
-       - It is NOT derived from non-narrative parts of INITIAL REVIEW (IRO analysis, background checks, prior claims, policy details).
-    e. No fixed quota. A brief narrative may yield zero; a detailed one may yield several. Err on inclusion when a narrative element clearly warrants field follow-up.
+3. Derive narrative-driven enquiries from this account. Identify major field enquiries — gaps, claims, assertions, named or implied entities, or details needing independent verification. Validate each against all CRITICAL RULES. A brief narrative may yield zero; a detailed one may yield several.
 
 4. **Derive enquiries from any explanations in the narrative**: When the narrative cites an explanation for a circumstance or decision, identify what records from the entity or party cited — even if only implied — would independently verify that explanation. Derive an enquiry targeting that external party.
 
