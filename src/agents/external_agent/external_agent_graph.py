@@ -86,22 +86,42 @@ use_checkpointer = True  # TODO get from config
 # ---------------------------------------------------------------------------
 # Hard-exclusion pre-filter: strips methodology doc types that have no
 # factual hook in case facts, before the LLM ever sees them.
+#
+# Each hook keyword is compiled as a case-insensitive word-boundary regex
+# to prevent false matches (e.g. "work" matching "WorkBench").
 # ---------------------------------------------------------------------------
+import re as _re
+
 _HARD_EXCLUSIONS = {
-    "work roster":       ["work", "employ", "attendance", "shift", "roster"],
-    "timesheet":         ["work", "employ", "attendance", "shift", "roster"],
-    "insurance history": ["prior claim", "previous claim", "earlier claim",
-                          "past claim", "prior loss", "prior insurance"],
-    "claims history":    ["prior claim", "previous claim", "earlier claim",
-                          "past claim", "prior loss", "prior insurance"],
-    "criminal history":  ["criminal", "offen", "convict", "charge", "police",
-                          "arrest"],
-    "background check":  ["criminal", "offen", "convict", "charge", "police",
-                          "arrest"],
-    "rideshare":         ["rideshare", "taxi", "uber", "didi", "bolt", "ola"],
-    "taxi":              ["rideshare", "taxi", "uber", "didi", "bolt", "ola"],
-    "transport receipt": ["rideshare", "taxi", "uber", "didi", "bolt", "ola"],
-    "toll":              ["toll", "motorway", "expressway", "tollway"],
+    # doc_type pattern → hook keywords (word-boundary regexes)
+    "work roster":       [r"work roster", r"time sheet", r"shift work",
+                          r"clock in", r"clock out", r"on duty"],
+    "timesheet":         [r"work roster", r"time sheet", r"shift work",
+                          r"clock in", r"clock out", r"on duty"],
+    "insurance history": [r"other insurer", r"external claims?",
+                          r"claims? ?made ?outside", r"outside of suncorp",
+                          r"lodged a claim with"],
+    "claims history":    [r"other insurer", r"external claims?",
+                          r"claims? ?made ?outside", r"outside of suncorp",
+                          r"lodged a claim with"],
+    "criminal history":  [r"criminal", r"offen[dc]er?", r"convict(?:ed|ion)",
+                          r"charg(?:ed?|ing)", r"police", r"arrest(?:ed)?"],
+    "background check":  [r"criminal", r"offen[dc]er?", r"convict(?:ed|ion)",
+                          r"charg(?:ed?|ing)", r"police", r"arrest(?:ed)?"],
+    "rideshare":         [r"rideshare", r"taxi", r"\buber\b", r"\bdidi\b",
+                          r"\bbolt\b", r"\bola\b"],
+    "taxi":              [r"rideshare", r"taxi", r"\buber\b", r"\bdidi\b",
+                          r"\bbolt\b", r"\bola\b"],
+    "transport receipt": [r"rideshare", r"taxi", r"\buber\b", r"\bdidi\b",
+                          r"\bbolt\b", r"\bola\b"],
+    "toll":              [r"\btoll\b", r"\bmotorway\b", r"\bexpressway\b",
+                          r"\btollway\b"],
+}
+
+# Pre-compile hook patterns for each exclusion group
+_HOOK_REGEXES = {
+    group: [_re.compile(patt, _re.IGNORECASE) for patt in patterns]
+    for group, patterns in _HARD_EXCLUSIONS.items()
 }
 
 _CATCH_ALL_MARKERS = [
@@ -113,9 +133,13 @@ _CATCH_ALL_MARKERS = [
 ]
 
 
-def _has_hook(case_text: str, hook_keywords: list) -> bool:
+def _has_hook(case_text: str, group: str) -> bool:
+    """Check if any hook regex for `group` finds a match in case_text."""
+    regexes = _HOOK_REGEXES.get(group, [])
+    if not regexes:
+        return False
     case_lower = case_text.lower()
-    return any(kw in case_lower for kw in hook_keywords)
+    return any(rgx.search(case_lower) for rgx in regexes)
 
 
 def _is_catch_all(doc_type: str) -> bool:
@@ -124,10 +148,11 @@ def _is_catch_all(doc_type: str) -> bool:
 
 
 def _doc_type_is_excludable(doc_type: str, case_text: str) -> bool:
+    """Return True if doc_type matches a hard exclusion with no hook."""
     doc_lower = doc_type.lower()
-    for pattern, hook_keywords in _HARD_EXCLUSIONS.items():
+    for pattern in _HARD_EXCLUSIONS:
         if pattern in doc_lower:
-            if not _has_hook(case_text, hook_keywords):
+            if not _has_hook(case_text, pattern):
                 return True
             return False
     return False
@@ -168,17 +193,23 @@ def strip_hard_exclusions(doc_list_data: dict, initial_review: str,
     docs = doc_list_data.get("document_set", [])
     case_text = f"{initial_review or ''} {additional_info or ''}"
     result = []
+    stripped = []
     for doc in docs:
         doc_type = doc.get("doc_type", "")
         if _doc_type_is_excludable(doc_type, case_text):
+            stripped.append(doc_type)
             continue
         doc_details = doc.get("doc_details", "")
         if _is_catch_all(doc_type) and doc_details:
             cleaned = _filter_doc_details(doc_details, case_text)
             if not cleaned.strip():
+                stripped.append(f"{doc_type} [all sub-items filtered]")
                 continue
             doc["doc_details"] = cleaned
         result.append(doc)
+    if stripped:
+        logger.info("Hard-exclusion pre-filter stripped %d doc types: %s",
+                      len(stripped), stripped)
     doc_list_data["document_set"] = result
     return doc_list_data
 
