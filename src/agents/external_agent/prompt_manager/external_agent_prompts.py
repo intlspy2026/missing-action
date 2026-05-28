@@ -404,7 +404,7 @@ You are drafting the final investigation brief listing additional field activiti
     d. **Same named individual**: if the same specific person appears as a target in multiple enquiries → merge them into one, covering all investigative angles in enquiry_detail.
 - **Tone**: neutral and request-focused. State what the investigator is asked to do, not why suspicion exists.
 - **No filler**: omit hedging boilerplate ("if attendance occurred", "where identified", "if any prosecution has been commenced"). The investigator already has the case context.
-- Do not label tow operators, repairers, or storage providers as "third parties" or "witnesses."
+- Refer to tow operators, repairers, panel shops, and storage providers by their specific role only (e.g., "the tow operator", "the repairer"). Do not group them under any collective label such as "third parties", "witnesses", or "independent attendees."
 </STYLE>
 
 <CRITICAL_RULES>
