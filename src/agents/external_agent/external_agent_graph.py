@@ -83,6 +83,103 @@ logger = logging.getLogger(__name__)
 
 use_checkpointer = True  # TODO get from config
 
+# ---------------------------------------------------------------------------
+# Hard-exclusion pre-filter: strips methodology doc types that have no
+# factual hook in case facts, before the LLM ever sees them.
+# ---------------------------------------------------------------------------
+_HARD_EXCLUSIONS = {
+    "work roster":       ["work", "employ", "attendance", "shift", "roster"],
+    "timesheet":         ["work", "employ", "attendance", "shift", "roster"],
+    "insurance history": ["prior claim", "previous claim", "earlier claim",
+                          "past claim", "prior loss", "prior insurance"],
+    "claims history":    ["prior claim", "previous claim", "earlier claim",
+                          "past claim", "prior loss", "prior insurance"],
+    "criminal history":  ["criminal", "offen", "convict", "charge", "police",
+                          "arrest"],
+    "background check":  ["criminal", "offen", "convict", "charge", "police",
+                          "arrest"],
+    "rideshare":         ["rideshare", "taxi", "uber", "didi", "bolt", "ola"],
+    "taxi":              ["rideshare", "taxi", "uber", "didi", "bolt", "ola"],
+    "transport receipt": ["rideshare", "taxi", "uber", "didi", "bolt", "ola"],
+    "toll":              ["toll", "motorway", "expressway", "tollway"],
+}
+
+_CATCH_ALL_MARKERS = [
+    "any other document",
+    "including but not limited to",
+    "including but not limited",
+    "other documents",
+    "other supporting",
+]
+
+
+def _has_hook(case_text: str, hook_keywords: list) -> bool:
+    case_lower = case_text.lower()
+    return any(kw in case_lower for kw in hook_keywords)
+
+
+def _is_catch_all(doc_type: str) -> bool:
+    doc_lower = doc_type.lower()
+    return any(marker in doc_lower for marker in _CATCH_ALL_MARKERS)
+
+
+def _doc_type_is_excludable(doc_type: str, case_text: str) -> bool:
+    doc_lower = doc_type.lower()
+    for pattern, hook_keywords in _HARD_EXCLUSIONS.items():
+        if pattern in doc_lower:
+            if not _has_hook(case_text, hook_keywords):
+                return True
+            return False
+    return False
+
+
+def _split_sub_items(text: str) -> list:
+    if ";" in text:
+        return [s.strip() for s in text.split(";") if s.strip()]
+    if "\n-" in text or "\n•" in text:
+        parts = []
+        for line in text.split("\n"):
+            stripped = line.lstrip("-• \t")
+            if stripped:
+                parts.append(stripped)
+        return parts
+    return [text]
+
+
+def _filter_doc_details(doc_details: str, case_text: str) -> str:
+    sub_items = _split_sub_items(doc_details)
+    if len(sub_items) <= 1:
+        return doc_details
+    kept = []
+    for item in sub_items:
+        if not _doc_type_is_excludable(item, case_text):
+            kept.append(item)
+    if not kept:
+        return ""
+    if ";" in doc_details:
+        return "; ".join(kept)
+    if "\n" in doc_details:
+        return "\n".join(kept)
+    return ", ".join(kept)
+
+
+def strip_hard_exclusions(doc_list: list, initial_review: str,
+                          additional_info: str) -> list:
+    case_text = f"{initial_review or ''} {additional_info or ''}"
+    result = []
+    for doc in doc_list:
+        doc_type = doc.get("doc_type", "")
+        if _doc_type_is_excludable(doc_type, case_text):
+            continue
+        doc_details = doc.get("doc_details", "")
+        if _is_catch_all(doc_type) and doc_details:
+            cleaned = _filter_doc_details(doc_details, case_text)
+            if not cleaned.strip():
+                continue
+            doc["doc_details"] = cleaned
+        result.append(doc)
+    return result
+
 
 def get_graph(llm: BaseChatModel) -> StateGraph:
     # ------------------------------------
@@ -1170,7 +1267,11 @@ def get_graph(llm: BaseChatModel) -> StateGraph:
                 [
                     {
                         "investigation_type": entry["investigation_type"],
-                        "doc_list": entry["doc_list"].model_dump(exclude_none=True),
+                        "doc_list": strip_hard_exclusions(
+                            entry["doc_list"].model_dump(exclude_none=True),
+                            initial_review,
+                            additional_info,
+                        ),
                     }
                     for entry in per_inv_type
                 ],
