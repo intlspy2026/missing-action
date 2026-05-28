@@ -410,7 +410,7 @@ BEFORE drafting any enquiries, you MUST understand these rules. Violating these 
 
 **RULE 1 - SOURCE RESTRICTION**: Every enquiry in your output MUST originate from one of two permitted sources:
     a. PREVIOUS VERSION — the methodology-driven enquiries already filtered and contextualised for this case. You MUST include all entries from PREVIOUS VERSION unless you merge them into a theme-aggregated entry.
-    b. The claimant's incident account within INITIAL REVIEW — narrative-driven enquiries (see TASK Step 3).
+    b. The claimant's incident account within INITIAL REVIEW — narrative-driven enquiries (see TASK Step 2). The narrative is the current claim's first-hand account as reported by the claimant. It may appear under headings such as "Claim Lodgement", "Loss Description", "Circumstances", "What Happened", "Verint", "Nice", "Genysis", "Calls", or any similar heading, or without an explicit heading. Distinguish it from IRO analysis, background checks, policy details, and prior claims history including their own loss descriptions.
 If an enquiry cannot be traced back to either source, it MUST be excluded.
 
 **RULE 2 - PARTY SCOPE**: Only frame enquiries around parties directly involved in the current claim under investigation. Use INITIAL REVIEW and ADDITIONAL INFORMATION to identify who the direct parties are. Individuals mentioned in prior claims, historical associations, or background checks within INITIAL REVIEW or ADDITIONAL INFORMATION are NOT direct parties to the current claim. Do not generate enquiries focused on associated individuals who are not direct parties.
@@ -420,10 +420,9 @@ If an enquiry cannot be traced back to either source, it MUST be excluded.
 **RULE 4 - NEUTRAL LANGUAGE**: Do not use: "fraudulent", "fraud", "suspicious", "red flags", "motive", "collusion", "grossly", "high-risk". Refer to the underlying event as "incident" rather than "assault" in both the enquiry title and enquiry_detail. Describe the incident neutrally (e.g., "the incident on [date] at [location]") — do not preface with "alleged", "potential", or any qualifier that pre-judges the case. Do not infer intent or wrongdoing.
 
 **RULE 5 - NARRATIVE GUARDRAILS**: When deriving enquiries from the claimant's incident account:
-    a. Derive SOLELY from the claimant's first-hand narrative — their description of the incident AND circumstances for THIS claim. Do NOT derive from IRO analysis, background checks, prior claims history, policy details, or interview transcripts.
-    b. Enquiries must be concrete field actions (RULE 3), not restatements of key concerns or observations.
-    c. **Prefer independent verification**: When the narrative explains a circumstance, prefer targeting the implied external party for records or confirmation over generating an enquiry that merely asks an involved party about the explanation.
-    d. Do NOT substantively duplicate any entry in PREVIOUS VERSION. If the same underlying field action already exists, merge the narrative angle into that enquiry rather than creating a duplicate.
+    a. Enquiries must be concrete field actions (RULE 3), not restatements of key concerns or observations.
+    b. **Prefer independent verification**: When the narrative explains a circumstance, prefer targeting the implied external party for records or confirmation over generating an enquiry that merely asks an involved party about the explanation.
+    c. Do NOT substantively duplicate any entry in PREVIOUS VERSION. If the same underlying field action already exists, merge the narrative angle into that enquiry rather than creating a duplicate.
 </CRITICAL_RULES>
 
 <TASK>
@@ -433,7 +432,7 @@ Finalise the additional enquiries by deriving narrative-driven enquiries, mergin
 Steps:
 1. Read PREVIOUS VERSION to understand the methodology-driven enquiries already filtered and contextualised for this case. These are your foundation — every entry must be reflected in your final output (either as-is or merged into a theme-aggregated entry).
 
-2. Read INITIAL REVIEW and locate the claimant's incident account — the narrative describing what happened as reported by the claimant for THIS claim. Use semantic understanding to distinguish it from IRO analysis, background checks, policy details, and prior claims history including their own loss descriptions.
+2. Read INITIAL REVIEW and locate the claimant's incident account — the narrative describing what happened as reported by the claimant for THIS claim. This narrative may appear under headings such as "Claim Lodgement", "Loss Description", "Circumstances", "What Happened", "Verint", "Nice", "Genysis", "Calls", or any similar heading, or without an explicit heading. Use semantic understanding to distinguish it from IRO analysis, background checks, policy details, and prior claims history including their own loss descriptions.
 
 3. Derive narrative-driven enquiries from this account. Identify major field enquiries — gaps, claims, assertions, named or implied entities, or details needing independent verification. Validate each against all CRITICAL RULES. A brief narrative may yield zero; a detailed one may yield several.
 
