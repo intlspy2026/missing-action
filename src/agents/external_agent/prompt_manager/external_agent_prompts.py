@@ -105,11 +105,21 @@ BEFORE listing any documents, you MUST understand these rules. Violating these r
 
 **RULE 2 - PARTY SCOPE**: Only request documents from parties directly involved in the current claim under investigation. Use INITIAL REVIEW and ADDITIONAL INFORMATION to identify who the direct parties are. Individuals mentioned in prior claims, historical associations, or background checks within INITIAL REVIEW or ADDITIONAL INFORMATION are NOT direct parties to the current claim. Do not request documents from associated individuals who are not direct parties. Replace generic references in INVESTIGATION PROCESSES with the specific individuals identified from INITIAL REVIEW and ADDITIONAL INFORMATION.
 
-**RULE 3 - RELEVANCE FILTER (INCLUDE-ONLY)**: You START from the position that EVERY document type from INVESTIGATION PROCESSES is EXCLUDED. A document type is INCLUDED ONLY when you can point to a SPECIFIC FACT in the narrative content of INITIAL REVIEW or ADDITIONAL INFORMATION that directly creates a need for that document. Presence in the methodology is necessary but NOT sufficient — the investigation type label itself is NOT a factual basis. Exclude a document type when:
+**RULE 3 - RELEVANCE FILTER (INCLUDE-ONLY)**: You START from the position that EVERY document type from INVESTIGATION PROCESSES is EXCLUDED. A document type is INCLUDED ONLY when it is either (i) core to the investigation type — the allegation itself creates a need for it — or (ii) supported by a SPECIFIC FACT in the narrative content of INITIAL REVIEW or ADDITIONAL INFORMATION.
+
+    CORE METHODOLOGY ITEMS are document types that are inherent to investigating a given allegation type regardless of case specifics. These ALWAYS pass the relevance filter. Examples:
+    - Financial statements, bank records, MyGov/Centrelink: core for fraud investigations (the fraud allegation itself creates a need to verify financial position).
+    - Vehicle purchase documents, registration, service history, photographs: core for motor claims (the motor claim itself creates a need to verify vehicle circumstances).
+    - Phone records: core for investigations requiring timeline reconstruction or party communication verification.
+    - Signed authorities, photographs of scene/damage: core for most investigation types.
+
+    When in doubt about whether a document type is a core methodology item, apply the following test: would a reasonable investigator ALWAYS request this document type for this investigation type, regardless of specific case facts? YES → include it. NO → require a specific factual hook.
+
+    Exclude a non-core document type when:
 
     a. **Contradiction**: The case facts contradict the document's subject (e.g., tenancy documents when the party owns the property; contract of sale when the party is a tenant).
 
-    b. **No factual basis**: You cannot identify a specific sentence in INITIAL REVIEW or ADDITIONAL INFORMATION that directly justifies the request. Absence of evidence IS evidence of irrelevance. The investigation type label is NOT a factual basis — the hook must come from the narrative content of the case.
+    b. **No factual basis**: For non-core document types, you cannot identify a specific sentence in INITIAL REVIEW or ADDITIONAL INFORMATION that directly justifies the request. Absence of evidence IS evidence of irrelevance.
 
     c. **Conditional qualifier unmet**: A conditional qualifier in the methodology (e.g., "(if applicable)", "(only request if X)", "(only request if there are concerns)") is not met by the case facts.
 
@@ -138,24 +148,26 @@ BEFORE listing any documents, you MUST understand these rules. Violating these r
 Filter the document types from INVESTIGATION PROCESSES to include only those relevant to THIS claim:
 
 Steps:
-0. **Default exclude**: Mark EVERY document type from INVESTIGATION PROCESSES as EXCLUDED. You will only move a document type to INCLUDED if you find a specific fact-based hook in Steps 1-2.
+0. **Default exclude**: Mark EVERY document type from INVESTIGATION PROCESSES as EXCLUDED.
 
-1. Read INVESTIGATION PROCESSES. Identify all document types specified for the given investigation type. These are your primary source for methodology-driven document types.
+1. Read INVESTIGATION PROCESSES. Identify all document types specified for the given investigation type. For each, determine whether it is a CORE methodology item (RULE 3 opening) or a non-core item requiring a factual hook.
 
-2. Read INITIAL REVIEW and ADDITIONAL INFORMATION to extract case-specific values (names of direct parties, dates, locations, incident specifics, periods, identifiers). ADDITIONAL INFORMATION may contain supplementary details (e.g., police reports, engineer reports, incident reports) not captured in INITIAL REVIEW – use these as additional evidence where relevant.
+2. For each CORE methodology item: move from EXCLUDED to INCLUDED. These are inherent to the investigation and do not require a specific case-fact hook.
 
-3. For each document type identified in Step 1:
+3. Read INITIAL REVIEW and ADDITIONAL INFORMATION to extract case-specific values (names of direct parties, dates, locations, incident specifics, periods, identifiers). ADDITIONAL INFORMATION may contain supplementary details (e.g., police reports, engineer reports, incident reports) not captured in INITIAL REVIEW – use these as additional evidence where relevant.
+
+4. For each NON-CORE document type identified in Step 1:
     a. FIRST, check the HARD EXCLUSIONS list in RULE 3. If the document type matches one of those categories AND you cannot find the stated fact in INITIAL REVIEW or ADDITIONAL INFORMATION, mark it EXCLUDED and move to the next type. Do NOT waste time on types that clearly fail the hard exclusions.
     b. THEN, assess relevance against INITIAL REVIEW and ADDITIONAL INFORMATION (apply RULE 3b). Only move from EXCLUDED to INCLUDED if you can cite a specific sentence.
 
-4. **Validation gate**: Before including each document type in your output, confirm:
-    - Can I point to a specific fact in the narrative content of INITIAL REVIEW or ADDITIONAL INFORMATION — not the investigation type label — that makes this document type relevant to this claim? If I cannot articulate a fact-based connection, exclude it.
+5. **Validation gate**: Before including each non-core document type in your output, confirm:
+    - Can I point to a specific fact in the narrative content of INITIAL REVIEW or ADDITIONAL INFORMATION that makes this document type relevant to this claim? If I cannot articulate a fact-based connection, exclude it.
     - Can I point to the specific entry in INVESTIGATION PROCESSES that this document type comes from? If not -> exclude it.
     - Am I requesting documents from someone who is NOT a direct party to the claim? If YES -> remove that person. Being mentioned in INITIAL REVIEW or ADDITIONAL INFORMATION does not make someone a direct party.
     - For each detail in this document type, check if the same detail appears under any other document type in your output. If YES -> remove the duplicate from the document type where it is less central to the overall purpose.
     - If this document type is a catch-all that lists sub-items, assess EACH sub-item individually against RULE 3. Strip any sub-item with no factual hook from the doc_details. If no sub-items remain after filtering, exclude the entire document type.
 
-5. Review the final list and ensure all document types pass the validation gate.
+6. Review the final list. Ensure all core methodology items are present and all non-core items pass the validation gate.
 
 For each included document type, output the doc_type and doc_details as they appear in INVESTIGATION PROCESSES — do NOT rewrite or finalize the wording. A later step will apply SME-standard phrasing.
 </TASK>
