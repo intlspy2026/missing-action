@@ -336,7 +336,7 @@ INITIAL REVIEW and ADDITIONAL INFORMATION are used ONLY for contextualisation of
 
 **RULE 4 - EXTERNAL SCOPE ONLY**: All enquiries must be actions an external investigator can perform in the field (e.g., canvassing, interviewing witnesses, obtaining records from third parties). Exclude any enquiry that relates to internal processes, internal review, internal assessments, or summarising results of enquiries already conducted by the insurer's own team. Exclude any enquiry that involves interviewing the primary insured directly — this is covered by a separate interview plan section. CCTV and record requests must be limited to the incident scene and its immediate surroundings. Do not request CCTV of pre-incident activities at venues, licensed premises, or retail locations.
 
-**RULE 5 - RELEVANCE FILTER**: For each enquiry from INVESTIGATION PROCESSES, assess whether it is applicable based on the facts in INITIAL REVIEW and ADDITIONAL INFORMATION. If INVESTIGATION PROCESSES includes a conditional qualifier (e.g., "if police attended"), apply that condition against INITIAL REVIEW and ADDITIONAL INFORMATION — if the condition is not met, exclude the enquiry. Even without an explicit conditional qualifier, if an enquiry references a scenario, person, or event that has no basis in INITIAL REVIEW or ADDITIONAL INFORMATION, exclude it.
+**RULE 5 - RELEVANCE FILTER**: For each enquiry from INVESTIGATION PROCESSES, assess whether it is applicable based on the facts in INITIAL REVIEW and ADDITIONAL INFORMATION. If INVESTIGATION PROCESSES includes a conditional qualifier (e.g., "if police attended"), apply that condition against INITIAL REVIEW and ADDITIONAL INFORMATION — if the condition is not met, exclude the enquiry. Even without an explicit conditional qualifier, if an enquiry references a scenario, person, or event that has no basis in INITIAL REVIEW or ADDITIONAL INFORMATION, exclude it. Do not infer entities (e.g., repairers, assessors, tow operators) not explicitly named in INITIAL REVIEW or ADDITIONAL INFORMATION. If a methodology template references an entity absent from the case, exclude that enquiry.
 
 **RULE 6 - NEUTRAL LANGUAGE**: Do not use: "fraudulent", "fraud", "suspicious", "red flags", "motive", "collusion", "grossly", "high-risk". Refer to the underlying event as "incident" rather than "assault" in both the enquiry title and enquiry_detail. Describe the incident neutrally (e.g., "the incident on [date] at [location]") — do not preface with "alleged", "potential", or any qualifier that pre-judges the case. Do not infer intent or wrongdoing.
 </CRITICAL_RULES>
@@ -442,7 +442,7 @@ Steps:
 
 5. **Aggregate by theme**: Group ALL enquiries (methodology + narrative-derived) by underlying theme. Combine enquiries that address the same subject, location, party, or investigative action into a single output entry — merging their sub-tasks and details into enquiry_detail. Output approximately one enquiry per theme identified.
 
-6. Review the final list. Ensure all methodology-driven entries from PREVIOUS VERSION are reflected, all narrative-derived entries pass guardrails, and the output is concise with neutral language and no filler.
+6. Review the final list. For each enquiry, confirm the target entity is explicitly named in the case materials. Ensure all methodology-driven entries from PREVIOUS VERSION are reflected, all narrative-derived entries pass guardrails, and the output is concise with neutral language and no filler.
 </TASK>
 
 <CONTEXT>
