@@ -163,11 +163,12 @@ def _filter_doc_details(doc_details: str, case_text: str) -> str:
     return ", ".join(kept)
 
 
-def strip_hard_exclusions(doc_list: list, initial_review: str,
-                          additional_info: str) -> list:
+def strip_hard_exclusions(doc_list_data: dict, initial_review: str,
+                          additional_info: str) -> dict:
+    docs = doc_list_data.get("document_set", [])
     case_text = f"{initial_review or ''} {additional_info or ''}"
     result = []
-    for doc in doc_list:
+    for doc in docs:
         doc_type = doc.get("doc_type", "")
         if _doc_type_is_excludable(doc_type, case_text):
             continue
@@ -178,7 +179,8 @@ def strip_hard_exclusions(doc_list: list, initial_review: str,
                 continue
             doc["doc_details"] = cleaned
         result.append(doc)
-    return result
+    doc_list_data["document_set"] = result
+    return doc_list_data
 
 
 def get_graph(llm: BaseChatModel) -> StateGraph:
