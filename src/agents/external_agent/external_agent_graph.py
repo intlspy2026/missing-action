@@ -19,7 +19,8 @@ from agents.external_agent.prompt_manager.external_agent_prompts import (
     DOC_REQUEST_RELEVANCE_PROMPT,
     DOC_REQUEST_SME_PROMPT,
     NARRATIVE_DOC_REQUEST_DRAFT_PROMPT,
-    ADDITIONAL_ENQUIRIES_DRAFT_PROMPT,
+    ADDITIONAL_ENQUIRIES_RELEVANCE_PROMPT,
+    ADDITIONAL_ENQUIRIES_FINAL_PROMPT,
     INTERVIEW_PLAN_DRAFT_PROMPT,
     SECTION_FEEDBACK_PROMPT,
     SECTION_FEEDBACK_KNOWLEDGE_BLOCK,
@@ -1501,11 +1502,8 @@ def get_graph(llm: BaseChatModel) -> StateGraph:
             if not per_inv_type:
                 # Short-circuit: every inv_type had empty knowledge. Skip the
                 # drafting LLM and emit an empty section.
-                prompt = None
+                parsed = AdditionalEnquiriesSet(enquiries_set=[])
             else:
-                writer(prepare_thinking_message(
-                    EXTERNAL_AGENT_NAME, "Drafting additional enquiries..."))
-
                 knowledge_json = json.dumps(
                     [
                         {
@@ -1516,28 +1514,54 @@ def get_graph(llm: BaseChatModel) -> StateGraph:
                     ],
                     indent=2,
                 )
-                prompt = ADDITIONAL_ENQUIRIES_DRAFT_PROMPT.format(
+
+                # --- Call 1: Relevance filter + contextualisation ---
+                writer(prepare_thinking_message(
+                    EXTERNAL_AGENT_NAME, "Filtering relevant additional enquiries..."))
+
+                relevance_prompt = ADDITIONAL_ENQUIRIES_RELEVANCE_PROMPT.format(
                     initial_review=initial_review,
                     additional_info=additional_info,
                     knowledge=knowledge_json,
                     format=parser.get_format_instructions(),
                 )
+                relevance_prompts = [SystemMessage(content=system_prompt),
+                                    HumanMessage(content=relevance_prompt)]
+                relevance_response = llm.invoke(
+                    input=relevance_prompts,
+                    temperature=0.0,
+                    max_tokens=4000,
+                    response_format={"type": "json_object"},
+                )
+                relevance_content = relevance_response.content if isinstance(
+                    relevance_response.content, str) else relevance_response.content[0]["text"]
+                prev_version: AdditionalEnquiriesSet = parser.parse(relevance_content)
 
-        if prompt is None:
-            parsed = AdditionalEnquiriesSet(enquiries_set=[])
-        else:
-            prompts = [SystemMessage(content=system_prompt),
-                       HumanMessage(content=prompt)]
+                # --- Call 2: Narrative derivation + aggregation + final polish ---
+                writer(prepare_thinking_message(
+                    EXTERNAL_AGENT_NAME, "Aggregating and finalising additional enquiries..."))
 
-            response = llm.invoke(
-                input=prompts,
-                temperature=0.0,
-                max_tokens=4000,
-                response_format={"type": "json_object"},
-            )
-            content = response.content if isinstance(
-                response.content, str) else response.content[0]["text"]
-            parsed: AdditionalEnquiriesSet = parser.parse(content)
+                prev_version_json = json.dumps(
+                    prev_version.model_dump(exclude_none=True),
+                    indent=2,
+                )
+                final_prompt = ADDITIONAL_ENQUIRIES_FINAL_PROMPT.format(
+                    prev_version=prev_version_json,
+                    initial_review=initial_review,
+                    additional_info=additional_info,
+                    format=parser.get_format_instructions(),
+                )
+                final_prompts = [SystemMessage(content=system_prompt),
+                                HumanMessage(content=final_prompt)]
+                final_response = llm.invoke(
+                    input=final_prompts,
+                    temperature=0.0,
+                    max_tokens=4000,
+                    response_format={"type": "json_object"},
+                )
+                final_content = final_response.content if isinstance(
+                    final_response.content, str) else final_response.content[0]["text"]
+                parsed: AdditionalEnquiriesSet = parser.parse(final_content)
 
         # Notify user about inv_types with no textbook coverage AFTER drafting
         # so the right-hand section already shows any enquiries that were

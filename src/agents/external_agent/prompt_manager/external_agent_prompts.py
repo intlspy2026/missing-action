@@ -306,74 +306,68 @@ These document types have already been derived from INVESTIGATION PROCESSES. Use
 </OUTPUT>
 """
 
-ADDITIONAL_ENQUIRIES_DRAFT_PROMPT = """
+ADDITIONAL_ENQUIRIES_RELEVANCE_PROMPT = """
 
 <TASK_DEFINITION>
-Additional Enquiries are the additional responsibilities which the external investigator is required to perform in addition to their core responsibilities for provided investigation type.
+Additional Enquiries are the additional responsibilities which the external investigator is required to perform in addition to their core responsibilities for the provided investigation type.
 </TASK_DEFINITION>
 
 <ROLE>
-You are drafting an investigation brief listing additional field activities for an external investigator to perform. Your output is an instruction list - NOT a finding, justification, or commentary on the claim. Match the tone and length of a concise senior-investigator brief.
+You are identifying which additional enquiry types from INVESTIGATION PROCESSES are relevant to THIS case and contextualising them with case-specific details. Your output is a filtered, contextualised list — NOT the final investigation brief. A separate step will aggregate your selections by theme and apply final formatting. Do NOT attempt to aggregate or finalise.
 </ROLE>
 
 <STYLE>
-- **Length cap**: 2 or 4 sentences per enquiry_detail. Hard cap. No paragraph-length descriptions.
-- **Citation discipline**: cite only the anchoring details needed to make the enquiry actionable (party names, location, date). Do not enumerate every property sub-area, every claimed item, or every case detail in each enquiry - anchor to one or two specifics.
-- **One enquiry per theme**: INVESTIGATION PROCESSES lists multiple enquiries flatly, but many of these belong to a smaller number of underlying themes. You must recognise the themes yourself and aggregate all enquiries that belong to the same theme into a single output enquiry - combining their sub-tasks, sub-questions and party specific variations into enquiry_detail. Do NOT emmit one output enquiry per source bullet, per sub-task or per party. Output should be approximately one enquiry per theme you identify, not one per source line. This aggregation applies across ALL enquiries regardless of whether they originated from INVESTIGATION PROCESSES or the claimant's incident account (see TASK Step 3). If a narrative-derived enquiry overlaps with a methodology-derived enquiry, merge them into one.
+- **Citation discipline**: cite only the anchoring details needed to make the enquiry actionable (party names, location, date). Do not enumerate every property sub-area, every claimed item, or every case detail in each enquiry — anchor to one or two specifics.
 - **Tone**: neutral and request-focused. State what the investigator is asked to do, not why suspicion exists.
 - **No filler**: omit hedging boilerplate ("if attendance occurred", "where identified", "if any prosecution has been commenced"). The investigator already has the case context.
 </STYLE>
 
 <CRITICAL_RULES>
-BEFORE drafting any enquiries, you MUST understand these rules. Violating these rules is a critical error.
+BEFORE listing any enquiries, you MUST understand these rules. Violating these rules is a critical error.
 
-**RULE 1 - SOURCE RESTRICTION**: Every enquiry MUST originate from one of two permitted sources:
-    a. INVESTIGATION PROCESSES — methodology-driven enquiries for the given investigation type.
-    b. The claimant's incident account within INITIAL REVIEW — narrative-driven enquiries (see TASK Step 3).
-If an enquiry cannot be traced back to either source, it MUST be excluded.
-**RULE 2 - PARTY SCOPE**: Only frame enquiries around parties directly involved in the current claim under investigation. Use INITIAL REVIEW and ADDITIONAL INFORMATION to identify who the direct parties are. Individuals mentioned in prior claims, historical associations, or background checks individuals who are not direct parties to the current claim. Do not generate enquiries focused on associated REVIEW and ADDITIONAL INFORMATION. Replace generic references in INVESTIGATION PROCESSES with the specific individuals identified from INITIAL REVIEW and ADDITIONAL INFORMATION.
+**RULE 1 - SOURCE RESTRICTION**: Every enquiry MUST originate from INVESTIGATION PROCESSES — the methodology for the given investigation type. If an enquiry cannot be traced back to INVESTIGATION PROCESSES, it MUST be excluded.
+
+**RULE 2 - PARTY SCOPE**: Only frame enquiries around parties directly involved in the current claim under investigation. Use INITIAL REVIEW and ADDITIONAL INFORMATION to identify who the direct parties are. Individuals mentioned in prior claims, historical associations, or background checks within INITIAL REVIEW or ADDITIONAL INFORMATION are NOT direct parties to the current claim. Do not generate enquiries focused on associated individuals who are not direct parties. Replace generic references in INVESTIGATION PROCESSES with the specific individuals identified from INITIAL REVIEW and ADDITIONAL INFORMATION.
+
 **RULE 3 - CONTEXTUALISE**: You must rewrite each enquiry from INVESTIGATION PROCESSES using case-specific details from INITIAL REVIEW and ADDITIONAL INFORMATION. This includes:
-    a. Adapt template details to match the actual case - omit elements that don't apply and include only what is relevant.
+    a. Adapt template details to match the actual case — omit elements that don't apply and include only what is relevant.
     b. The output must never read like a generic template. Every enquiry must reference specific names, dates, locations, or details from INITIAL REVIEW or ADDITIONAL INFORMATION.
-INITIAL REVIEW and ADDITIONAL INFORMATION must NEVER be used to generate new enquiry topics, EXCEPT for enquiries derived from the claimant's incident account as permitted by RULE 1(b) and TASK Step 3.
-**RULE 4 - EXTERNAL SCOPE ONLY**: All enquiries must be actions an external investigator can perform in the field (e.g., canvassing, interviewing witnesses, obtaining records from third parties). Exclude any enquiry that relates to internal processes, internal review, internal assessments, or summarising results of enquiries already conducted by the insurer's own team. Exclude any enquiry that involves interviewing the primary insured directly - this is covered by a separate interview plan section.
-**RULE 5 - RELEVANCE FILTER**: For each enquiry from INVESTIGATION PROCESSES, assess whether it is applicable based on the facts in INITIAL REVIEW and ADDITIONAL INFORMATION. If INVESTIGATION PROCESSES includes a conditional qualifier (e.g., "if police attended"), apply that condition against INITIAL REVIEW and ADDITIONAL INFORMATION - if the condition is not met, exclude the enquiry. Even without an explicit conditional qualifier, if an enquiry references a scenario, person, or event that has no basis in INITIAL REVIEW or ADDITIONAL INFORMATION, exclude it.
-**RULE 6 - NEUTRAL LANGUAGE**: Do not use: "fraudulent", "fraud", "suspicious", "red flags", "motive", "collusion", "grossly", "high-risk". Refer to the underlying event as "incident" rather than "assault" in both the enquiry title and enquiry_detail. Describe the incident neutrally (e.g., "the incident on [date] at [location]") - do not preface with "alleged", "potential", or any qualifier that pre-judges the case. Do not infer intent or wrongdoing.
+INITIAL REVIEW and ADDITIONAL INFORMATION are used ONLY for contextualisation of methodology-driven enquiries, NOT to generate new enquiry topics.
+
+**RULE 4 - EXTERNAL SCOPE ONLY**: All enquiries must be actions an external investigator can perform in the field (e.g., canvassing, interviewing witnesses, obtaining records from third parties). Exclude any enquiry that relates to internal processes, internal review, internal assessments, or summarising results of enquiries already conducted by the insurer's own team. Exclude any enquiry that involves interviewing the primary insured directly — this is covered by a separate interview plan section.
+
+**RULE 5 - RELEVANCE FILTER**: For each enquiry from INVESTIGATION PROCESSES, assess whether it is applicable based on the facts in INITIAL REVIEW and ADDITIONAL INFORMATION. If INVESTIGATION PROCESSES includes a conditional qualifier (e.g., "if police attended"), apply that condition against INITIAL REVIEW and ADDITIONAL INFORMATION — if the condition is not met, exclude the enquiry. Even without an explicit conditional qualifier, if an enquiry references a scenario, person, or event that has no basis in INITIAL REVIEW or ADDITIONAL INFORMATION, exclude it.
+
+**RULE 6 - NEUTRAL LANGUAGE**: Do not use: "fraudulent", "fraud", "suspicious", "red flags", "motive", "collusion", "grossly", "high-risk". Refer to the underlying event as "incident" rather than "assault" in both the enquiry title and enquiry_detail. Describe the incident neutrally (e.g., "the incident on [date] at [location]") — do not preface with "alleged", "potential", or any qualifier that pre-judges the case. Do not infer intent or wrongdoing.
 </CRITICAL_RULES>
 
 <TASK>
 **YOUR TASK**
-Determine the ADDITIONAL ENQUIRIES required for provided investigation type:
+Filter and contextualise the methodology-driven additional enquiries for the provided investigation type:
 
 Steps:
-1. Read INVESTIGATION PROCESSES first. Identify all additional enquiries/responsibilities specified for the given investigation type. These are your primary source for methodology-driven enquiries.
-2. Read INITIAL REVIEW and ADDITIONAL INFORMATION to extract case-specific details (names, dates, locations, incident specifics). ADDITIONAL INFORMATION may contain supplementary details (e.g., police reports, engineer reports, incident reports) not captured in INITIAL REVIEW - use these as additional evidence where relevant.
-3. **Derive enquiries from the claimant's incident account in INITIAL REVIEW**:
-    a. Scan INITIAL REVIEW to locate the current claim's first-hand account of what happened — the narrative describing the incident as reported by the claimant for THIS claim. This is the claimant's own description of this claim's event — NOT accounts of prior claims, historical incidents, or previous claim lodgements. This narrative may appear under headings such as "Claim Lodgement", "Loss Description", "Circumstances", "What Happened", "Verint", "Nice", "Genysis", "Calls", or any similar heading, or without an explicit heading. Use semantic understanding to:
-       - Distinguish the current claim's incident narrative from IRO analysis, background checks, policy details, and prior claims history.
-       - Distinguish the current claim's lodgement from descriptions of previous claims — prior claims may contain their own loss descriptions; these must NOT be treated as the current claim's incident account.
-    b. From this narrative, identify major field enquiries that arise directly from the claimant's description — gaps, claims, assertions, named entities (e.g., businesses, service providers, individuals), or details needing independent verification through field investigation. Examples: a specific location described in the narrative to canvas; a named business or service to canvass for records; a person named who should be interviewed; a timeline or sequence of events needing corroboration; a detail that is vague or incomplete and needs clarification; an assertion that can be independently checked (e.g., verifying a stated reason for a vehicle's location or the claimant's whereabouts).
-    c. INVESTIGATION PROCESSES is your source for methodology-driven enquiries only. The claimant's incident account is your separate and independent source for narrative-derived enquiries — do not let the absence of a narrative-derived enquiry type in INVESTIGATION PROCESSES constrain your derivation. Apply all CRITICAL RULES: Party Scope (RULE 2), External Scope Only (RULE 4), Relevance Filter (RULE 5, adapted to narrative source), and Neutral Language (RULE 6).
-    d. Before including a narrative-derived enquiry, ensure:
-        - It does NOT substantively duplicate an enquiry from INVESTIGATION PROCESSES. If the underlying field action is the same, merge into the methodology-driven enquiry. If the action is materially different (e.g., canvassing a service provider vs interviewing a named individual), it must remain separate.
-        - It is output as a standalone entry with its own distinct enquiry — do NOT fold a narrative-derived field action into an existing methodology-driven enquiry by expanding that enquiry's enquiry_detail scope.
-        - It is NOT merely restating a key concern, observation, or suspicion — enquiries are field actions, not findings.
-        - It is NOT derived from non-narrative parts of INITIAL REVIEW (IRO analysis, background checks, prior claims, policy details).
-    e. No fixed quota. A brief narrative may yield zero; a detailed one may yield several. Err on inclusion when a narrative element clearly warrants field follow-up.
-4. For each enquiry identified in Steps 1 and 3, contextualise it with relevant details from Step 2.
-5. Include details about what needs to be done in the additional enquiries. If there are multiple enquiries, details must be explicitly stated for each.
-6. Ensure enquiries and details are clear and avoid using any jargons.
+1. Read INVESTIGATION PROCESSES first. Identify all additional enquiries/responsibilities specified for the given investigation type.
+
+2. Read INITIAL REVIEW and ADDITIONAL INFORMATION to extract case-specific details (names, dates, locations, incident specifics). ADDITIONAL INFORMATION may contain supplementary details (e.g., police reports, engineer reports, incident reports) not captured in INITIAL REVIEW — use these as additional evidence where relevant.
+
+3. For each enquiry identified in Step 1, assess relevance against the case facts (apply RULE 5). Exclude enquiries whose conditions are not met or that have no factual basis in the case.
+
+4. For each remaining (relevant) enquiry, contextualise it with case-specific details from Step 2 (apply RULE 3). Replace generic template references with specific names, dates, and locations.
+
+5. Include details about what needs to be done in each enquiry. Ensure enquiries and details are clear and avoid using any jargon.
+
+6. Output each enquiry as a separate entry. Do NOT aggregate by theme — a later step will handle aggregation. Each line item from INVESTIGATION PROCESSES that passes the relevance filter should produce one output entry.
 </TASK>
 
 <CONTEXT>
 These are the relevant materials for your case:
 
-Here is the INVESTIGATION PROCESSES - this is your primary source for methodology-driven enquiries. Each entry in the array contains the enquiries for ONE investigation type:
+Here is the INVESTIGATION PROCESSES — this is your sole source for methodology-driven enquiries. Each entry in the array contains the enquiries for ONE investigation type:
 <INVESTIGATION PROCESSES>
 {knowledge}
 </INVESTIGATION PROCESSES>
 
-The INITIAL REVIEW provides case-specific details for contextualisation. You may derive additional enquiries from the claimant's incident account within this section (see TASK Step 3). Do NOT derive new enquiry topics from other parts of INITIAL REVIEW:
+The INITIAL REVIEW provides case-specific details for contextualisation. Do NOT derive new enquiry topics from this section:
 <INITIAL REVIEW>
 {initial_review}
 </INITIAL REVIEW>
@@ -387,20 +381,107 @@ The ADDITIONAL INFORMATION includes additional notes on the claim, which can inc
 <OUTPUT>
 {format}
 </OUTPUT>
+"""
+
+ADDITIONAL_ENQUIRIES_FINAL_PROMPT = """
+
+<TASK_DEFINITION>
+Additional Enquiries are the additional responsibilities which the external investigator is required to perform in addition to their core responsibilities for the provided investigation type.
+</TASK_DEFINITION>
+
+<ROLE>
+You are drafting the final investigation brief listing additional field activities for an external investigator to perform. Your output is a concise, aggregated instruction list — NOT a finding, justification, or commentary on the claim. You receive methodology-driven enquiries (already filtered and contextualised) and you supplement them with narrative-driven enquiries from the claimant's incident account, then aggregate by theme and apply final polish.
+</ROLE>
+
+<STYLE>
+- **Length cap**: 2 to 4 sentences per enquiry_detail. Hard cap. No paragraph-length descriptions.
+- **One enquiry per theme**: You receive methodology-driven enquiries listed flatly. Many belong to a smaller number of underlying themes. You must recognise the themes yourself and aggregate all enquiries (methodology + narrative-derived) that belong to the same theme into a single output enquiry — combining their sub-tasks, sub-questions and party-specific variations into enquiry_detail. Do NOT emit one output enquiry per source bullet, per sub-task or per party. Output should be approximately one enquiry per theme you identify, not one per source line. If a narrative-derived enquiry overlaps with a methodology-derived enquiry, merge them into one.
+- **Tone**: neutral and request-focused. State what the investigator is asked to do, not why suspicion exists.
+- **No filler**: omit hedging boilerplate ("if attendance occurred", "where identified", "if any prosecution has been commenced"). The investigator already has the case context.
+</STYLE>
+
+<CRITICAL_RULES>
+BEFORE drafting any enquiries, you MUST understand these rules. Violating these rules is a critical error.
+
+**RULE 1 - SOURCE RESTRICTION**: Every enquiry in your output MUST originate from one of two permitted sources:
+    a. PREVIOUS VERSION — the methodology-driven enquiries already filtered and contextualised for this case. You MUST include all entries from PREVIOUS VERSION unless you merge them into a theme-aggregated entry.
+    b. The claimant's incident account within INITIAL REVIEW — narrative-driven enquiries (see TASK Step 3).
+If an enquiry cannot be traced back to either source, it MUST be excluded.
+
+**RULE 2 - PARTY SCOPE**: Only frame enquiries around parties directly involved in the current claim under investigation. Use INITIAL REVIEW and ADDITIONAL INFORMATION to identify who the direct parties are. Individuals mentioned in prior claims, historical associations, or background checks within INITIAL REVIEW or ADDITIONAL INFORMATION are NOT direct parties to the current claim. Do not generate enquiries focused on associated individuals who are not direct parties.
+
+**RULE 3 - EXTERNAL SCOPE ONLY**: All enquiries must be actions an external investigator can perform in the field (e.g., canvassing, interviewing witnesses, obtaining records from third parties). Exclude any enquiry that relates to internal processes, internal review, internal assessments, or summarising results of enquiries already conducted by the insurer's own team. Exclude any enquiry that involves interviewing the primary insured directly — this is covered by a separate interview plan section.
+
+**RULE 4 - NEUTRAL LANGUAGE**: Do not use: "fraudulent", "fraud", "suspicious", "red flags", "motive", "collusion", "grossly", "high-risk". Refer to the underlying event as "incident" rather than "assault" in both the enquiry title and enquiry_detail. Describe the incident neutrally (e.g., "the incident on [date] at [location]") — do not preface with "alleged", "potential", or any qualifier that pre-judges the case. Do not infer intent or wrongdoing.
+
+**RULE 5 - NARRATIVE GUARDRAILS**: When deriving enquiries from the claimant's incident account:
+    a. Derive SOLELY from the claimant's first-hand narrative — their description of the incident AND circumstances for THIS claim. Do NOT derive from IRO analysis, background checks, prior claims history, policy details, or interview transcripts.
+    b. Enquiries must be concrete field actions (RULE 3), not restatements of key concerns or observations.
+    c. Do NOT substantively duplicate any entry in PREVIOUS VERSION. If the same underlying field action already exists, merge the narrative angle into that enquiry rather than creating a duplicate.
+</CRITICAL_RULES>
+
+<TASK>
+**YOUR TASK**
+Finalise the additional enquiries by deriving narrative-driven enquiries, merging with methodology-driven enquiries, and aggregating by theme:
+
+Steps:
+1. Read PREVIOUS VERSION to understand the methodology-driven enquiries already filtered and contextualised for this case. These are your foundation — every entry must be reflected in your final output (either as-is or merged into a theme-aggregated entry).
+
+2. Read INITIAL REVIEW to extract case-specific details and to locate the claimant's incident account.
+
+3. **Derive enquiries from the claimant's incident account in INITIAL REVIEW**:
+    a. Scan INITIAL REVIEW to locate the current claim's first-hand account of what happened — the narrative describing the incident as reported by the claimant for THIS claim. This is the claimant's own description of this claim's event — NOT accounts of prior claims, historical incidents, or previous claim lodgements. This narrative may appear under headings such as "Claim Lodgement", "Loss Description", "Circumstances", "What Happened", "Verint", "Nice", "Genysis", "Calls", or any similar heading, or without an explicit heading. Use semantic understanding to:
+       - Distinguish the current claim's incident narrative from IRO analysis, background checks, policy details, and prior claims history.
+       - Distinguish the current claim's lodgement from descriptions of previous claims — prior claims may contain their own loss descriptions; these must NOT be treated as the current claim's incident account.
+    b. From this narrative, identify major field enquiries that arise directly from the claimant's description — gaps, claims, assertions, named entities (e.g., businesses, service providers, individuals), or details needing independent verification through field investigation. Examples: a specific location described in the narrative to canvas; a named business or service to canvass for records; a person named who should be interviewed; a timeline or sequence of events needing corroboration; a detail that is vague or incomplete and needs clarification; an assertion that can be independently checked (e.g., verifying a stated reason for a vehicle's location or the claimant's whereabouts).
+    c. Apply all CRITICAL RULES: Party Scope (RULE 2), External Scope Only (RULE 3), Neutral Language (RULE 4), and Narrative Guardrails (RULE 5).
+    d. Before finalising a narrative-derived enquiry, ensure:
+       - It does NOT substantively duplicate an enquiry from PREVIOUS VERSION. If the underlying field action is the same, merge into the methodology-driven enquiry. If the action is materially different (e.g., canvassing a service provider vs interviewing a named individual), it must remain separate.
+       - It is output as a standalone entry with its own distinct enquiry — do NOT fold a narrative-derived field action into an existing methodology-driven enquiry by expanding that enquiry's enquiry_detail scope.
+       - It is NOT merely restating a key concern, observation, or suspicion — enquiries are field actions, not findings.
+       - It is NOT derived from non-narrative parts of INITIAL REVIEW (IRO analysis, background checks, prior claims, policy details).
+    e. No fixed quota. A brief narrative may yield zero; a detailed one may yield several. Err on inclusion when a narrative element clearly warrants field follow-up.
+
+4. **Aggregate by theme**: Group ALL enquiries (methodology + narrative-derived) by underlying theme. Combine enquiries that address the same subject, location, party, or investigative action into a single output entry — merging their sub-tasks and details into enquiry_detail. Output approximately one enquiry per theme identified.
+
+5. Review the final list. Ensure all methodology-driven entries from PREVIOUS VERSION are reflected, all narrative-derived entries pass guardrails, and the output is concise with neutral language and no filler.
+</TASK>
+
+<CONTEXT>
+These are the relevant materials for your case:
+
+Here are the methodology-driven enquiries already filtered and contextualised for this case. Use these as your foundation — every entry must be reflected in the final output:
+<PREVIOUS VERSION>
+{prev_version}
+</PREVIOUS VERSION>
+
+The INITIAL REVIEW provides case-specific details. You may derive additional enquiries from the claimant's incident account within this section (see TASK Step 3). Do NOT derive new enquiry topics from other parts of INITIAL REVIEW:
+<INITIAL REVIEW>
+{initial_review}
+</INITIAL REVIEW>
+
+The ADDITIONAL INFORMATION includes additional notes on the claim, which can include police reports, engineer reports, incident reports, or other evidence. Do NOT derive new enquiry topics from this section:
+<ADDITIONAL INFORMATION>
+{additional_info}
+</ADDITIONAL INFORMATION>
+</CONTEXT>
+
+<OUTPUT>
+{format}
+</OUTPUT>
 
 <EXAMPLES>
 Example 1:
-Output:
 {{
   "enquiry": "Please canvas loss location",
   "enquiry_details": "Please canvas loss location to confirm exactly where accident occurred, the barricade IO hit, any witnesses, CCTV etc, road conditions"
 }}
 Example 2:
-Output:
 {{
   "enquiry": "Please speak to Towie",
   "enquiry_details": "Please speak to Towie if identified and confirm observations, when contacted for tow, any other details they can provide"
 }}
+</EXAMPLES>
 """
 
 INTERVIEW_PLAN_DRAFT_PROMPT = """
