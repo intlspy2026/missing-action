@@ -110,6 +110,7 @@ BEFORE listing any documents, you MUST understand these rules. Violating these r
     CORE METHODOLOGY ITEMS are document types that are inherent to investigating a given allegation type regardless of case specifics. These ALWAYS pass the relevance filter. Examples:
     - Financial statements, bank records, MyGov/Centrelink: core for fraud investigations (the fraud allegation itself creates a need to verify financial position).
     - Vehicle purchase documents, registration, service history, photographs: core for motor claims (the motor claim itself creates a need to verify vehicle circumstances).
+    - Photographs of property, evidence of ownership, schedule of loss: core for property claims (the property claim itself creates a need to verify ownership and damage).
     - Phone records: core for investigations requiring timeline reconstruction or party communication verification.
     - Signed authorities, photographs of scene/damage: core for most investigation types.
 
