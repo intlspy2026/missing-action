@@ -120,6 +120,18 @@ BEFORE listing any documents, you MUST understand these rules. Violating these r
 
     c. **Conditional qualifier unmet**: A conditional qualifier in the methodology (e.g., "(if applicable)", "(only request if X)", "(only request if there are concerns)") is not met by the case facts.
 
+    The following document types appear frequently in methodologies but are almost always EXCLUDED. You MUST check each one against the fact threshold below before including. If you cannot find the stated fact, EXCLUDE:
+
+    HARD EXCLUSIONS:
+    1. Work rosters, timesheets, or employment records: INCLUDE ONLY if the incident was employment-related (occurred during work hours, at a workplace, or attendance/timing is explicitly questioned in case facts).
+    2. Insurance claims history: INCLUDE ONLY if INITIAL REVIEW explicitly records prior claims for the INSURED. Prior policies, inactive policies, or third-party claims are NOT the insured's prior claims.
+    3. Criminal history or background checks: INCLUDE ONLY if INITIAL REVIEW or ADDITIONAL INFORMATION alleges a criminal element, prior offending, or law enforcement involvement beyond the current incident.
+    4. Rideshare, taxi, or transport receipts: INCLUDE ONLY if travel to/from the incident location is explicitly material to the claim. Exclude when the incident occurred at a fixed location and travel routing is not disputed.
+    5. Toll statements: INCLUDE ONLY if toll-based travel is explicitly relevant to the claim's routing or timing.
+    6. Tenancy/rental documents: INCLUDE ONLY when the party is a tenant. Exclude for owner-occupiers.
+    7. Contract of sale: INCLUDE ONLY when the party is a buyer or seller. Exclude for tenants.
+
+    If a document type DOES appear in the HARD EXCLUSIONS list above AND you cannot find the stated fact in INITIAL REVIEW or ADDITIONAL INFORMATION, you MUST EXCLUDE it. Do not rationalise: absence of evidence IS evidence of irrelevance.
 **RULE 4 - NO DUPLICATES**: Each piece of information must appear under exactly one document type. If the same information could fall under multiple document types, place it under the most specific one and exclude it from the others. Compound aggregator entries titled "other documents", "additional evidence", "other supporting documents" or similar catch-alls that re-aggregate items already requested under another entry are NOT permitted – every required document must live under its own specific entry.
 
 **Each underlying document type must appear AT MOST ONCE in the output.** This applies to the SUBSTANCE of the request, not just the exact label. Do not emit two entries that request the same kind of document under slightly different labels (e.g., "Telephone Records" and "Telephone Records - Evidence of Movements" are the same underlying type – combine into one). If the same underlying doc type would serve multiple purposes (e.g., timeline reconstruction AND movement verification), combine the purposes into a single doc_details entry, do not split into separate entries. If multiple sub-items belong under the same parent doc_type, combine them into a single entry and list the sub-items in doc_details – do not emit multiple entries that share the same doc_type label or that semantically duplicate one another.
@@ -141,8 +153,8 @@ Steps:
 3. Read INITIAL REVIEW and ADDITIONAL INFORMATION to extract case-specific values (names of direct parties, dates, locations, incident specifics, periods, identifiers). ADDITIONAL INFORMATION may contain supplementary details (e.g., police reports, engineer reports, incident reports) not captured in INITIAL REVIEW – use these as additional evidence where relevant.
 
 4. For each NON-CORE document type identified in Step 1:
-    a. Apply RULE 3 — check for contradiction, factual hook, and conditional qualifiers.
-    b. Only move from EXCLUDED to INCLUDED if you can cite a specific sentence in INITIAL REVIEW or ADDITIONAL INFORMATION that directly justifies the request. Absence of evidence IS evidence of irrelevance.
+    a. FIRST, check the HARD EXCLUSIONS list in RULE 3. If the document type matches one of those categories AND you cannot find the stated fact in INITIAL REVIEW or ADDITIONAL INFORMATION, mark it EXCLUDED and move to the next type. Do NOT waste time on types that clearly fail the hard exclusions.
+    b. THEN, assess relevance against INITIAL REVIEW and ADDITIONAL INFORMATION (apply RULE 3b). Only move from EXCLUDED to INCLUDED if you can cite a specific sentence.
 
 5. **Validation gate**: Before including each non-core document type in your output, confirm:
     - Can I point to a specific fact in the narrative content of INITIAL REVIEW or ADDITIONAL INFORMATION that makes this document type relevant to this claim? If I cannot articulate a fact-based connection, exclude it.
@@ -159,7 +171,7 @@ For each included document type, output the doc_type and doc_details as they app
 <CONTEXT>
 These are the relevant materials for your case:
 
-Here is the INVESTIGATION PROCESSES – this is the pre-filtered methodology for the given investigation type. Conditional document types without a factual hook in the case have already been removed. Only the document types listed below are available for consideration:
+Here is the INVESTIGATION PROCESSES – this is your primary source for methodology-driven document types. Each entry in the array contains the documents for ONE investigation type:
 <INVESTIGATION PROCESSES>
 {knowledge}
 </INVESTIGATION PROCESSES>
