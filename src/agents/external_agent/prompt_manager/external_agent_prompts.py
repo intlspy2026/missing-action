@@ -401,6 +401,7 @@ You are drafting the final investigation brief listing additional field activiti
     a. **Same investigative goal**: enquiries that ask different people the same core question about the same event, timeframe, or subject → merge into one, listing the respondent groups together in enquiry_detail.
     b. **Overlapping purpose**: enquiries that both aim to establish the same thing (movements, timeline, vehicle status, damage discovery) around the same time or place → merge.
     c. **Shared subject**: enquiries about the same person, vehicle, or location from different angles → merge.
+    d. **Same named individual**: if the same specific person appears as a target in multiple enquiries → merge them into one, covering all investigative angles in enquiry_detail.
 - **Tone**: neutral and request-focused. State what the investigator is asked to do, not why suspicion exists.
 - **No filler**: omit hedging boilerplate ("if attendance occurred", "where identified", "if any prosecution has been commenced"). The investigator already has the case context.
 </STYLE>
@@ -436,7 +437,7 @@ Steps:
 
 3. Derive narrative-driven enquiries from this account. Identify major field enquiries — gaps, claims, assertions, named or implied entities, or details needing independent verification. Validate each against all CRITICAL RULES. A brief narrative may yield zero; a detailed one may yield several.
 
-4. **Derive enquiries from any explanations in the narrative**: When the narrative cites an explanation for a circumstance or decision, identify what records from the entity or party cited — even if only implied — would independently verify that explanation. Derive an enquiry targeting that external party.
+4. **Derive enquiries from any explanations in the narrative**: When the narrative cites an explanation for a circumstance or decision, identify the external entity behind that explanation — even if not named — and derive an enquiry to independently verify it. Do NOT treat an involved party's restatement of the explanation as satisfying this step; only an enquiry targeting the implied external entity counts.
 
 5. **Aggregate by theme**: Group ALL enquiries (methodology + narrative-derived) by underlying theme. Combine enquiries that address the same subject, location, party, or investigative action into a single output entry — merging their sub-tasks and details into enquiry_detail. Output approximately one enquiry per theme identified.
 
