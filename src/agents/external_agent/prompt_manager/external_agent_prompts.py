@@ -107,12 +107,8 @@ BEFORE listing any documents, you MUST understand these rules. Violating these r
 
 **RULE 3 - RELEVANCE FILTER (INCLUDE-ONLY)**: You START from the position that EVERY document type from INVESTIGATION PROCESSES is EXCLUDED. A document type is INCLUDED ONLY when it is either (i) core to the investigation type — the allegation itself creates a need for it — or (ii) supported by a SPECIFIC FACT in the narrative content of INITIAL REVIEW or ADDITIONAL INFORMATION.
 
-    CORE METHODOLOGY ITEMS are document types that are inherent to investigating a given allegation type regardless of case specifics. These ALWAYS pass the relevance filter. Examples:
+    CORE METHODOLOGY ITEMS are document types that are inherent to investigating a given allegation type regardless of case specifics. These ALWAYS pass the relevance filter:
     - Financial statements, bank records, MyGov/Centrelink: core for fraud investigations (the fraud allegation itself creates a need to verify financial position).
-    - Vehicle purchase documents, registration, service history, photographs: core for motor claims (the motor claim itself creates a need to verify vehicle circumstances).
-    - Photographs of property, evidence of ownership, schedule of loss: core for property claims (the property claim itself creates a need to verify ownership and damage).
-    - Phone records: core for investigations requiring timeline reconstruction or party communication verification.
-    - Signed authorities, photographs of scene/damage: core for most investigation types.
 
     When in doubt about whether a document type is a core methodology item, apply the following test: would a reasonable investigator ALWAYS request this document type for this investigation type, regardless of specific case facts? YES → include it. NO → require a specific factual hook.
 
