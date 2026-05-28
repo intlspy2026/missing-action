@@ -116,6 +116,10 @@ _HARD_EXCLUSIONS = {
                           r"\bbolt\b", r"\bola\b"],
     "toll":              [r"\btoll\b", r"\bmotorway\b", r"\bexpressway\b",
                           r"\btollway\b"],
+    "tenancy":           [r"\btenant\b", r"\btenancy\b", r"\brental\b",
+                          r"\blease\b", r"\blandlord\b"],
+    "contract of sale":  [r"contract of sale", r"\bconveyanc", r"\bsettlement\b",
+                          r"\bpurchaser\b", r"\bvendor\b"],
 }
 
 # Pre-compile hook patterns for each exclusion group
