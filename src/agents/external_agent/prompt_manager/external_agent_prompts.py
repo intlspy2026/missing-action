@@ -422,7 +422,7 @@ If an enquiry cannot be traced back to either source, it MUST be excluded.
 **RULE 5 - NARRATIVE GUARDRAILS**: When deriving enquiries from the claimant's incident account:
     a. Derive SOLELY from the claimant's first-hand narrative — their description of the incident AND circumstances for THIS claim. Do NOT derive from IRO analysis, background checks, prior claims history, policy details, or interview transcripts.
     b. Enquiries must be concrete field actions (RULE 3), not restatements of key concerns or observations.
-    c. **Prefer independent verification**: When the narrative references an external party to explain a circumstance (e.g., a business, service provider, facility, or venue whose actions or records would corroborate or contradict a claim detail), target that external party for records or confirmation. Do NOT substitute this by interviewing an involved party about whether the explanation is true — that is an interview plan question.
+    c. **Prefer independent verification**: When the narrative explains a circumstance, prefer targeting the implied external party for records or confirmation over generating an enquiry that merely asks an involved party about the explanation.
     d. Do NOT substantively duplicate any entry in PREVIOUS VERSION. If the same underlying field action already exists, merge the narrative angle into that enquiry rather than creating a duplicate.
 </CRITICAL_RULES>
 
@@ -440,13 +440,14 @@ Steps:
        - Distinguish the current claim's incident narrative from IRO analysis, background checks, policy details, and prior claims history.
        - Distinguish the current claim's lodgement from descriptions of previous claims — prior claims may contain their own loss descriptions; these must NOT be treated as the current claim's incident account.
     b. From this narrative, identify major field enquiries that arise directly from the claimant's description — gaps, claims, assertions, named entities (e.g., businesses, service providers, individuals), or details needing independent verification through field investigation. Examples: a specific location described in the narrative to canvas; a named business or service to canvass for records; a person named who should be interviewed; a timeline or sequence of events needing corroboration; a detail that is vague or incomplete and needs clarification; an assertion that can be independently checked (e.g., verifying a stated reason for a vehicle's location or the claimant's whereabouts).
-    c. Apply all CRITICAL RULES: Party Scope (RULE 2), External Scope Only (RULE 3), Neutral Language (RULE 4), and Narrative Guardrails (RULE 5).
-    d. Before finalising a narrative-derived enquiry, ensure:
+    c. When the narrative cites an explanation for a circumstance or decision, identify what records from the entity or party cited — even if only implied — would independently verify that explanation. Derive an enquiry targeting that external party.
+    d. Apply all CRITICAL RULES: Party Scope (RULE 2), External Scope Only (RULE 3), Neutral Language (RULE 4), and Narrative Guardrails (RULE 5).
+    e. Before finalising a narrative-derived enquiry, ensure:
        - It does NOT substantively duplicate an enquiry from PREVIOUS VERSION. If the underlying field action is the same, merge into the methodology-driven enquiry. If the action is materially different (e.g., canvassing a service provider vs interviewing a named individual), it must remain separate.
        - It is output as a standalone entry with its own distinct enquiry — do NOT fold a narrative-derived field action into an existing methodology-driven enquiry by expanding that enquiry's enquiry_detail scope.
        - It is NOT merely restating a key concern, observation, or suspicion — enquiries are field actions, not findings.
        - It is NOT derived from non-narrative parts of INITIAL REVIEW (IRO analysis, background checks, prior claims, policy details).
-    e. No fixed quota. A brief narrative may yield zero; a detailed one may yield several. Err on inclusion when a narrative element clearly warrants field follow-up.
+    f. No fixed quota. A brief narrative may yield zero; a detailed one may yield several. Err on inclusion when a narrative element clearly warrants field follow-up.
 
 4. **Aggregate by theme**: Group ALL enquiries (methodology + narrative-derived) by underlying theme. Combine enquiries that address the same subject, location, party, or investigative action into a single output entry — merging their sub-tasks and details into enquiry_detail. Output approximately one enquiry per theme identified.
 
