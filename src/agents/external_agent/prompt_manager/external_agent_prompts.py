@@ -437,7 +437,7 @@ Steps:
 
 3. Derive narrative-driven enquiries from this account. Identify major field enquiries — gaps, claims, assertions, named or implied entities, or details needing independent verification. Validate each against all CRITICAL RULES. A brief narrative may yield zero; a detailed one may yield several.
 
-4. **Derive enquiries from any explanations in the narrative**: When the narrative cites an explanation for a circumstance or decision, identify the external entity behind that explanation — even if not named — and derive an enquiry to independently verify it. Do NOT treat an involved party's restatement of the explanation as satisfying this step; only an enquiry targeting the implied external entity counts.
+4. **Derive enquiries from explanations that imply an external entity**: When the narrative cites an explanation for a material circumstance or decision and that explanation implies a specific external entity capable of independent verification — even if that entity is not named — derive an enquiry targeting that entity to verify the explanation. Do NOT treat an involved party's restatement of the explanation as satisfying this step; only an enquiry targeting the implied external entity counts. Skip explanations that lack a concrete, verifiable external entity (e.g., weather, traffic, or personal reasons).
 
 5. **Aggregate by theme**: Group ALL enquiries (methodology + narrative-derived) by underlying theme. Combine enquiries that address the same subject, location, party, or investigative action into a single output entry — merging their sub-tasks and details into enquiry_detail. Output approximately one enquiry per theme identified.
 
