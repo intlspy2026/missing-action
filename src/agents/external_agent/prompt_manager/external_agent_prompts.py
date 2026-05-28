@@ -396,6 +396,11 @@ You are drafting the final investigation brief listing additional field activiti
 <STYLE>
 - **Length cap**: 2 to 4 sentences per enquiry_detail. Hard cap. No paragraph-length descriptions.
 - **One enquiry per theme**: You receive methodology-driven enquiries listed flatly. Many belong to a smaller number of underlying themes. You must recognise the themes yourself and aggregate all enquiries (methodology + narrative-derived) that belong to the same theme into a single output enquiry — combining their sub-tasks, sub-questions and party-specific variations into enquiry_detail. Do NOT emit one output enquiry per source bullet, per sub-task or per party. Output should be approximately one enquiry per theme you identify, not one per source line. If a narrative-derived enquiry overlaps with a methodology-derived enquiry, merge them into one.
+
+    **Same-theme merge tests** — apply these before finalising. If any test matches, the enquiries MUST be one, not several:
+    a. **Same investigative goal**: enquiries that ask different people the same core question about the same event, timeframe, or subject → merge into one, listing the respondent groups together in enquiry_detail.
+    b. **Overlapping purpose**: enquiries that both aim to establish the same thing (movements, timeline, vehicle status, damage discovery) around the same time or place → merge.
+    c. **Shared subject**: enquiries about the same person, vehicle, or location from different angles → merge.
 - **Tone**: neutral and request-focused. State what the investigator is asked to do, not why suspicion exists.
 - **No filler**: omit hedging boilerplate ("if attendance occurred", "where identified", "if any prosecution has been commenced"). The investigator already has the case context.
 </STYLE>
@@ -417,7 +422,8 @@ If an enquiry cannot be traced back to either source, it MUST be excluded.
 **RULE 5 - NARRATIVE GUARDRAILS**: When deriving enquiries from the claimant's incident account:
     a. Derive SOLELY from the claimant's first-hand narrative — their description of the incident AND circumstances for THIS claim. Do NOT derive from IRO analysis, background checks, prior claims history, policy details, or interview transcripts.
     b. Enquiries must be concrete field actions (RULE 3), not restatements of key concerns or observations.
-    c. Do NOT substantively duplicate any entry in PREVIOUS VERSION. If the same underlying field action already exists, merge the narrative angle into that enquiry rather than creating a duplicate.
+    c. **Prefer independent verification**: When the narrative references an external party to explain a circumstance (e.g., a business, service provider, facility, or venue whose actions or records would corroborate or contradict a claim detail), target that external party for records or confirmation. Do NOT substitute this by interviewing an involved party about whether the explanation is true — that is an interview plan question.
+    d. Do NOT substantively duplicate any entry in PREVIOUS VERSION. If the same underlying field action already exists, merge the narrative angle into that enquiry rather than creating a duplicate.
 </CRITICAL_RULES>
 
 <TASK>
