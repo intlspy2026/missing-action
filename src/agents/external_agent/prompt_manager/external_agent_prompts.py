@@ -346,7 +346,9 @@ INITIAL REVIEW and ADDITIONAL INFORMATION are used ONLY for contextualisation of
 Filter and contextualise the methodology-driven additional enquiries for the provided investigation type:
 
 Steps:
-1. Read INVESTIGATION PROCESSES. For each enquiry listed, apply RULE 1 (RELEVANCE FILTER) to determine whether it applies to this case. Identify and keep only the enquiries that pass all filter conditions. Enquiries that fail the filter are not carried forward.
+0. Scan INITIAL REVIEW and ADDITIONAL INFORMATION to compile a complete list of every person, business, or organisation explicitly named in the case, plus any group the case describes the insured as having been with at or around the incident (e.g., "friends"). This is your AUTHORITATIVE ENTITY LIST. A claim detail (damage, estimate, repair need, loss amount, vehicle condition) does NOT establish an entity on this list — only a specific named entity or described group counts.
+
+1. Read INVESTIGATION PROCESSES. For each enquiry listed, identify its target (who the enquiry directs the investigator to contact). Check the target against your AUTHORITATIVE ENTITY LIST from Step 0. Apply RULE 1 (RELEVANCE FILTER): if the target is not on the list, exclude that enquiry entirely. Keep only the enquiries whose targets appear on the list.
 
 2. Read INITIAL REVIEW and ADDITIONAL INFORMATION to extract case-specific details (names, dates, locations, incident specifics). ADDITIONAL INFORMATION may contain supplementary details (e.g., police reports, engineer reports, incident reports) not captured in INITIAL REVIEW — use these as additional evidence where relevant.
 
