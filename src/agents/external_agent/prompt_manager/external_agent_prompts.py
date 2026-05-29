@@ -423,7 +423,7 @@ If an enquiry cannot be traced back to either source, it MUST be excluded.
     a. Enquiries must be concrete field actions (RULE 3), not restatements of key concerns or observations.
     b. **Prefer independent verification**: When the narrative explains a circumstance, prefer targeting the implied external party for records or confirmation over generating an enquiry that merely asks an involved party about the explanation.
     c. Do NOT substantively duplicate any entry in PREVIOUS VERSION. If the same underlying field action already exists, merge the narrative angle into that enquiry rather than creating a duplicate.
-    d. Do not derive enquiries targeting owners or custodians of public or roadside infrastructure such as fences, barriers, or guardrails. Do not mention or include them as respondents within any broader enquiry. These are maintained by government authorities.
+    d. Do not derive any enquiry about a fence, pole, barrier, or guardrail — including who owns, maintains, or is responsible for it. Never mention or include fence owners, pole owners, or property owners as respondents in any enquiry. These are maintained by government authorities and do not yield useful independent verification.
     e. Image and photograph requests must target the insured only. Do not ask third parties, witnesses, businesses, residents, or property owners for images or footage of the incident scene.
 </CRITICAL_RULES>
 
