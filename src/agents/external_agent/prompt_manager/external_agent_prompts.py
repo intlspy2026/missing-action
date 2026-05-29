@@ -325,18 +325,18 @@ You are identifying which additional enquiry types from INVESTIGATION PROCESSES 
 <CRITICAL_RULES>
 BEFORE listing any enquiries, you MUST understand these rules. Violating these rules is a critical error.
 
-**RULE 1 - SOURCE RESTRICTION**: Every enquiry MUST originate from INVESTIGATION PROCESSES — the methodology for the given investigation type. If an enquiry cannot be traced back to INVESTIGATION PROCESSES, it MUST be excluded.
+**RULE 1 - RELEVANCE FILTER**: For each enquiry from INVESTIGATION PROCESSES, assess whether it is applicable based on the facts in INITIAL REVIEW and ADDITIONAL INFORMATION. If INVESTIGATION PROCESSES includes a conditional qualifier (e.g., "if police attended"), apply that condition against INITIAL REVIEW and ADDITIONAL INFORMATION — if the condition is not met, exclude the enquiry. Even without an explicit conditional qualifier, if an enquiry references a scenario, person, or event that has no basis in INITIAL REVIEW or ADDITIONAL INFORMATION, exclude it. Exclude any enquiry whose target (person, business, or organization) is not named in INITIAL REVIEW or ADDITIONAL INFORMATION. If a methodology template references a role but no specific party filling that role appears in the case materials, exclude that enquiry entirely. Never assume an entity exists because damage, an incident, or a claim implies one might.
 
-**RULE 2 - PARTY SCOPE**: Only frame enquiries around parties directly involved in the current claim under investigation. Use INITIAL REVIEW and ADDITIONAL INFORMATION to identify who the direct parties are. Individuals mentioned in prior claims, historical associations, or background checks within INITIAL REVIEW or ADDITIONAL INFORMATION are NOT direct parties to the current claim. Do not generate enquiries focused on associated individuals who are not direct parties. Replace generic references in INVESTIGATION PROCESSES with the specific individuals identified from INITIAL REVIEW and ADDITIONAL INFORMATION.
+**RULE 2 - SOURCE RESTRICTION**: Every enquiry MUST originate from INVESTIGATION PROCESSES — the methodology for the given investigation type. If an enquiry cannot be traced back to INVESTIGATION PROCESSES, it MUST be excluded.
 
-**RULE 3 - CONTEXTUALISE**: You must rewrite each enquiry from INVESTIGATION PROCESSES using case-specific details from INITIAL REVIEW and ADDITIONAL INFORMATION. This includes:
-    a. Adapt template details to match the actual case — omit elements that don't apply and include only what is relevant.
-    b. The output must never read like a generic template. Every enquiry must reference specific names, dates, locations, or details from INITIAL REVIEW or ADDITIONAL INFORMATION.
-INITIAL REVIEW and ADDITIONAL INFORMATION are used ONLY for contextualisation of methodology-driven enquiries, NOT to generate new enquiry topics.
+**RULE 3 - PARTY SCOPE**: Only frame enquiries around parties directly involved in the current claim under investigation. Use INITIAL REVIEW and ADDITIONAL INFORMATION to identify who the direct parties are. Individuals mentioned in prior claims, historical associations, or background checks within INITIAL REVIEW or ADDITIONAL INFORMATION are NOT direct parties to the current claim. Do not generate enquiries focused on associated individuals who are not direct parties. Replace generic references in INVESTIGATION PROCESSES with the specific individuals identified from INITIAL REVIEW and ADDITIONAL INFORMATION.
 
 **RULE 4 - EXTERNAL SCOPE ONLY**: All enquiries must be actions an external investigator can perform in the field (e.g., canvassing, interviewing witnesses, obtaining records from third parties). Exclude any enquiry that relates to internal processes, internal review, internal assessments, or summarising results of enquiries already conducted by the insurer's own team. Exclude any enquiry that involves interviewing the primary insured directly — this is covered by a separate interview plan section. CCTV and record requests must be limited to the incident scene and its immediate surroundings. Do not request CCTV of pre-incident activities at venues, licensed premises, or retail locations. Prior insurance verification: if the case materials already reference prior claims or prior insurance under headings such as Customer Workbench, Claim Network, Claim Centre, ClaimHistory, Motorweb, Filenet, concurrent claims, or previous policies, exclude that enquiry — the prior insurer is Suncorp. If no prior claims or prior insurance appear anywhere in the case materials, raise a prior insurance enquiry targeting the insured to request their documents. Never generate an enquiry targeting the prior insurer.
 
-**RULE 5 - RELEVANCE FILTER**: For each enquiry from INVESTIGATION PROCESSES, assess whether it is applicable based on the facts in INITIAL REVIEW and ADDITIONAL INFORMATION. If INVESTIGATION PROCESSES includes a conditional qualifier (e.g., "if police attended"), apply that condition against INITIAL REVIEW and ADDITIONAL INFORMATION — if the condition is not met, exclude the enquiry. Even without an explicit conditional qualifier, if an enquiry references a scenario, person, or event that has no basis in INITIAL REVIEW or ADDITIONAL INFORMATION, exclude it. Exclude any enquiry whose target (person, business, or organization) is not named in INITIAL REVIEW or ADDITIONAL INFORMATION. If a methodology template references a role but no specific party filling that role appears in the case materials, exclude that enquiry entirely. Never assume an entity exists because damage, an incident, or a claim implies one might.
+**RULE 5 - CONTEXTUALISE**: You must rewrite each enquiry from INVESTIGATION PROCESSES using case-specific details from INITIAL REVIEW and ADDITIONAL INFORMATION. This includes:
+    a. Adapt template details to match the actual case — omit elements that don't apply and include only what is relevant.
+    b. The output must never read like a generic template. Every enquiry must reference specific names, dates, locations, or details from INITIAL REVIEW or ADDITIONAL INFORMATION.
+INITIAL REVIEW and ADDITIONAL INFORMATION are used ONLY for contextualisation of methodology-driven enquiries, NOT to generate new enquiry topics.
 
 **RULE 6 - NEUTRAL LANGUAGE**: Do not use: "fraudulent", "fraud", "suspicious", "red flags", "motive", "collusion", "grossly", "high-risk". Refer to the underlying event as "incident" rather than "assault" in both the enquiry title and enquiry_detail. Describe the incident neutrally (e.g., "the incident on [date] at [location]") — do not preface with "alleged", "potential", or any qualifier that pre-judges the case. Do not infer intent or wrongdoing.
 </CRITICAL_RULES>
@@ -346,17 +346,15 @@ INITIAL REVIEW and ADDITIONAL INFORMATION are used ONLY for contextualisation of
 Filter and contextualise the methodology-driven additional enquiries for the provided investigation type:
 
 Steps:
-1. Read INVESTIGATION PROCESSES first. Identify all additional enquiries/responsibilities specified for the given investigation type.
+1. Read INVESTIGATION PROCESSES. For each enquiry listed, apply RULE 1 (RELEVANCE FILTER) to determine whether it applies to this case. Identify and keep only the enquiries that pass all filter conditions. Enquiries that fail the filter are not carried forward.
 
 2. Read INITIAL REVIEW and ADDITIONAL INFORMATION to extract case-specific details (names, dates, locations, incident specifics). ADDITIONAL INFORMATION may contain supplementary details (e.g., police reports, engineer reports, incident reports) not captured in INITIAL REVIEW — use these as additional evidence where relevant.
 
-3. For each enquiry identified in Step 1, assess relevance against the case facts (apply RULE 5). Exclude enquiries whose conditions are not met or that have no factual basis in the case.
+3. For each remaining (relevant) enquiry, contextualise it with case-specific details from Step 2 (apply RULE 5). Replace generic template references with specific names, dates, and locations.
 
-4. For each remaining (relevant) enquiry, contextualise it with case-specific details from Step 2 (apply RULE 3). Replace generic template references with specific names, dates, and locations.
+4. Include details about what needs to be done in each enquiry. Ensure enquiries and details are clear and avoid using any jargon.
 
-5. Include details about what needs to be done in each enquiry. Ensure enquiries and details are clear and avoid using any jargon.
-
-6. Output each enquiry as a separate entry. Do NOT aggregate by theme — a later step will handle aggregation. Each line item from INVESTIGATION PROCESSES that passes the relevance filter should produce one output entry.
+5. Output each enquiry as a separate entry. Do NOT aggregate by theme — a later step will handle aggregation. Each line item from INVESTIGATION PROCESSES that passes the relevance filter should produce one output entry.
 </TASK>
 
 <CONTEXT>
@@ -438,7 +436,7 @@ Steps:
 
 2. Read INITIAL REVIEW and locate the claimant's incident account — the narrative describing what happened as reported by the claimant for THIS claim. This narrative may appear under headings such as "Claim Lodgement", "Loss Description", "Circumstances", "What Happened", "Verint", "Nice", "Genysis", "Calls", or any similar heading, or without an explicit heading. Use semantic understanding to distinguish it from IRO analysis, background checks, policy details, and prior claims history including their own loss descriptions.
 
-3. Derive narrative-driven enquiries from this account. Identify major field enquiries — gaps, claims, assertions, named or implied entities, or details needing independent verification. Validate each against all CRITICAL RULES. A brief narrative may yield zero; a detailed one may yield several.
+3. Derive narrative-driven enquiries from this account while applying RULE 5 (NARRATIVE GUARDRAILS) — exclude an enquiry at the point it would violate any guardrail, not after. Identify major field enquiries — gaps, claims, assertions, named or implied entities, or details needing independent verification. Validate each remaining enquiry against all other CRITICAL RULES. A brief narrative may yield zero; a detailed one may yield several.
 
 4. **Derive enquiries from explanations that imply an external entity**: When the narrative cites an explanation for a material circumstance or decision and that explanation implies a specific external entity capable of independent verification — even if that entity is not named — derive an enquiry targeting that entity to verify the explanation. Do NOT treat an involved party's restatement of the explanation as satisfying this step; only an enquiry targeting the implied external entity counts. Skip explanations that lack a concrete, verifiable external entity (e.g., weather, traffic, or personal reasons).
 
