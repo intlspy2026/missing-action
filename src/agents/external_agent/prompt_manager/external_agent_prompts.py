@@ -346,9 +346,9 @@ INITIAL REVIEW and ADDITIONAL INFORMATION are used ONLY for contextualisation of
 Filter and contextualise the methodology-driven additional enquiries for the provided investigation type:
 
 Steps:
-0. Scan INITIAL REVIEW and ADDITIONAL INFORMATION to compile a complete list of every person, business, or organisation explicitly named in the case, plus any group the case describes the insured as having been with at or around the incident (e.g., "friends"). This is your AUTHORITATIVE ENTITY LIST. A claim detail (damage, estimate, repair need, loss amount, vehicle condition) does NOT establish an entity on this list — only a specific named entity or described group counts.
+0. Read INITIAL REVIEW and ADDITIONAL INFORMATION. Before processing any templates, write the complete AUTHORITATIVE ENTITY LIST into your response FIRST — before any enquiry text. Include every person, business, or organisation explicitly named, plus any described group the insured was with around the incident. Do NOT include: entities implied by claim details (damage, estimate, loss amount), or generic institutions that exist by default.
 
-1. Read INVESTIGATION PROCESSES. For each enquiry listed, identify its target (who the enquiry directs the investigator to contact). Check the target against your AUTHORITATIVE ENTITY LIST from Step 0. Apply RULE 1 (RELEVANCE FILTER): if the target is not on the list, exclude that enquiry entirely. Keep only the enquiries whose targets appear on the list.
+1. Read INVESTIGATION PROCESSES. For each template, identify its target. Check the target against the AUTHORITATIVE ENTITY LIST you wrote in Step 0 — if the exact target does not appear on that list, exclude the enquiry. You cannot add entities to the list now. What you wrote in Step 0 is final.
 
 2. Read INITIAL REVIEW and ADDITIONAL INFORMATION to extract case-specific details (names, dates, locations, incident specifics). ADDITIONAL INFORMATION may contain supplementary details (e.g., police reports, engineer reports, incident reports) not captured in INITIAL REVIEW — use these as additional evidence where relevant.
 
