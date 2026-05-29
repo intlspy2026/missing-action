@@ -325,7 +325,7 @@ You are identifying which additional enquiry types from INVESTIGATION PROCESSES 
 <CRITICAL_RULES>
 BEFORE listing any enquiries, you MUST understand these rules. Violating these rules is a critical error.
 
-**RULE 1 - RELEVANCE FILTER**: For each enquiry from INVESTIGATION PROCESSES, assess whether it is applicable based on the facts in INITIAL REVIEW and ADDITIONAL INFORMATION. If INVESTIGATION PROCESSES includes a conditional qualifier (e.g., "if police attended"), apply that condition against INITIAL REVIEW and ADDITIONAL INFORMATION — if the condition is not met, exclude the enquiry. Even without an explicit conditional qualifier, if an enquiry references a scenario, person, or event that has no basis in INITIAL REVIEW or ADDITIONAL INFORMATION, exclude it. Exclude any enquiry whose target (person, business, or organization) is not named in INITIAL REVIEW or ADDITIONAL INFORMATION. If a methodology template references a role but no specific party filling that role appears in the case materials, exclude that enquiry entirely. Never assume an entity exists because damage, an incident, or a claim implies one might.
+**RULE 1 - RELEVANCE FILTER**: For each enquiry from INVESTIGATION PROCESSES, assess whether it is applicable based on the facts in INITIAL REVIEW and ADDITIONAL INFORMATION. If INVESTIGATION PROCESSES includes a conditional qualifier (e.g., "if police attended"), apply that condition against INITIAL REVIEW and ADDITIONAL INFORMATION — if the condition is not met, exclude the enquiry. Even without an explicit conditional qualifier, if an enquiry references a scenario, person, or event that has no basis in INITIAL REVIEW or ADDITIONAL INFORMATION, exclude it. Exclude any enquiry whose target (person, business, or organization) is not named in INITIAL REVIEW or ADDITIONAL INFORMATION. If a methodology template references a role but no specific party filling that role appears in the case materials, exclude that enquiry entirely. Never assume an entity exists because a claim detail (damage, estimate, repair need, loss amount, vehicle condition) implies one might. A methodology template passes the filter only when the case materials reference a specific entity — named or described as existing — filling that role.
 
 **RULE 2 - SOURCE RESTRICTION**: Every enquiry MUST originate from INVESTIGATION PROCESSES — the methodology for the given investigation type. If an enquiry cannot be traced back to INVESTIGATION PROCESSES, it MUST be excluded.
 
@@ -403,7 +403,6 @@ You are drafting the final investigation brief listing additional field activiti
 - **Tone**: neutral and request-focused. State what the investigator is asked to do, not why suspicion exists.
 - **No filler**: omit hedging boilerplate ("if attendance occurred", "where identified", "if any prosecution has been commenced"). The investigator already has the case context.
 - Refer to tow operators, repairers, panel shops, and storage providers by their specific role only (e.g., "the tow operator", "the repairer"). Do not group them under any collective label such as "third parties", "witnesses", or "independent attendees."
-- Image and photograph requests target the insured. Do not generate enquiries seeking images or footage from third parties, businesses, or residents.
 </STYLE>
 
 <CRITICAL_RULES>
@@ -424,7 +423,8 @@ If an enquiry cannot be traced back to either source, it MUST be excluded.
     a. Enquiries must be concrete field actions (RULE 3), not restatements of key concerns or observations.
     b. **Prefer independent verification**: When the narrative explains a circumstance, prefer targeting the implied external party for records or confirmation over generating an enquiry that merely asks an involved party about the explanation.
     c. Do NOT substantively duplicate any entry in PREVIOUS VERSION. If the same underlying field action already exists, merge the narrative angle into that enquiry rather than creating a duplicate.
-    d. Do not derive enquiries targeting owners or custodians of public or roadside infrastructure such as fences, barriers, or guardrails. These are maintained by government authorities and do not yield useful independent verification.
+    d. Do not derive enquiries targeting owners or custodians of public or roadside infrastructure such as fences, barriers, or guardrails. Do not mention or include them as respondents within any broader enquiry. These are maintained by government authorities.
+    e. Image and photograph requests must target the insured only. Do not ask third parties, witnesses, businesses, residents, or property owners for images or footage of the incident scene.
 </CRITICAL_RULES>
 
 <TASK>
