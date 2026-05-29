@@ -425,6 +425,7 @@ If an enquiry cannot be traced back to either source, it MUST be excluded.
     c. Do NOT substantively duplicate any entry in PREVIOUS VERSION. If the same underlying field action already exists, merge the narrative angle into that enquiry rather than creating a duplicate.
     d. Do not derive any enquiry about a fence, pole, barrier, or guardrail — including who owns, maintains, or is responsible for it. Never mention or include fence owners, pole owners, or property owners as respondents in any enquiry. These are maintained by government authorities and do not yield useful independent verification.
     e. Image and photograph requests must target the insured only. Do not ask third parties, witnesses, businesses, residents, or property owners for images or footage of the incident scene.
+    f. If INITIAL REVIEW or ADDITIONAL INFORMATION state that police did not attend, do not generate any enquiry — dedicated or embedded within another — asking to confirm police attendance at the incident scene.
 </CRITICAL_RULES>
 
 <TASK>
