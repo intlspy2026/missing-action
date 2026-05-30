@@ -210,7 +210,9 @@ def strip_hard_exclusions(doc_list_data: dict, initial_review: str,
             if not cleaned.strip():
                 stripped.append(f"{doc_type} [all sub-items filtered]")
                 continue
-            doc["doc_details"] = cleaned
+            for item in _split_sub_items(cleaned):
+                result.append({"doc_type": item, "doc_details": item})
+            continue
         result.append(doc)
     if stripped:
         logger.info("Hard-exclusion pre-filter stripped %d doc types: %s",
