@@ -106,7 +106,7 @@ _HARD_EXCLUSIONS = {
                           r"claims? ?made ?outside", r"outside of suncorp",
                           r"lodged a claim with"],
     "criminal history":  [r"criminal", r"offen[dc]er?", r"convict(?:ed|ion)",
-                          r"charg(?:ed?|ing)", r"police", r"arrest(?:ed)?"],
+                           r"arrest(?:ed)?"],
     "background check":  [r"criminal", r"offen[dc]er?", r"convict(?:ed|ion)",
                            r"charg(?:ed?|ing)", r"police", r"arrest(?:ed)?"],
     "medical certificate": [r"injur", r"hospital", r"medical treat", r"admission",
