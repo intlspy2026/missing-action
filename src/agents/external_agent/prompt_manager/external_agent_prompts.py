@@ -125,7 +125,7 @@ BEFORE listing any documents, you MUST understand these rules. Violating these r
     HARD EXCLUSIONS:
     1. Work rosters, timesheets, or employment records: INCLUDE ONLY if the incident was employment-related (occurred during work hours, at a workplace, or attendance/timing is explicitly questioned in case facts).
     2. Insurance claims history: INCLUDE ONLY if INITIAL REVIEW explicitly records prior claims for the INSURED. Prior policies, inactive policies, or third-party claims are NOT the insured's prior claims.
-     3. Criminal history or background checks: INCLUDE ONLY if INITIAL REVIEW or ADDITIONAL INFORMATION alleges a criminal element, prior offending, or law enforcement involvement beyond the current incident, OR mentions court listings or criminal concerns for a party directly involved in this claim.
+     3. Criminal history or background checks: INCLUDE ONLY if INITIAL REVIEW or ADDITIONAL INFORMATION alleges a criminal element, prior offending, or law enforcement involvement beyond the current incident for a party directly involved in this claim, OR mentions court listings or criminal concerns for a party directly involved in this claim.
     4. Rideshare, taxi, or transport receipts: INCLUDE ONLY if travel to/from the incident location is explicitly material to the claim. Exclude when the incident occurred at a fixed location and travel routing is not disputed.
     5. Toll statements: INCLUDE ONLY if toll-based travel is explicitly relevant to the claim's routing or timing.
     6. Tenancy/rental documents: INCLUDE ONLY when the party is a tenant. Exclude for owner-occupiers.
