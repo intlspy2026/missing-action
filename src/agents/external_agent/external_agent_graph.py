@@ -1303,6 +1303,7 @@ def get_graph(llm: BaseChatModel) -> StateGraph:
                 EXTERNAL_AGENT_NAME, "Drafting document requests..."))
 
             investigation_types = state.get("investigation_type", []) or []
+            investigation_type_str = ", ".join(investigation_types)
             knowledge_json = json.dumps(
                 [
                     {
@@ -1381,6 +1382,7 @@ def get_graph(llm: BaseChatModel) -> StateGraph:
             narrative_prompt = NARRATIVE_DOC_REQUEST_DRAFT_PROMPT.format(
                 methodology_docs=methodology_doc_list,
                 initial_review=initial_review,
+                investigation_type=investigation_type_str,
                 format=parser.get_format_instructions(),
             )
             narrative_prompts = [SystemMessage(content=system_prompt),
