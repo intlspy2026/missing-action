@@ -137,8 +137,6 @@ _HOOK_REGEXES = {
 
 _CATCH_ALL_MARKERS = [
     "any other document",
-    "including but not limited to",
-    "including but not limited",
     "other documents",
     "other supporting",
 ]
@@ -216,8 +214,8 @@ def strip_hard_exclusions(doc_list_data: dict, initial_review: str,
             if not cleaned.strip():
                 stripped.append(f"{doc_type} [all sub-items filtered]")
                 continue
-            doc["doc_details"] = cleaned
-            result.append(doc)
+            for item in _split_sub_items(cleaned):
+                result.append({"doc_type": item, "doc_details": item})
             continue
         if doc_details:
             cleaned = _filter_doc_details(doc_details, case_text)
