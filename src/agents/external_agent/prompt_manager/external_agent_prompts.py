@@ -163,7 +163,13 @@ Steps:
     - For each detail in this document type, check if the same detail appears under any other document type in your output. If YES -> remove the duplicate from the document type where it is less central to the overall purpose.
     - If this document type is a catch-all that lists sub-items, assess EACH sub-item individually against RULE 3. Strip any sub-item with no factual hook from the doc_details. If no sub-items remain after filtering, exclude the entire document type.
 
-6. **POST-OUTPUT DEDUP CHECK**: Before finalising, scan ALL output entries pairwise. For each entry, check if the document it requests is already obtainable as a listed sub-item or constituent within the doc_details of any OTHER entry in your output. If yes → REMOVE the subsumed entry. Example: if "Evidence of ownership for all items listed on the Schedule of Loss" lists "an original receipt for purchase" in its doc_details, and a separate entry is "A copy of the receipt of purchase" — the separate entry is a double-up; remove it. Check every entry against every other entry, not just adjacent ones.
+6. **POST-OUTPUT DEDUP CHECK**: Before finalising, scan ALL output entries pairwise.
+
+   a. **Same-class check**: For each pair of entries, check if they request the same underlying record class — documents of the same kind from the same source. If two entries could be fulfilled by obtaining the same set of records, they ARE the same underlying document type (per RULE 4), even if the stated purpose or wording differs. Keep only the most comprehensive entry and remove the narrower one. Example: "Copies of any correspondence confirming the events date and time" and "Copy of text messages/emails that relate to notification of incident" both request personal communications from the policyholder around the incident period — same record class. Keep the broader entry, remove the narrower one.
+
+   b. **Sub-item check**: For each entry, check if the document it requests is already obtainable as a listed sub-item or constituent within the doc_details of any OTHER entry. If yes → REMOVE the subsumed entry. Example: if "Evidence of ownership for all items listed on the Schedule of Loss" lists "an original receipt for purchase" in its doc_details, and a separate entry is "A copy of the receipt of purchase" — the separate entry is a double-up; remove it.
+
+   Check every entry against every other entry, not just adjacent ones.
 
 7. Review the final list. Ensure all core methodology items are present and all non-core items pass the validation gate.
 
