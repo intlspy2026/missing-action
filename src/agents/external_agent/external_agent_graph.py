@@ -216,8 +216,8 @@ def strip_hard_exclusions(doc_list_data: dict, initial_review: str,
             if not cleaned.strip():
                 stripped.append(f"{doc_type} [all sub-items filtered]")
                 continue
-            for item in _split_sub_items(cleaned):
-                result.append({"doc_type": item, "doc_details": item})
+            doc["doc_details"] = cleaned
+            result.append(doc)
             continue
         if doc_details:
             cleaned = _filter_doc_details(doc_details, case_text)
