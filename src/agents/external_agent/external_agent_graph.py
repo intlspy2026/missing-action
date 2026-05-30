@@ -113,6 +113,8 @@ _HARD_EXCLUSIONS = {
                             r"surger", r"doctor", r"ambulance", r"mental health"],
     "hospital":           [r"hospitali[sz]", r"admission", r"injur",
                             r"ambulance", r"surger"],
+    "medical records":     [r"injur", r"hospital", r"medical treat", r"admission",
+                            r"surger", r"doctor", r"ambulance", r"mental health"],
     "rideshare":         [r"rideshare", r"taxi", r"\buber\b", r"\bdidi\b",
                           r"\bbolt\b", r"\bola\b"],
     "taxi":              [r"rideshare", r"taxi", r"\buber\b", r"\bdidi\b",
@@ -217,6 +219,10 @@ def strip_hard_exclusions(doc_list_data: dict, initial_review: str,
             for item in _split_sub_items(cleaned):
                 result.append({"doc_type": item, "doc_details": item})
             continue
+        if doc_details:
+            cleaned = _filter_doc_details(doc_details, case_text)
+            if cleaned != doc_details:
+                doc["doc_details"] = cleaned
         result.append(doc)
     if stripped:
         logger.info("Hard-exclusion pre-filter stripped %d doc types: %s",
