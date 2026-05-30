@@ -137,6 +137,8 @@ _HOOK_REGEXES = {
 
 _CATCH_ALL_MARKERS = [
     "any other document",
+    "including but not limited to",
+    "including but not limited",
     "other documents",
     "other supporting",
 ]
