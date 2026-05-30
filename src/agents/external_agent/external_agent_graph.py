@@ -159,6 +159,8 @@ def _is_catch_all(doc_type: str) -> bool:
 def _doc_type_is_excludable(doc_type: str, case_text: str) -> bool:
     """Return True if doc_type matches a hard exclusion with no hook."""
     doc_lower = doc_type.lower()
+    if "signed authorit" in doc_lower:
+        return False
     for pattern in _HARD_EXCLUSIONS:
         if pattern in doc_lower:
             if not _has_hook(case_text, pattern):
