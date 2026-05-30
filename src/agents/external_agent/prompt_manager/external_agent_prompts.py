@@ -109,6 +109,7 @@ BEFORE listing any documents, you MUST understand these rules. Violating these r
 
     CORE METHODOLOGY ITEMS are document types that are inherent to investigating a given allegation type regardless of case specifics. These ALWAYS pass the relevance filter:
     - Financial statements, bank records: core for fraud investigations (the fraud allegation itself creates a need to verify financial position).
+    - Financial statements, bank records, phone records, and financial position documents (MyGov, Centrelink, tax information): these are NOT core methodology items for Policy Exclusion investigations. For Policy Exclusion, the question is whether a policy condition applies — not whether the event occurred and not whether there is financial motivation. Only include these document types for a Policy Exclusion investigation if a SPECIFIC FACT in the case narrative shows that the insured's financial position or movements are directly material to the policy condition being investigated.
 
     When in doubt about whether a document type is a core methodology item, apply the following test: would a reasonable investigator ALWAYS request this document type for this investigation type, regardless of specific case facts? YES → include it. NO → require a specific factual hook.
 
