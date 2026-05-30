@@ -1381,7 +1381,7 @@ def get_graph(llm: BaseChatModel) -> StateGraph:
 
             # Format methodology doc types for narrative dedup reference
             methodology_doc_list = "\n".join(
-                f"- {dr.doc_type}"
+                f"- {dr.doc_type}: {dr.doc_details}" if dr.doc_details else f"- {dr.doc_type}"
                 for dr in methodology_docs.document_set
             ) if methodology_docs.document_set else "(none)"
 
