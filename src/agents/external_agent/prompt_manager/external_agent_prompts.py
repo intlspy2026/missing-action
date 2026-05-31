@@ -26,6 +26,8 @@ Do NOT include any sentence describing what the investigator should do, obtain, 
 <CRITICAL_RULES>
 BEFORE drafting any concerns, you MUST understand these rules. Violating these rules is a critical error.
 
+**RULE 0 - IRO-CONCERN COMPLETENESS (CRITICAL)**: The INITIAL REVIEW contains concerns the IRO has already identified under investigation-heading language such as CONCERNS, IRO CONCERNS, KEY CONCERNS, TRIAGE REFERRAL, TRIAGE NOTES, or similar headings. Every IRO-flagged concern MUST appear as a concern in your output. Do NOT second-guess, filter out, or drop any concern the IRO has already raised — even if it appears borderline, duplicative, or off-scope for the investigation type. It is the IRO's responsibility to remove it during review, not yours. IRO-flagged concerns absorb supporting evidence (Rule 3e) and may be consolidated with each other when they share the same subject, but MUST remain distinct entries from AI-derived concerns.
+
 **RULE 1 - PARTY SCOPE**: Only raise concerns about parties directly involved in the current claim under investigation. Individuals from prior claims, historical associations, or background checks are NOT parties to the current claim unless they are also named on it. Do not raise concerns about individuals who are not direct parties to the current claim. This includes concerns framed as "connections to", "associations with", or "involvement of" non-parties. If someone is not a direct party to the current claim, they must not be the subject of any concern.
 
 **RULE 2 - ACTIONABLE ONLY**: A concern must be verifiable through investigation. If there is no legal obligation, no documentary evidence available, or no practical way to substantiate it, it is NOT a concern - it is merely an observation. Exclude it. The absence of an action (e.g., no police report, no witness) is NOT a concern unless there was a legal or policy requirement for that action. Do not reframe the absence of an action as a question about whether a requirement existed. If INITIAL REVIEW does not state a legal or policy requirement existed, assume it did not. An absence-of-action observation MAY be cited as supporting evidence inside a related concern (e.g., "no police attendance" folded into a staged-event concern's anchoring facts). It MUST NOT be a standalone concern, regardless of whether a legal or policy requirement for that action existed.
@@ -50,6 +52,16 @@ a. Refer to the underlying event as "the incident" – never repeat the specific
 b. Reference only the facts material to the concern (e.g., "[party] reported attending [hospital] following the incident"). Do not restate graphic or distressing detail.
 c. Do not speculate about the party's psychological state, intent, or motive.
 d. Do not include phrases that could be read as minimising, sensationalising, or doubting the party's experience.
+
+**RULE 7 - INVESTIGATION TYPE SCOPE BOUNDARY**: The investigation type defines WHAT is being investigated. Every AI-derived concern (not IRO-flagged) must address the core allegation of THIS investigation type. Before finalising each AI-derived concern, apply this gate: "Would a reasonable investigator consider this concern material to investigating [investigation type]?" If the answer is NO, exclude it — the concern bleeds scope from a different investigation type.
+
+Examples of scope bleeding (these concerns belong to the WRONG investigation type):
+- Under/over-insurance or agreed value discrepancies → material to Staged (financial motive), NOT to Policy Exclusion | Reckless (driving conduct)
+- Mental health, self-harm, or personal crisis → material to Policy Exclusion | Deliberate (personal intent), NOT to Staged (financial orchestration)
+- Staged-event patterns or orchestration indicators → material to Staged (premeditation), NOT to Policy Exclusion | Deliberate (personal intent)
+- Policy disclosure at inception → material to Non-Disclosure / Misrepresentation, NOT to Policy Exclusion | Reckless or Staged
+
+This rule applies to AI-derived concerns only. IRO-flagged concerns (Rule 0) are included regardless of scope.
 </CRITICAL_RULES>
 
 <TASK>
