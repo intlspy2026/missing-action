@@ -28,7 +28,7 @@ A rationale ends after stating the material facts. Do not append trailing phrase
 <CRITICAL_RULES>
 BEFORE drafting any concerns, you MUST understand these rules. Violating these rules is a critical error.
 
-**RULE 0 - IRO-CONCERN SOLE SOURCE (CRITICAL)**: All key concerns derive exclusively from IRO-flagged sections of INITIAL REVIEW. These sections appear under investigation-heading language: CONCERNS, IRO CONCERNS, KEY CONCERNS, TRIAGE REFERRAL, TRIAGE NOTES, or similar. Every bullet point, line item, and distinct statement within these sections is a candidate concern. The IRO has already determined what is material — your role is to extract, consolidate, and format these concerns. Do NOT generate concerns from any other part of INITIAL REVIEW or from ADDITIONAL INFORMATION. Other parts of INITIAL REVIEW and all of ADDITIONAL INFORMATION provide supporting evidence only — facts you cite in rationales to anchor IRO concerns.
+**RULE 0 - IRO-CONCERN SOLE SOURCE (CRITICAL)**: All key concerns derive exclusively from IRO-flagged sections of INITIAL REVIEW. These sections appear under investigation-heading language: CONCERNS, IRO CONCERNS, KEY CONCERNS, or similar. Every bullet point, line item, and distinct statement within these sections is a candidate concern. The IRO has already determined what is material — your role is to extract, consolidate, and format these concerns. Do NOT generate concerns from any other part of INITIAL REVIEW or from ADDITIONAL INFORMATION. Other parts of INITIAL REVIEW and all of ADDITIONAL INFORMATION provide supporting evidence only — facts you cite in rationales to anchor IRO concerns.
 
 - Every extracted IRO concern MUST appear in the final output. Do NOT drop, skip, or second-guess any. If an IRO concern is wrong or out of scope, the IRO removes it during review — that decision is not yours.
 - IRO concerns MAY be consolidated with each other when they share the same subject (apply RULE 2a-e merge tests). The consolidated concern's title and rationale must cover the substance of all merged IRO points.
@@ -66,7 +66,7 @@ Key concerns are MATERIAL issues the IRO has identified that could directly impa
 ADDITIONAL INFORMATION and the rest of INITIAL REVIEW provide supporting facts only — use them to anchor concerns with evidence, not to generate new concerns.
 
 Steps:
-0. EXTRACT IRO CONCERNS: Scan INITIAL REVIEW for investigation-heading sections (CONCERNS, IRO CONCERNS, KEY CONCERNS, TRIAGE REFERRAL, TRIAGE NOTES, or similar language). Extract EVERY bullet point, line item, and distinct statement within these sections. These are your complete set of candidate concerns — no other sources.
+0. EXTRACT IRO CONCERNS: Scan INITIAL REVIEW for investigation-heading sections (CONCERNS, IRO CONCERNS, KEY CONCERNS, or similar language). Extract EVERY bullet point, line item, and distinct statement within these sections. These are your complete set of candidate concerns — no other sources.
 
 1. CONSOLIDATE: Apply RULE 2 merge tests. Cover all IRO concern substance in the smallest set of distinct concerns.
 
