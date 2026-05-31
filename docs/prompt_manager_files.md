@@ -1,5 +1,19 @@
 # Prompt Manager Files
 
+## Business Summary
+
+Think of the system like a **senior investigator's desk**:
+
+| File | Business role | What it does |
+|------|-------------|--------------|
+| `knowledge_prompts.py` | **Procedure Manual Lookup** | Acts like a clerk pulling the right checklists from the investigation methodology handbook. Given an investigation type (e.g., "Staged Collision", "DUI", "Non-Disclosure Misrepresentation"), it finds the relevant procedures: what documents to request, what field enquiries to assign. |
+| `external_agent_prompts.py` | **Briefing Instructions** | Acts like a senior investigator writing the actual brief. Takes the generic checklist, filters out irrelevant items based on case facts (no repairer named? skip repairer enquiries), adds case-specific names/dates/locations, derives extra work from the claimant's own story, and polishes everything into professional investigation language. |
+| `standards.py` | **Quality Style Guide** | Ensures document requests always use the exact, SME-approved phrasing — so the output is consistently professional, court-ready, and never sounds like a template. Motor and Property claims each have their own set of approved phrases. |
+
+The three files work together: the Procedure Manual finds what's relevant, the Briefing Instructions turn it into a case-specific investigation plan, and the Style Guide ensures every line is worded to a professional standard.
+
+---
+
 ## `external_agent_prompts.py` (689 lines)
 
 All LLM prompt templates for the external agent workflow.
