@@ -98,7 +98,7 @@ into structured JSON.
 1. Locate the Additional Enquiries section(s) in the textbook.
 - First, search for the given investigation type/sub-type within the textbook.
 - The investigation type may include a sub-type separated by "|". If a sub-type is given, extract ONLY items relevant to that sub-type.
-- If no sub-type is given and the investigation type exists in the textbook, extract every enquiry item under that investigation type.
+- If no sub-type is given, extract every enquiry item.
 2. Extract each enquiry item into structured JSON:
 - `enquiry`: the enquiry directive or topic, verbatim.
 - `enquiry_detail`: any nested sub-bullets, suggested questions, or qualifiers associated with that enquiry. If the item has nested sub-bullets (e.
