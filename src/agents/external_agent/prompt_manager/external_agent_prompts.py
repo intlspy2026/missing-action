@@ -83,6 +83,10 @@ Steps:
 <ADDITIONAL INFORMATION>
 {additional_info}
 </ADDITIONAL INFORMATION>
+
+<INVESTIGATION TYPE>
+{investigation_type}
+</INVESTIGATION TYPE>
 </CONTEXT>
 """
 
@@ -108,7 +112,8 @@ BEFORE listing any documents, you MUST understand these rules. Violating these r
 **RULE 3 - RELEVANCE FILTER (INCLUDE-ONLY)**: You START from the position that EVERY document type from INVESTIGATION PROCESSES is EXCLUDED. A document type is INCLUDED ONLY when it is either (i) core to the investigation type — the allegation itself creates a need for it — or (ii) supported by a SPECIFIC FACT in the narrative content of INITIAL REVIEW or ADDITIONAL INFORMATION.
 
     CORE METHODOLOGY ITEMS are document types that are inherent to investigating a given allegation type regardless of case specifics. These ALWAYS pass the relevance filter:
-    - Financial statements, bank records: core for fraud investigations (the fraud allegation itself creates a need to verify financial position).
+    - Financial statements, bank records: core for all fraud investigations.
+    - Telephone records, financial statements, bank records, and MyGov/Centrelink account summaries: core for Staged Arson, Staged Theft / Malicious Damage, Staged Collision, and Staged Theft/Malicious Damage. For these investigation types these documents MUST be requested in every instance — no factual hook required.
 
     When in doubt about whether a document type is a core methodology item, apply the following test: would a reasonable investigator ALWAYS request this document type for this investigation type, regardless of specific case facts? YES → include it. NO → require a specific factual hook.
 
@@ -131,6 +136,8 @@ BEFORE listing any documents, you MUST understand these rules. Violating these r
     6. Tenancy/rental documents: INCLUDE ONLY when the party is a tenant. Exclude for owner-occupiers.
     7. Contract of sale: INCLUDE ONLY when the party is a buyer or seller. Exclude for tenants.
     8. CCTV footage: INCLUDE ONLY if INITIAL REVIEW or ADDITIONAL INFORMATION explicitly mentions cameras, CCTV, footage, surveillance, or video recording at or near the incident location.
+    9. MyGov account summaries, Centrelink statements, tax information, and tax returns: INCLUDE ONLY if fraud or financial motive is alleged in INITIAL REVIEW or ADDITIONAL INFORMATION.
+    10. Phone records, telephone records, bank statements, and financial statements: INCLUDE ONLY if EITHER (a) fraud or financial motive is alleged in INITIAL REVIEW or ADDITIONAL INFORMATION, OR (b) INITIAL REVIEW or ADDITIONAL INFORMATION disputes or questions whether the incident occurred, including whether the incident happened at all or as described. When the event occurrence is undisputed and no fraud is alleged, movements and financial position are irrelevant — exclude.
 
     If a document type DOES appear in the HARD EXCLUSIONS list above AND you cannot find the stated fact in INITIAL REVIEW or ADDITIONAL INFORMATION, you MUST EXCLUDE it. Do not rationalise: absence of evidence IS evidence of irrelevance.
 **RULE 4 - NO DUPLICATES**: Each piece of information must appear under exactly one document type. If the same information could fall under multiple document types, place it under the most specific one and exclude it from the others. Compound aggregator entries titled "other documents", "additional evidence", "other supporting documents" or similar catch-alls that re-aggregate items already requested under another entry are NOT permitted – every required document must live under its own specific entry.

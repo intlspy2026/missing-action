@@ -1337,6 +1337,7 @@ def get_graph(llm: BaseChatModel) -> StateGraph:
                 initial_review=initial_review,
                 additional_info=additional_info,
                 knowledge=knowledge_json,
+                investigation_type=investigation_type_str,
                 format=parser.get_format_instructions(),
             )
             relevance_prompts = [SystemMessage(content=system_prompt),
