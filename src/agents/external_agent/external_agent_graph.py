@@ -1277,6 +1277,10 @@ def get_graph(llm: BaseChatModel) -> StateGraph:
             knowledge_block = SECTION_FEEDBACK_KNOWLEDGE_BLOCK.format(
                 knowledge=cached_knowledge) if cached_knowledge else ""
 
+            investigation_types = state.get("investigation_type", []) or []
+            investigation_type_str = ", ".join(investigation_types)
+            investigation_type_block = f"<INVESTIGATION TYPE>\n{investigation_type_str}\n</INVESTIGATION TYPE>" if investigation_type_str else ""
+
             prompt = SECTION_FEEDBACK_PROMPT.format(
                 section_name="document requests",
                 prev_version=prev_version_json,
@@ -1285,7 +1289,7 @@ def get_graph(llm: BaseChatModel) -> StateGraph:
                 additional_info=additional_info,
                 knowledge_block=knowledge_block,
                 gold_standards_block=gold_standards_block,
-                investigation_type_block="",
+                investigation_type_block=investigation_type_block,
                 format=parser.get_format_instructions(),
             )
             prompts = [SystemMessage(content=system_prompt),
