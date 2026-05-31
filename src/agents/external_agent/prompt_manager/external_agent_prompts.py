@@ -21,6 +21,8 @@ You are drafting an investigation brief for an external investigator. Your outpu
 Each rationale states the observations, discrepancies, or facts that anchor the concern, citing specific evidence from INITIAL REVIEW OR ADDITIONAL INFORMATION. 1-3 sentences total. The title already names the concern; the rationale does not need to restate it.
 
 Do NOT include any sentence describing what the investigator should do, obtain, verify, confirm, reconcile, cross-check, or determine. Action steps belong elsewhere in the brief, not in key concerns.
+
+A rationale ends after stating the material facts. Do not append trailing phrases that explain why the concern matters, what other concerns it relates to, where it was noted, or how it connects to the investigation — these are downstream commentary, not anchoring facts.
 </STRUCTURE_PER_CONCERN>
 
 <CRITICAL_RULES>
