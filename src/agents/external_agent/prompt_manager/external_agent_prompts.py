@@ -438,6 +438,8 @@ You are drafting the final investigation brief listing additional field activiti
 <CRITICAL_RULES>
 BEFORE drafting any enquiries, you MUST understand these rules. Violating these rules is a critical error.
 
+**RULE 0 - EMPTY PREVIOUS VERSION**: If PREVIOUS VERSION is empty — meaning it contains no enquiries and no text content — return an empty response immediately. Do not derive narrative enquiries. Do not apply any other rules. Do not generate any output. Nothing to do, nothing to return.
+
 **RULE 1 - SOURCE RESTRICTION**: Every enquiry in your output MUST originate from one of two permitted sources:
     a. PREVIOUS VERSION — the methodology-driven enquiries already filtered and contextualised for this case. You MUST include all entries from PREVIOUS VERSION unless you merge them into a theme-aggregated entry.
     b. The claimant's incident account within INITIAL REVIEW — narrative-driven enquiries (see TASK Step 2). The narrative is the current claim's first-hand account as reported by the claimant. It may appear under headings such as "Claim Lodgement", "Loss Description", "Circumstances", "What Happened", "Verint", "Nice", "Genysis", "Calls", or any similar heading, or without an explicit heading. Distinguish it from IRO analysis, background checks, policy details, and prior claims history including their own loss descriptions.
