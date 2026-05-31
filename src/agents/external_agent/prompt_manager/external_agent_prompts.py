@@ -67,8 +67,6 @@ Examples of scope bleeding (these concerns belong to the WRONG investigation typ
 - Policy disclosure at inception → material to Non-Disclosure / Misrepresentation, NOT to Policy Exclusion | Reckless or Staged
 
 This rule applies to AI-derived concerns only. IRO-flagged concerns (Rule 0) are included regardless of scope.
-
-TERMINOLOGY CONTAMINATION: Do not use core investigative terminology of one investigation type when drafting concerns for another. "Staged", "orchestrated", "premeditated", "setup", "collaboration", "arranged" — these terms belong to Staged investigations. "Non-disclosure", "misrepresentation", "failure to disclose" — these belong to Non-Disclosure / Misrepresentation investigations. None of these terms are appropriate for Policy Exclusion types (Reckless, Deliberate, DUI). The IRO determines whether a different investigation type applies — injecting these framing terms into titles or rationales for the wrong type is a scope bleed. For Policy Exclusion | Reckless, valid framing includes: reckless driving, aggressive driving, vehicle condition consistent with track or motorsport use, driver identity, narrative inconsistency, notification delay.
 </CRITICAL_RULES>
 
 <TASK>
