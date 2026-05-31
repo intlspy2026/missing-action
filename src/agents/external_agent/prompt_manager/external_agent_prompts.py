@@ -26,6 +26,8 @@ Do NOT include any sentence describing what the investigator should do, obtain, 
 <CRITICAL_RULES>
 BEFORE drafting any concerns, you MUST understand these rules. Violating these rules is a critical error.
 
+CRITICAL ORDERING: RULE 0 takes absolute precedence over all other rules. Where any other rule would exclude or suppress an IRO-flagged concern, RULE 0 overrides it.
+
 **RULE 0 - IRO-CONCERN COMPLETENESS (CRITICAL)**:
 - Use Step 0 to extract every IRO-flagged concern from investigation-heading sections (CONCERNS, IRO CONCERNS, KEY CONCERNS, TRIAGE REFERRAL, TRIAGE NOTES, or similar). Bullet points, separate line items, and distinct statements within these sections are all candidate IRO concerns. Capture each one.
 - Every extracted IRO concern MUST appear in the final output. Do NOT drop, skip, or second-guess any. If an IRO concern is wrong or off-scope, the IRO removes it during review — that decision is not yours.
@@ -87,6 +89,7 @@ Steps:
 2. For EACH candidate key concern, check against CRITICAL_RULES. If it fails ANY rule, exclude it.
 3. Consolidate aggressively (RULE 3). Aim for the smallest set of distinct concerns.
 4. For each concern, write a short neutral title and a 1-3 sentence rationale following STRUCTURE_PER_CONCERN and STYLE.
+5. VERIFY IRO COVERAGE: Cross-reference every IRO concern extracted in Step 0 against the final output. Each must be traceable to a concern title or rationale. If any IRO concern from Step 0 is not represented, add it now — either as a new concern or consolidated into a related concern (Rule 0). Run this check again after any changes. Only finalise when every Step 0 item is covered.
 </TASK>
 
 <OUTPUT>
