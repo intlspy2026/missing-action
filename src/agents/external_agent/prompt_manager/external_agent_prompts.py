@@ -26,7 +26,12 @@ Do NOT include any sentence describing what the investigator should do, obtain, 
 <CRITICAL_RULES>
 BEFORE drafting any concerns, you MUST understand these rules. Violating these rules is a critical error.
 
-**RULE 0 - IRO-CONCERN COMPLETENESS (CRITICAL)**: The INITIAL REVIEW contains concerns the IRO has already identified under investigation-heading language such as CONCERNS, IRO CONCERNS, KEY CONCERNS, TRIAGE REFERRAL, TRIAGE NOTES, or similar headings. Every IRO-flagged concern MUST appear as a concern in your output. Do NOT second-guess, filter out, or drop any concern the IRO has already raised — even if it appears borderline, duplicative, or off-scope for the investigation type. It is the IRO's responsibility to remove it during review, not yours. IRO-flagged concerns absorb supporting evidence (Rule 3e) and may be consolidated with each other when they share the same subject, but MUST remain distinct entries from AI-derived concerns.
+**RULE 0 - IRO-CONCERN COMPLETENESS (CRITICAL)**:
+- Use Step 0 to extract every IRO-flagged concern from investigation-heading sections (CONCERNS, IRO CONCERNS, KEY CONCERNS, TRIAGE REFERRAL, TRIAGE NOTES, or similar). Bullet points, separate line items, and distinct statements within these sections are all candidate IRO concerns. Capture each one.
+- Every extracted IRO concern MUST appear in the final output. Do NOT drop, skip, or second-guess any. If an IRO concern is wrong or off-scope, the IRO removes it during review — that decision is not yours.
+- IRO concerns MAY be consolidated with each other when they share the same subject (apply Rule 3a-e merge tests). The consolidated concern's title and rationale must cover the substance of all merged IRO points. A bullet about tyre wear and a bullet about rubber melting can consolidate into one concern about vehicle condition consistent with track use — this is valid.
+- IRO concerns MUST NOT be absorbed into AI-derived concerns. Absorption is when an IRO's substantive point disappears into an AI-generated concern whose title reframes it with different investigation-type terminology. Example: the IRO flagged "tyre condition consistent with track day usage" and this ends up inside a concern titled "Staged incident" — the IRO's point has been absorbed into AI-invented framing. This is a violation. The IRO point must remain distinguishable in the concern title or rationale.
+- IRO concerns absorb supporting evidence (Rule 3e) but retain the IRO's own framing — supporting evidence folds into the IRO concern, not the other way around.
 
 **RULE 1 - PARTY SCOPE**: Only raise concerns about parties directly involved in the current claim under investigation. Individuals from prior claims, historical associations, or background checks are NOT parties to the current claim unless they are also named on it. Do not raise concerns about individuals who are not direct parties to the current claim. This includes concerns framed as "connections to", "associations with", or "involvement of" non-parties. If someone is not a direct party to the current claim, they must not be the subject of any concern.
 
@@ -62,6 +67,8 @@ Examples of scope bleeding (these concerns belong to the WRONG investigation typ
 - Policy disclosure at inception → material to Non-Disclosure / Misrepresentation, NOT to Policy Exclusion | Reckless or Staged
 
 This rule applies to AI-derived concerns only. IRO-flagged concerns (Rule 0) are included regardless of scope.
+
+TERMINOLOGY CONTAMINATION: Do not use core investigative terminology of one investigation type when drafting concerns for another. "Staged", "orchestrated", "premeditated", "setup", "collaboration", "arranged" — these terms belong to Staged investigations. "Non-disclosure", "misrepresentation", "failure to disclose" — these belong to Non-Disclosure / Misrepresentation investigations. None of these terms are appropriate for Policy Exclusion types (Reckless, Deliberate, DUI). The IRO determines whether a different investigation type applies — injecting these framing terms into titles or rationales for the wrong type is a scope bleed. For Policy Exclusion | Reckless, valid framing includes: reckless driving, aggressive driving, vehicle condition consistent with track or motorsport use, driver identity, narrative inconsistency, notification delay.
 </CRITICAL_RULES>
 
 <TASK>
@@ -77,6 +84,7 @@ The following are NOT key concerns and must not appear as standalone entries in 
 Both sources contain a mix of relevant concerns and irrelevant background – your job is to FILTER and consolidate.
 
 Steps:
+0. EXTRACT IRO CONCERNS: Before generating anything, scan INITIAL REVIEW for investigation-heading sections (CONCERNS, IRO CONCERNS, KEY CONCERNS, TRIAGE REFERRAL, TRIAGE NOTES, or similar language). Extract EVERY bullet point, line item, and distinct statement within these sections. These are non-negotiable — every one must appear in the final output (RULE 0 governs how).
 1. Identify potential key concerns from INITIAL REVIEW and ADDITIONAL INFORMATION.
 2. For EACH candidate key concern, check against CRITICAL_RULES. If it fails ANY rule, exclude it.
 3. Consolidate aggressively (RULE 3). Aim for the smallest set of distinct concerns.
