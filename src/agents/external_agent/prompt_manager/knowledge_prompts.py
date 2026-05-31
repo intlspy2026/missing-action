@@ -107,6 +107,11 @@ string. Empty string if the textbook has no qualifier.
 - Maintain the order given in the textbook.
 
 # Rules
+- The following investigation types have NO additional enquiries and MUST return an empty JSON array:
+  - Non Disclosure misrepresentation | Criminal History
+  - Non Disclosure misrepresentation | Demolition
+  - Non Disclosure misrepresentation | Claim and Insurance History
+  - Non Disclosure misrepresentation | Use of property
 - Preserve enquiry text verbatim. Fix only obvious truncation or typos.
 - Extract ALL relevant items. Missing items will make the response incomplete.
 - Do NOT extract preamble prose (e.g., "Include all additional enquiries to be completed by the External Agent.") – only the enquiry items themselves.
