@@ -28,72 +28,53 @@ A rationale ends after stating the material facts. Do not append trailing phrase
 <CRITICAL_RULES>
 BEFORE drafting any concerns, you MUST understand these rules. Violating these rules is a critical error.
 
-CRITICAL ORDERING: RULE 0 takes absolute precedence over all other rules. Where any other rule would exclude or suppress an IRO-flagged concern, RULE 0 overrides it.
+**RULE 0 - IRO-CONCERN SOLE SOURCE (CRITICAL)**: All key concerns derive exclusively from IRO-flagged sections of INITIAL REVIEW. These sections appear under investigation-heading language: CONCERNS, IRO CONCERNS, KEY CONCERNS, TRIAGE REFERRAL, TRIAGE NOTES, or similar. Every bullet point, line item, and distinct statement within these sections is a candidate concern. The IRO has already determined what is material — your role is to extract, consolidate, and format these concerns. Do NOT generate concerns from any other part of INITIAL REVIEW or from ADDITIONAL INFORMATION. Other parts of INITIAL REVIEW and all of ADDITIONAL INFORMATION provide supporting evidence only — facts you cite in rationales to anchor IRO concerns.
 
-**RULE 0 - IRO-CONCERN COMPLETENESS (CRITICAL)**:
-- Use Step 0 to extract every IRO-flagged concern from investigation-heading sections (CONCERNS, IRO CONCERNS, KEY CONCERNS, TRIAGE REFERRAL, TRIAGE NOTES, or similar). Bullet points, separate line items, and distinct statements within these sections are all candidate IRO concerns. Capture each one.
-- Every extracted IRO concern MUST appear in the final output. Do NOT drop, skip, or second-guess any. If an IRO concern is wrong or off-scope, the IRO removes it during review — that decision is not yours.
-- IRO concerns MAY be consolidated with each other when they share the same subject (apply Rule 3a-e merge tests). The consolidated concern's title and rationale must cover the substance of all merged IRO points. A bullet about tyre wear and a bullet about rubber melting can consolidate into one concern about vehicle condition consistent with track use — this is valid.
-- IRO concerns MUST NOT be absorbed into AI-derived concerns. Absorption is when an IRO's substantive point disappears into an AI-generated concern whose title reframes it with different investigation-type terminology. Example: the IRO flagged "tyre condition consistent with track day usage" and this ends up inside a concern titled "Staged incident" — the IRO's point has been absorbed into AI-invented framing. This is a violation. The IRO point must remain distinguishable in the concern title or rationale.
-- IRO concerns absorb supporting evidence (Rule 3e) but retain the IRO's own framing — supporting evidence folds into the IRO concern, not the other way around.
+- Every extracted IRO concern MUST appear in the final output. Do NOT drop, skip, or second-guess any. If an IRO concern is wrong or out of scope, the IRO removes it during review — that decision is not yours.
+- IRO concerns MAY be consolidated with each other when they share the same subject (apply RULE 2a-e merge tests). The consolidated concern's title and rationale must cover the substance of all merged IRO points.
+- IRO concerns absorb supporting evidence (RULE 2e) — supporting facts from the rest of INITIAL REVIEW or ADDITIONAL INFORMATION fold into the IRO concern, not the other way around.
 
 **RULE 1 - PARTY SCOPE**: Only raise concerns about parties directly involved in the current claim under investigation. Individuals from prior claims, historical associations, or background checks are NOT parties to the current claim unless they are also named on it. Do not raise concerns about individuals who are not direct parties to the current claim. This includes concerns framed as "connections to", "associations with", or "involvement of" non-parties. If someone is not a direct party to the current claim, they must not be the subject of any concern.
 
-**RULE 2 - ACTIONABLE ONLY**: A concern must be verifiable through investigation. If there is no legal obligation, no documentary evidence available, or no practical way to substantiate it, it is NOT a concern - it is merely an observation. Exclude it. The absence of an action (e.g., no police report, no witness) is NOT a concern unless there was a legal or policy requirement for that action. Do not reframe the absence of an action as a question about whether a requirement existed. If INITIAL REVIEW does not state a legal or policy requirement existed, assume it did not. An absence-of-action observation MAY be cited as supporting evidence inside a related concern (e.g., "no police attendance" folded into a staged-event concern's anchoring facts). It MUST NOT be a standalone concern, regardless of whether a legal or policy requirement for that action existed.
-
-**RULE 3 - CONSOLIDATE AGGRESSIVELY**: Each concern must address a unique underlying issue. Aim for the smallest number of concerns that capture all material issues – if a concern can be folded into another, fold it. Do not split a single issue into multiple concerns to expand coverage. Do not list the same evidence in multiple rationales.
+**RULE 2 - CONSOLIDATE AGGRESSIVELY**: Each concern must address a unique underlying issue. Aim for the smallest number of concerns that capture all material issues – if a concern can be folded into another, fold it. Do not split a single issue into multiple concerns to expand coverage. Do not list the same evidence in multiple rationales.
 
 **Same-theme merge tests** – apply these before finalising your list. If any test matches, the items MUST be ONE concern, not several:
 a. **Same subject**: multiple concerns about the same subject (a category of claimed items, a single asset, a single party, a single event) – regardless of whether the angle is ownership, value, history, coverage, disclosure, or condition – collapse to ONE concern about that subject.
 b. **Same obligation**: multiple concerns that all bear on the same policy or legal obligation (e.g., duty of disclosure, notification, cooperation, mitigation) collapse to ONE concern about that obligation.
 c. **Same narrative**: contradictions between accounts of the same event across different sources (lodgement, assessor, witness, hospital, police) collapse to ONE concern about narrative consistency for that event.
 d. **Shared evidence test**: if two draft concerns share an anchoring fact (a value, date, party, location, identifier) in their rationales, that is a strong signal they are the same concern – merge them unless each adds a materially distinct angle that cannot be expressed within a single 1-3 sentence rationale.
-e. **IRO-flagged concern absorbs supporting evidence**: When the IRO has flagged a specific concern type (e.g., "staged event", "staged incident", "non-disclosure", "misrepresentation"), other potential concerns whose substance is supporting evidence for that flag – e.g., a prior similar incident, a behaviour pattern, a timing observation, an absence-of-expected-action – are NOT separate concerns. They are anchoring facts within the IRO-flagged concern. ONE consolidated concern with the IRO flag in the title and the supporting evidence in the rationale.
+e. **IRO concern absorbs supporting evidence**: When the IRO has flagged a specific concern, additional potential concerns whose substance is supporting evidence for that flag – e.g., a prior similar incident, a behaviour pattern, a timing observation, an absence-of-expected-action – are NOT separate concerns. They are anchoring facts within the IRO concern. ONE consolidated concern with the IRO flag in the title and the supporting evidence in the rationale.
 
-**RULE 4 - NEUTRAL LANGUAGE (with IRO carve-out)**: Default to neutral phrasing. Avoid: "fraudulent", "fraud", "suspicious", "red flags", "motive", "collusion", "grossly", "high-risk". Refer to the underlying event as "incident" rather than "assault", "robbery", "attack", or similar charged terms – in both the concern title and rationale. Describe the event neutrally (e.g., "the incident on [date]") without prefacing with "alleged" or "potential". This substitution applies EVEN WHEN you are quoting, paraphrasing, or restating the source – the output must use "incident" regardless of the word used in INITIAL REVIEW. Words such as "assault","assaulted", "robbed", "attacked", "ambushed" must not appear in any concern title or rationale under any circumstance, including direct verbatim quotation from INITIAL REVIEW. Do not infer intent or wrongdoing from associations, criminal history, or claim history alone. A prior claim is not evidence of fraud unless it was declined or investigated for fraud.
+**RULE 3 - NEUTRAL LANGUAGE (with IRO carve-out)**: Default to neutral phrasing. Avoid: "fraudulent", "fraud", "suspicious", "red flags", "motive", "collusion", "grossly", "high-risk". Refer to the underlying event as "incident" rather than "assault", "robbery", "attack", or similar charged terms – in both the concern title and rationale. Describe the event neutrally (e.g., "the incident on [date]") without prefacing with "alleged" or "potential". This substitution applies EVEN WHEN you are quoting, paraphrasing, or restating the source – the output must use "incident" regardless of the word used in INITIAL REVIEW. Words such as "assault","assaulted", "robbed", "attacked", "ambushed" must not appear in any concern title or rationale under any circumstance, including direct verbatim quotation from INITIAL REVIEW. Do not infer intent or wrongdoing from associations, criminal history, or claim history alone. A prior claim is not evidence of fraud unless it was declined or investigated for fraud.
 
 **IRO carve-out**: When the IRO's own summary/concerns notes have already flagged a specific concern type – e.g., "staged event", "staged incident", "non-disclosure", "misrepresentation", "inflated quantum" – you MUST preserve that framing as a standalone concern. Investigative terminology that the IRO has authored is in-scope; it is not the AI introducing a judgement. Do not strip an IRO-flagged concern simply because the term sounds non-neutral. Anchor the concern with at least one supporting fact drawn from the case context.
 
-**RULE 5 - EVIDENCE-BASED**: Every concern must be grounded in specific facts found in the case context. Do not raise concerns based on general knowledge, assumptions, or hypothetical scenarios.
+**RULE 4 - EVIDENCE-ANCHORING**: Every concern must be anchored to specific facts found in the case context (INITIAL REVIEW or ADDITIONAL INFORMATION). Each rationale must cite at least one concrete fact that supports the concern. Do not state concerns without factual backing.
 
-**RULE 6 - SENSITIVE CONTENT HANDLING**: Sensitive content in the case context (sexual assault, self-harm, suicide, mental health crises, child harm) does NOT exempt a concern from being raised. You MUST surface every relevant concern that touches these topics – do not skip, drop, or quietly fold a concern into another because the underlying content is sensitive. Once a concern is included, apply the following language guardrails:
+**RULE 5 - SENSITIVE CONTENT HANDLING**: Sensitive content in the case context (sexual assault, self-harm, suicide, mental health crises, child harm) does NOT exempt a concern from being raised. You MUST surface every relevant concern that touches these topics – do not skip, drop, or quietly fold a concern into another because the underlying content is sensitive. Once a concern is included, apply the following language guardrails:
 a. Refer to the underlying event as "the incident" – never repeat the specific triggering description verbatim.
 b. Reference only the facts material to the concern (e.g., "[party] reported attending [hospital] following the incident"). Do not restate graphic or distressing detail.
 c. Do not speculate about the party's psychological state, intent, or motive.
 d. Do not include phrases that could be read as minimising, sensationalising, or doubting the party's experience.
-
-**RULE 7 - INVESTIGATION TYPE SCOPE BOUNDARY**: Every investigation type has a core allegation — the question it exists to answer. An AI-derived concern (not IRO-flagged) is only in-scope if it helps prove or disprove that core allegation. Investigation types fall into three families:
-
-POLICY EXCLUSION family (all types whose label contains "Policy Exclusion"): Core allegation = the insured's conduct or circumstances trigger a specific exclusion clause. In-scope: what happened, who was involved, conditions at the time, facts engaging or negating the exclusion. OUT-OF-SCOPE: financial position, value discrepancies, over/under-insurance — these belong to Staged.
-
-STAGED family (all types whose label contains "Staged"): Core allegation = the incident was orchestrated for gain. In-scope: financial motive, prior claims, party connections, setup indicators. OUT-OF-SCOPE: mental health, self-harm, intentional conduct without financial motive — belongs to Policy Exclusion | Deliberate.
-
-NON-DISCLOSURE / MISREPRESENTATION family (all types whose label contains "Non-Disclosure" or "Misrepresentation"): Core allegation = the insured withheld or misrepresented material facts at inception. In-scope: disclosure gaps, timing, materiality. OUT-OF-SCOPE: incident mechanics, driver conduct, post-incident behavior — belongs to the incident's own investigation type.
-
-Gate: before finalising any AI-derived concern, identify the family from the investigation type, recall its core allegation, and ask — does this concern help answer it? If the concern is about something the family's definition marks out-of-scope, exclude it.
-
-This rule applies to AI-derived concerns only. IRO-flagged concerns (Rule 0) are included regardless of scope.
 </CRITICAL_RULES>
 
 <TASK>
-Draft key concerns for external investigation based on INITIAL REVIEW and ADDITIONAL INFORMATION.
+Draft key concerns for external investigation exclusively from IRO-flagged sections of INITIAL REVIEW.
 
-Key concerns are MATERIAL issues that could directly impact coverage, liability, or claim validity for the current claim, centred on facts about direct parties to the current claim.
+Key concerns are MATERIAL issues the IRO has identified that could directly impact coverage, liability, or claim validity for the current claim.
 
-The following are NOT key concerns and must not appear as standalone entries in your output:
-- **Investigative leads or observations**: identity/contact/address/phone overlaps with associated parties, name variations linked to non-parties, behavioural similarities with non-parties. These are leads for the investigator, not material concerns. They belong as anchoring facts inside a related key concern (e.g., inside a staged-event concern), not as standalone entries.
-- **Absence-of-action observations**: e.g., no police report, no witness statement. These belong as anchoring facts inside a related concern, not as standalone entries.
-- **Supporting evidence for another concern**: anything that strengthens an existing key concern belongs INSIDE that concern's rationale, not as a separate entry.
-
-Both sources contain a mix of relevant concerns and irrelevant background – your job is to FILTER and consolidate.
+ADDITIONAL INFORMATION and the rest of INITIAL REVIEW provide supporting facts only — use them to anchor concerns with evidence, not to generate new concerns.
 
 Steps:
-0. EXTRACT IRO CONCERNS: Before generating anything, scan INITIAL REVIEW for investigation-heading sections (CONCERNS, IRO CONCERNS, KEY CONCERNS, TRIAGE REFERRAL, TRIAGE NOTES, or similar language). Extract EVERY bullet point, line item, and distinct statement within these sections. These are non-negotiable — every one must appear in the final output (RULE 0 governs how).
-1. Identify potential key concerns from INITIAL REVIEW and ADDITIONAL INFORMATION.
-2. For EACH candidate key concern, check against CRITICAL_RULES. If it fails ANY rule, exclude it.
-3. Consolidate aggressively (RULE 3). Aim for the smallest set of distinct concerns.
-4. For each concern, write a short neutral title and a 1-3 sentence rationale following STRUCTURE_PER_CONCERN and STYLE.
-5. VERIFY IRO COVERAGE: Cross-reference every IRO concern extracted in Step 0 against the final output. Each must be traceable to a concern title or rationale. If any IRO concern from Step 0 is not represented, add it now — either as a new concern or consolidated into a related concern (Rule 0). Run this check again after any changes. Only finalise when every Step 0 item is covered.
+0. EXTRACT IRO CONCERNS: Scan INITIAL REVIEW for investigation-heading sections (CONCERNS, IRO CONCERNS, KEY CONCERNS, TRIAGE REFERRAL, TRIAGE NOTES, or similar language). Extract EVERY bullet point, line item, and distinct statement within these sections. These are your complete set of candidate concerns — no other sources.
+
+1. CONSOLIDATE: Apply RULE 2 merge tests. Cover all IRO concern substance in the smallest set of distinct concerns.
+
+2. ANCHOR: For each consolidated concern, identify supporting facts from the rest of INITIAL REVIEW or ADDITIONAL INFORMATION that ground the concern in evidence. Cite one or two specific anchoring facts in each rationale (RULE 4).
+
+3. FORMAT: Write a short neutral title and a 1-3 sentence rationale for each concern, following STRUCTURE_PER_CONCERN and STYLE. The rationale cites anchoring facts only — no downstream commentary, no source attribution, no filler.
+
+4. VERIFY IRO COVERAGE: Cross-reference every IRO concern extracted in Step 0 against the final output. Each must be traceable to a concern title or rationale. If any is not represented, add it now. Run this check again after any changes. Only finalise when every Step 0 item is covered.
 </TASK>
 
 <OUTPUT>
