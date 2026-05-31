@@ -62,13 +62,15 @@ b. Reference only the facts material to the concern (e.g., "[party] reported att
 c. Do not speculate about the party's psychological state, intent, or motive.
 d. Do not include phrases that could be read as minimising, sensationalising, or doubting the party's experience.
 
-**RULE 7 - INVESTIGATION TYPE SCOPE BOUNDARY**: The investigation type defines WHAT is being investigated. Every AI-derived concern (not IRO-flagged) must address the core allegation of THIS investigation type. Before finalising each AI-derived concern, apply this gate: "Would a reasonable investigator consider this concern material to investigating [investigation type]?" If the answer is NO, exclude it — the concern bleeds scope from a different investigation type.
+**RULE 7 - INVESTIGATION TYPE SCOPE BOUNDARY**: Every investigation type has a core allegation — the question it exists to answer. An AI-derived concern (not IRO-flagged) is only in-scope if it helps prove or disprove that core allegation. Investigation types fall into three families:
 
-Examples of scope bleeding (these concerns belong to the WRONG investigation type):
-- Under/over-insurance or agreed value discrepancies → material to Staged (financial motive), NOT to Policy Exclusion | Reckless (driving conduct)
-- Mental health, self-harm, or personal crisis → material to Policy Exclusion | Deliberate (personal intent), NOT to Staged (financial orchestration)
-- Staged-event patterns or orchestration indicators → material to Staged (premeditation), NOT to Policy Exclusion | Deliberate (personal intent)
-- Policy disclosure at inception → material to Non-Disclosure / Misrepresentation, NOT to Policy Exclusion | Reckless or Staged
+POLICY EXCLUSION family (all types whose label contains "Policy Exclusion"): Core allegation = the insured's conduct or circumstances trigger a specific exclusion clause. In-scope: what happened, who was involved, conditions at the time, facts engaging or negating the exclusion. OUT-OF-SCOPE: financial position, value discrepancies, over/under-insurance — these belong to Staged.
+
+STAGED family (all types whose label contains "Staged"): Core allegation = the incident was orchestrated for gain. In-scope: financial motive, prior claims, party connections, setup indicators. OUT-OF-SCOPE: mental health, self-harm, intentional conduct without financial motive — belongs to Policy Exclusion | Deliberate.
+
+NON-DISCLOSURE / MISREPRESENTATION family (all types whose label contains "Non-Disclosure" or "Misrepresentation"): Core allegation = the insured withheld or misrepresented material facts at inception. In-scope: disclosure gaps, timing, materiality. OUT-OF-SCOPE: incident mechanics, driver conduct, post-incident behavior — belongs to the incident's own investigation type.
+
+Gate: before finalising any AI-derived concern, identify the family from the investigation type, recall its core allegation, and ask — does this concern help answer it? If the concern is about something the family's definition marks out-of-scope, exclude it.
 
 This rule applies to AI-derived concerns only. IRO-flagged concerns (Rule 0) are included regardless of scope.
 </CRITICAL_RULES>
