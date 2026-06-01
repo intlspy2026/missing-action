@@ -250,7 +250,8 @@ def get_graph(llm: BaseChatModel) -> StateGraph:
     def _classify_hitl(
         hitl_text: str,
         hitl_artifact: dict[str, Any],
-        prev_task: str
+        prev_task: str,
+        pending_step: str = ""
     ) -> HITLDecision:
         """
         Classification rules:
@@ -265,11 +266,20 @@ def get_graph(llm: BaseChatModel) -> StateGraph:
         #    # Treat plain text as feedback by default (this matches your stated behavior)
         #    return HITLDecision(intent="feedback", hitl_text.strip())
 
+        _step_to_section = {
+            "key_concerns_review": "Key Concerns",
+            "doc_request_review": "Document Requests",
+            "enquiries_review": "Additional Enquiries",
+            "interview_plan_review": "Interview Plan",
+        }
+        section_name = _step_to_section.get(pending_step, "")
+
         parser = PydanticOutputParser(pydantic_object=HITLDecision)
         prompt = f"""
         You are routing and summarising the next task for a human-in-the-loop response for an insurance fraud external agent instruction workflow. The task should either be to draft instructions, or to edit based on user feedback.
 
         Previous task: {prev_task}
+        Current review section: {section_name if section_name else "<unknown>"}
 
         Human response text:
         {hitl_text if hitl_text else "<empty>"}
@@ -279,8 +289,8 @@ def get_graph(llm: BaseChatModel) -> StateGraph:
 
         Classify intent:
         - "accept": user accepts OR the artifact has been provided back with no human response text OR the artifact's reviewed section came back empty AND the user's text declines to add anything (e.g. "no", "no need", "skip", "nothing to add", "leave empty", "that's fine").
-        - "feedback": user gives feedback that mentions which section, concern, document, enquiry, or item the change applies to — even loosely (e.g. "change John to Jerry in phone records" names a section, so apply it everywhere within that section).
-        - "ambiguous": user gives feedback with no indication of WHERE to apply it — no section, no item, no context clue (e.g. "change the date from 22 Apr to 25 May" gives no location). In this case, write a clarifying question in task_summary asking the user which section or item they want updated.
+        - "feedback": user gives feedback that mentions which section, concern, document, enquiry, or item the change applies to — even loosely (e.g. "change John to Jerry in phone records" names a section, so apply it everywhere within that section). If the Current review section provides context (e.g. user says "add enquiry", "remove the second document", "change the date" while viewing a specific review page), classify as feedback — the section context resolves the target. A generic command that naturally applies to the current section IS feedback, not ambiguous.
+        - "ambiguous": user gives feedback with no indication of WHERE to apply it — no section, no item, and the Current review section does not resolve it (e.g. "change the date from 22 Apr to 25 May" with no section context at all). Only mark ambiguous when there is truly no locatable target even WITH the section context. In this case, write a clarifying question in task_summary asking the user which section or item they want updated.
         - "unrelated": user asks something unrelated.
 
         Summarise the task:
@@ -953,7 +963,7 @@ def get_graph(llm: BaseChatModel) -> StateGraph:
         )
         prev_task = prev_decision.task_summary if prev_decision else ""
 
-        hitl_decision = _classify_hitl(hitl_text, incoming_artifact, prev_task)
+        hitl_decision = _classify_hitl(hitl_text, incoming_artifact, prev_task, pending_step)
         hitl_artifact = _resolve_hitl_artifact(
             state, pending_step, incoming_artifact, intent=hitl_decision.intent)
 
