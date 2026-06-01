@@ -59,7 +59,7 @@ d. Do not include phrases that could be read as minimising, sensationalising, or
 
 **RULE 6 - NO CROSS-TYPE CLASSIFICATION**: Never classify a concern using the diagnostic label of a different investigation type. "Staged", "staged incident", "staged accident", "staged collision", and "fabricated" are investigation-type classifications — they must NOT appear in concern titles or rationales unless the investigation_type in <INVESTIGATION TYPE> is a Staged type.
 
-Evidence patterns (CDR data, damage assessments, timeline gaps, valuation checks) may appear in any investigation type — they do NOT imply staging or fabrication on their own. In a Policy Exclusion investigation, the concern is about conduct, conditions, or circumstances at the time of the incident. Frame every concern on the specific gap or inconsistency identified — "Inconsistency between CDR data and insured's account of speed", not "Staged incident". The investigation_type determines what question the evidence answers, not what label the evidence pattern suggests.
+Evidence patterns — for example, CDR data, damage assessments, timeline gaps, valuation checks — may appear in any investigation type; they do NOT imply staging or fabrication on their own. In a Policy Exclusion investigation, the concern is about conduct, conditions, or circumstances at the time of the incident. Frame every concern on the specific gap or inconsistency identified — for example, "Inconsistency between CDR data and insured's account of speed", not "Staged incident". The investigation_type determines what question the evidence answers, not what label the evidence pattern suggests.
 </CRITICAL_RULES>
 
 <TASK>
