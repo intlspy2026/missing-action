@@ -118,8 +118,8 @@ BEFORE listing any documents, you MUST understand these rules. Violating these r
 **RULE 3 - RELEVANCE FILTER (INCLUDE-ONLY)**: You START from the position that EVERY document type from INVESTIGATION PROCESSES is EXCLUDED. A document type is INCLUDED ONLY when it is either (i) core to the investigation type — the allegation itself creates a need for it — or (ii) supported by a SPECIFIC FACT in the narrative content of INITIAL REVIEW or ADDITIONAL INFORMATION. Determine the current investigation type from INVESTIGATION TYPE in the context below.
 
     CORE METHODOLOGY ITEMS are document types that are inherent to investigating a given allegation type regardless of case specifics. These ALWAYS pass the relevance filter:
-    - Financial statements, bank records: core for all fraud investigations.
-    - Telephone records, financial statements, bank records, and MyGov/Centrelink account summaries: core for Staged Arson, Staged Theft / Malicious Damage, Staged Collision, and Staged Theft/Malicious Damage. For these investigation types these documents MUST be requested in every instance — no factual hook required.
+    - Traffic history: core for all Motor investigation types — no factual hook required.
+    - Phone records, telephone records, MyGov/Centrelink account summaries, and financial records: core for Staged Arson, Staged Theft / Malicious Damage, Staged Collision, and Staged Theft/Malicious Damage — no factual hook required.
 
     When in doubt about whether a document type is a core methodology item, apply the following test: would a reasonable investigator ALWAYS request this document type for this investigation type, regardless of specific case facts? YES → include it. NO → require a specific factual hook.
 
@@ -142,7 +142,7 @@ BEFORE listing any documents, you MUST understand these rules. Violating these r
     6. Tenancy/rental documents: INCLUDE ONLY when the party is a tenant. Exclude for owner-occupiers.
     7. Contract of sale: INCLUDE ONLY when the party is a buyer or seller. Exclude for tenants.
     8. CCTV footage: INCLUDE ONLY if INITIAL REVIEW or ADDITIONAL INFORMATION explicitly mentions cameras, CCTV, footage, surveillance, or video recording at or near the incident location.
-    9. MyGov account summaries, Centrelink statements, tax information, and tax returns: INCLUDE ONLY if fraud or financial motive is explicitly alleged in INITIAL REVIEW or ADDITIONAL INFORMATION (e.g., "concerns over financial position", "potential fraud", "financial motive suspected").
+    9. MyGov account summaries, Centrelink statements, tax information, and tax returns: INCLUDE ONLY for Staged Arson, Staged Theft / Malicious Damage, Staged Collision, and Staged Theft/Malicious Damage. For all other investigation types, exclude. This supersedes any fraud or financial motive check.
     10. Phone records, telephone records, bank statements, and financial statements: INCLUDE ONLY if INITIAL REVIEW or ADDITIONAL INFORMATION explicitly states that the occurrence of the incident is in question (e.g., the event may not have happened, the claim may be fabricated, or an inconsistency undermines the insured's account), OR fraud or financial motive is explicitly alleged. Needing to confirm the insured's version of events, verifying incidental details, or confirming movements and whereabouts is NOT an occurrence dispute. Without an explicit dispute or fraud statement, exclude.
 
     If a document type DOES appear in the HARD EXCLUSIONS list above AND you cannot find the stated fact in INITIAL REVIEW or ADDITIONAL INFORMATION, you MUST EXCLUDE it. Do not rationalise: absence of evidence IS evidence of irrelevance.
