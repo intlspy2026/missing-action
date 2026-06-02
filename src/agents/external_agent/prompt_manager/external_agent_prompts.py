@@ -149,7 +149,11 @@ BEFORE listing any documents, you MUST understand these rules. Violating these r
     7. Contract of sale: INCLUDE ONLY when the party is a buyer or seller. Exclude for tenants.
     8. CCTV footage: INCLUDE ONLY if INITIAL REVIEW or ADDITIONAL INFORMATION explicitly mentions cameras, CCTV, footage, surveillance, or video recording at or near the incident location.
     9. MyGov account summaries and Centrelink statements: INCLUDE ONLY for Staged Arson, Staged Theft / Malicious Damage, Staged Collision, and Staged Theft/Malicious Damage. For all other investigation types, exclude.
-    10. Phone records, telephone records, bank statements, and financial statements: INCLUDE ONLY if INITIAL REVIEW or ADDITIONAL INFORMATION explicitly states that the occurrence of the incident is in question (e.g., the event may not have happened, the claim may be fabricated, an inconsistency undermines the insured's account, or movements need to be confirmed), OR fraud or financial motive is explicitly alleged. Without an explicit dispute or fraud statement, exclude.
+    10. Phone records, telephone records, bank statements, and financial statements:
+      INCLUDE ONLY if INITIAL REVIEW or ADDITIONAL INFORMATION:
+      - shows the insured's account of the incident is inconsistent or in question (e.g., physical evidence contradicts the account, key facts about who was involved are unclear, the version of events is inconsistent, or movements and whereabouts need verification), OR
+      - explicitly alleges fraud or financial motive.
+      Without one of these gates, exclude.
 
     If a document type DOES appear in the HARD EXCLUSIONS list above AND you cannot find the stated fact in INITIAL REVIEW or ADDITIONAL INFORMATION, you MUST EXCLUDE it. Do not rationalise: absence of evidence IS evidence of irrelevance.
 **RULE 4 - NO DUPLICATES**: Each piece of information must appear under exactly one document type. If the same information could fall under multiple document types, place it under the most specific one and exclude it from the others. Compound aggregator entries titled "other documents", "additional evidence", "other supporting documents", "Documents to confirm duty of disclosure questions/misrepresentation", or similar catch-alls that re-aggregate items already requested under another entry are NOT permitted – every required document must live under its own specific entry.
