@@ -54,13 +54,12 @@ Stop markers:
 If neither stop marker is found after the located section, the entire remainder of the chunk is in scope.
 
 # Instructions
-1. **Locate the investigation type/sub-type section.** Search the chunk for the given investigation type and sub-type (if any).
+1. **Locate the Document Request section.** The chunk contains a Document Request section — the content after any preamble prose (e.g., "Documents are requested from all policy holders..."). Within this section, search for the given investigation type/sub-type.
    - The investigation type may include a sub-type separated by "|". If a sub-type is given, extract ONLY items relevant to that sub-type.
-   - For example, for "Policy Exclusions | DUI", extract only DUI-related documents even if the textbook also lists items for other Policy Exclusions
-     sub-types.
-   - If no sub-type is given, extract every document item under the investigation type.
-   - Once the target section is located, scan forward from this position for the earliest stop marker (see CRITICAL rules above). Extraction is bounded
-     by: section start → the earlier of {stop marker position, end of chunk}.
+   - For example, for "Policy Exclusions | DUI", extract only DUI-related documents even if the textbook also lists items for other Policy Exclusions sub-types.
+   - If no sub-type is given, extract every document item.
+   - If the investigation type text is NOT found as a heading within the Document Request section, the section is already pre-scoped to this investigation type — extract all document items from it.
+   - Once the target scope is determined, scan forward for the earliest stop marker (see CRITICAL rules above). Extraction is bounded by: scope start → the earlier of {stop marker position, end of chunk}.
 
 2. Extract each in-scope document item (between section start and stop marker) into structured JSON:
    - `doc_type`: the item name, verbatim.
