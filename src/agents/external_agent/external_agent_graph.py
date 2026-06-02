@@ -179,6 +179,8 @@ def _split_sub_items(text: str) -> list:
             if stripped:
                 parts.append(stripped)
         return parts
+    if "\n" in text:
+        return [s.strip() for s in text.split("\n") if s.strip()]
     return [text]
 
 
