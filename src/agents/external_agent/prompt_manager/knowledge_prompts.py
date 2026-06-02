@@ -171,6 +171,8 @@ Do NOT mark items as duplicates merely because they:
 
 If an item introduces a different detail, document, person, timeframe, or evidentiary angle, it is NOT a duplicate.
 
+CRITICAL: When two items request the same fundamental record type from the same party (e.g., both ask for criminal history, both ask for traffic history, both ask for phone records), differing wording, suffixes, or parenthetical qualifiers like "(only request if...)" or "(if applicable)" do NOT make them distinct items. They are the same underlying request. The "different detail" / "different evidentiary angle" exception applies ONLY when the items serve genuinely different investigative purposes — not when the same record is merely described with different wording.
+
 If unsure, KEEP BOTH.
 
 OUTPUT RULES:
