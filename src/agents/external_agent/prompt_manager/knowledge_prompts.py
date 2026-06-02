@@ -67,6 +67,9 @@ If neither stop marker is found after the located section, the entire remainder 
    - `doc_details`: any inline qualifiers, parenthetical notes, or nested sub-bullets associated with that item. If the item has nested sub-bullets
      in the textbook (e.g., "Signed authorities for the following: <list of authorities>"), fold those sub-bullets into `doc_details` as a single
      coherent string. Empty string if the textbook has no qualifier.
+   - **CRITICAL — Signed authorities boundary**: "Documents to confirm duty of disclosure/duty to not misrepresent questions" is a separate, standalone
+     doc_type at the same level as "Signed authorities for the following:" — it is NOT a sub-item of authorities. When bullet markers are absent in the
+     chunk, do NOT fold it into "Signed authorities" doc_details. Treat it as its own entry with its own doc_type.
    - Maintain the order given in the textbook.
 
 # Rules
