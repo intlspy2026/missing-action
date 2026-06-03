@@ -242,26 +242,34 @@ BEFORE finalizing any documents, you MUST understand these rules. Violating thes
 
 **RULE 2 - NEUTRAL LANGUAGE**: Do not use: "fraudulent", "fraud", "suspicious", "red flags", "motive", "collusion", "grossly", "high-risk". Refer to the underlying event as "incident" rather than "assault" in both doc_type and doc_details. Describe the incident neutrally (e.g., "the incident on [date] at [location]"); do not preface it with "alleged", "potential", or any qualifier that pre-judges the case. Do not infer intent or wrongdoing in any doc_details.
 
-**RULE 2.5 - TIMEFRAME INJECTION (CRITICAL)**: Dates are injected into gold standard wording ONLY when the PREVIOUS VERSION methodology provides a concrete, quantifiable timeframe.
+**RULE 2.5 - DOC_TYPE TIMEFRAME (CRITICAL)**: The final doc_type MUST include the methodology timeframe from PREVIOUS VERSION when one is present.
 
-    QUANTIFIABLE (inject dates): PREVIOUS VERSION doc_details contains a number + unit (e.g., "1 week", "3 months", "2 days"). Compute EXACT dates anchored to the date of loss from Step 2. Output range in "[DD Month YYYY] to [DD Month YYYY]" format. Single-date anchors output as "DD Month YYYY". Do NOT output relative phrasings — convert to absolute dates.
+    Extract the relative timeframe phrase from PREVIOUS VERSION's doc_details — the portion that specifies how far from the date of loss records should cover
+    (e.g., "3 months from date of loss", "1 week from date of loss", "surrounding the date of loss"). Append it to the gold standard doc_type separated by
+    a dash: `"[Gold Standard Doc Type] - [timeframe phrase]"`.
 
-    NOT QUANTIFIABLE (strip ALL dates): PREVIOUS VERSION doc_details has only vague references — "surrounding", "around", "close proximity", "close to the date of loss" — or no timeframe at all. Strip ALL date clauses from the gold standard: remove "for the period XX to XX", "for the period XXX to XXX", "For the dates XXXX", and any similar date-anchored language. Do NOT inject the incident date anywhere into the doc_details. The output must contain zero computed dates.
+    If PREVIOUS VERSION's doc_details contains no timeframe mention, use the gold standard doc_type as-is with no dash or suffix. Do NOT fabricate a
+    timeframe.
+
+    For fallback entries (RULE 3b, no gold standard match), use the PREVIOUS VERSION doc_type in place of the gold standard name.
 
 **RULE 3 - VERBATIM SME PHRASING (with fallback)**: For every document type in PREVIOUS VERSION:
-a. **Primary (SME match exists)**: When a matching entry exists in the provided GOLD_STANDARDS, doc_details MUST mirror the SME wording verbatim, replacing only the AI-fillable placeholders (X-patterns such as XXX / XXXX / XX to XX / XXXXXXXXXX) with case-specific values from INITIAL REVIEW and ADDITIONAL INFORMATION. You MUST NOT shorten, summarise, paraphrase, simplify, or rewrite the SME wording when an SME entry exists. If uncertain whether your phrasing matches the SME entry, default to the SME phrasing.
+a. **Primary (SME match exists)**: When a matching entry exists in the provided GOLD_STANDARDS, doc_details MUST mirror the SME wording verbatim. Leave ALL
+   placeholders unchanged — `<INSERT ...>` tokens, X-patterns (XXX, XXXX, XX to XX, XXXXXXXXXX), and CAPITALISED slots (e.g., START/END) pass through exactly
+   as written in the SME entry. Do NOT fill any placeholder from case context. You MUST NOT shorten, summarise, paraphrase, simplify, or rewrite the SME
+   wording when an SME entry exists. If uncertain whether your phrasing matches the SME entry, default to the SME phrasing.
 
-    **Match rule — document class, not purpose**: A gold standard entry matches PREVIOUS VERSION only when both name the same document class — the same specific category of records. Match doc_type to doc_type by what record is requested, not by why it's requested. A shared keyword in doc_details does not make a match. Example: "Evidence to confirm movements" describes an investigative purpose; "Financial Statements" names a document class. They share "movements" in doc_details but are not the same document class — no match. Use RULE 3b fallback for purpose-based doc_types that do not name a specific document class matching a gold standard entry.
+    **Match rule — document class, not purpose**: A gold standard entry matches PREVIOUS VERSION only when both name the same document class — the same
+    specific category of records. Match doc_type to doc_type by what record is requested, not by why it's requested. A shared keyword in doc_details does not
+    make a match. Example: "Evidence to confirm movements" describes an investigative purpose; "Financial Statements" names a document class. They share
+    "movements" in doc_details but are not the same document class — no match. Use RULE 3b fallback for purpose-based doc_types that do not name a specific
+    document class matching a gold standard entry.
 
-**AI-fillable X-pattern handling**: X-patterns are filled as follows:
-- ENTITY (name, identifier, location, address): replace with the specific value from the case context.
-- TIMEFRAME: follow RULE 2.5.
-
-**User-supplied placeholders (DO NOT fill)**: Do NOT modify or fill user-supplied placeholders – leave the literal tokens `<INSERT PHONE NUMBER>`, `<INSERT PERIOD>`, `<INSERT NAME>`, and any angle-bracketed `<INSERT >` or UPPERCASE/CAPITALISED slots (e.g. `START/END`) exactly as written in the SME entry. These are user-flagged for manual completion and must pass through to the output unchanged. Even when the case context contains the exact value that would fill the slot (e.g., a phone number for `<INSERT PHONE NUMBER>`, a name for `<INSERT NAME>`, a date for `<INSERT PERIOD>`), you MUST NOT fill it — these exist for human verification, not AI auto-fill. Distinguish these from X-patterns: angle-bracketed `<INSERT _>` tokens and UPPERCASE slot names are user-supplied (leave alone); runs of X characters are AI-fillable (must be filled).
-
-b. **Fallback (no SME match)**: When a document type has no matching entry in the provided GOLD_STANDARDS, INCLUDE it using a fallback draft: write a full instruction-style request (e.g., "A copy of _", "Fully itemised _", "Provide _"), grounded in the PREVIOUS VERSION doc_details and case context. Match the cadence and neutral tone of the SME exemplars. Do NOT produce short labels or one-line summaries. MUST NOT list as examples any document type that has a standalone entry in GOLD_STANDARDS (e.g., work rosters, timesheets, rideshare receipts, toll records, police documents, medical records). Those pass or fail on their own relevance — re-listing them in a fallback entry's doc_details bypasses the methodology.
-
-**RULE 4 - SIGNED AUTHORITIES SCOPE**: When filling the XXX placeholder in Signed Authorities, you MUST include only authorities actually involved in this case — not every possible authority from the case context. Police only if police attended/investigated; Fire or Emergency Services only if they responded; Medical Records or Hospital only if injuries, hospitalisation, or medical treatment occurred. Do not list authorities with no case involvement. For example: in an arson case where police and fire brigade responded and no injuries occurred, XXX MUST be "Police; Other emergency services" — NOT "Police; Medical Records; Hospital; Other emergency services".
+b. **Fallback (no SME match)**: When a document type has no matching entry in the provided GOLD_STANDARDS, INCLUDE it using a fallback draft: write a full
+   instruction-style request (e.g., "A copy of _", "Fully itemised _", "Provide _"), grounded in the PREVIOUS VERSION doc_details and case context. Match the
+   cadence and neutral tone of the SME exemplars. Do NOT produce short labels or one-line summaries. MUST NOT list as examples any document type that has a
+   standalone entry in GOLD_STANDARDS (e.g., work rosters, timesheets, rideshare receipts, toll records, police documents, medical records). Those pass or
+   fail on their own relevance — re-listing them in a fallback entry's doc_details bypasses the methodology.
 </CRITICAL_RULES>
 
 <TASK>
@@ -270,15 +278,18 @@ Apply SME-standard wording to each document type in PREVIOUS VERSION:
 
 Steps:
 1. Read PREVIOUS VERSION to understand which document types have been selected.
-2. Read INITIAL REVIEW and ADDITIONAL INFORMATION to extract case-specific values (names of direct parties, dates, locations, incident specifics, periods, identifiers). Identify the date of loss from INITIAL REVIEW (look for fields like "Loss date", "Date of loss", "Loss date & Time", "Incident date"). Convert it from any short form (e.g., 26.3.24, 2024-03-26) to the long form "DD Month YYYY" (e.g., 26 March 2024). This long-form date is used for date references only when RULE 2.5 permits date injection — never output dates in short numeric form (e.g., 26.3.24, 26/3/24).
+2. Read INITIAL REVIEW to identify direct parties (insured, claimant, drivers) for grouping per STYLE only.
 3. For each document type in PREVIOUS VERSION:
-    a. Locate the matching entry in the provided GOLD_STANDARDS. Apply RULE 3a: reuse the SME wording verbatim, replacing only AI-fillable placeholders with case-specific values from Step 2. For timeframes, follow RULE 2.5 (quantifiable → compute dates; vague or none → strip dates).
-    b. If no matching SME entry exists in GOLD_STANDARDS, apply RULE 3b (fallback): draft a full instruction-style doc_details grounded in the PREVIOUS VERSION doc_details and case context.
+    a. Locate the matching entry in the provided GOLD_STANDARDS. Apply RULE 3a: reuse the SME wording verbatim — do NOT fill any placeholders. Set the
+       doc_type per RULE 2.5 (gold standard name + methodology timeframe from PREVIOUS VERSION doc_details).
+    b. If no matching SME entry exists in GOLD_STANDARDS, apply RULE 3b (fallback): draft a full instruction-style doc_details grounded in the PREVIOUS
+       VERSION doc_details and case context. Set doc_type per RULE 2.5 using PREVIOUS VERSION doc_type in place of gold standard name.
 4. For each entry, validate:
-    - If a matching SME entry exists: did I reuse its wording verbatim with only placeholders replaced? If NO -> revise.
+    - If a matching SME entry exists: did I reuse its wording verbatim with NO placeholder changes? If NO -> revise.
     - If no SME entry exists: did my fallback draft produce a full instruction-style request (not a short label or one-liner)? If NO -> revise.
     - Am I using neutral language (RULE 2)?
-5. Preserve the exact doc_type from PREVIOUS VERSION unchanged. Do NOT add or remove any entries.
+    - Does doc_type follow RULE 2.5 (gold standard name + timeframe if present in PREVIOUS VERSION)?
+5. Do NOT add or remove any entries.
 </TASK>
 
 <OUTPUT>
@@ -296,7 +307,7 @@ You are applying SME-standard wording to the following pre-filtered document typ
 {gold_standards}
 </GOLD_STANDARDS>
 
-The INITIAL REVIEW provides case-specific details for contextualisation and X-pattern filling:
+The INITIAL REVIEW provides case-specific details for contextualisation:
 <INITIAL REVIEW>
 {initial_review}
 </INITIAL REVIEW>
