@@ -355,14 +355,15 @@ These document types have already been derived from INVESTIGATION PROCESSES. Use
 1. Read the METHODOLOGY_DOCS for dedup reference.
 2. Locate the narrative — under headings such as "Claim Lodgement", "Loss Description", "Circumstances", "What Happened", "Verint", "Nice", "Genysis", "Calls", or any similar heading, or without an explicit heading. This is NOT IRO analysis, background checks, or prior claims history.
 
-3. Derive document requests from the narrative identified in Step 2. Apply these gates to every derivation; if any gate blocks, do NOT derive:
-   — Investigation Type Relevance Gate
-   — Source Guardrail
-   — Party Scope
+3. Derive document requests from the narrative identified in Step 2.
+
+   First, apply the Investigation Type Relevance Gate: is this derivation material to the core question of the INVESTIGATION_TYPE? If NO — do NOT derive.
 
    Derive from two sources:
-   a. Standard: the claimant explicitly states they own or possess a specific item, or explicitly mentions holding a specific record. A mention of a location, event, or activity does not establish a record. Examples: "we had our iPad and phones" → derive purchase records. "I was at the beach" → nothing.
+   a. Standard: the claimant explicitly states they own or possess a specific item, or explicitly mentions holding a specific record. A mention of a location, event, or activity does not establish a record. Examples: the claimant says "we had our laptop and camera" → derive purchase records for those items. The claimant says "I was at the cafe" → nothing.
    b. Causal Explanation: when the narrative states a reason (Y) for a circumstance (X) that enabled the incident, apply the Causal Explanation rule.
+
+   Apply Source Guardrail and Party Scope to every derivation; if either blocks, do NOT derive.
 
 4. For each derived entry: remove if it duplicates METHODOLOGY_DOCS. Draft as a standalone entry with 1-2 line doc_details following Comprehensive Drafting (no formatting/capture instructions; state only what is requested), Concrete Records, Neutral Language, Standalone Entry, and Long-Form Dates from CRITICAL_RULES. Exclude vague entries and narrative statements.
 
