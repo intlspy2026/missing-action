@@ -18,7 +18,13 @@ But applied to THIS case:
 2. **Party Scope blocks it**. The son is not a direct party to the claim — we don't request third-party records.
 3. **The LLM pivots**. Instead of stopping, it reinterprets Y as **the insured's own mental health** and requests her mental health treatment records.
 
-Three iterations of rule changes failed to stop the pivot — removing "MUST derive," adding "do not reinterpret Y," restructuring as sequential gates, removing case-specific counter-examples. Each time the LLM found a path to produce mental health records for the insured.
+Three iterations of rule changes failed to stop the pivot — removing "MUST derive," adding "do not reinterpret Y," restructuring as sequential gates, removing case-specific counter-examples. Each time the LLM found a path to produce mental health records for the insured:
+
+| Iteration | Failed Output |
+|-----------|--------------|
+| 1 (original) | Son's mental health treatment records |
+| 2 (Party Scope tightened to block non-party records) | Insured's mental health treatment records — LLM pivoted from son to insured |
+| 3 (Causal Explanation: "do not reinterpret Y, move on") | Still insured's mental health records |
 
 ## Root Cause
 
@@ -26,7 +32,17 @@ The Causal Explanation rule was designed for **objective, verifiable causes** (e
 
 ## Fix Applied
 
-Added a **scope gate** to the Causal Explanation rule:
+### 1. Party Scope tightened
+
+The original Party Scope rule only prevented requesting documents **from** non-parties. It did not prevent requesting records **about** non-parties from a direct party.
+
+**Changed from**: *"Only request documents from parties directly involved in the current claim."*
+
+**Changed to**: *"Only request documents that belong to or are about parties directly involved in the current claim. Do not request records of persons who are not direct parties to the claim (e.g., family members, witnesses, third parties) — even when the request is addressed to a direct party."*
+
+### 2. Causal Explanation scope gate
+
+Added an upfront scope exclusion to the Causal Explanation rule:
 
 > This rule applies ONLY to objective, concrete causes — work arrangements, service bookings, physical circumstances, logistics, business records. It does NOT apply to psychological or emotional explanations (e.g., mental state, emotional distress, mental health episode being the stated reason). For such explanations, produce NO output.
 
@@ -34,6 +50,11 @@ This prevents the LLM from entering the litmus test at all when the cause is psy
 
 ## Related Changes
 
-- **Party Scope** tightened to block requests for records of non-parties even when addressed to a direct party
 - **Party Scope** cross-referenced inside Causal Explanation so gates are not applied in isolation
 - Causal Explanation restructured as sequential gates (no "MUST derive")
+
+## Result
+
+After applying both changes, the narrative doc prompt for this case now correctly produces **no documents** — the Causal Explanation rule is blocked at the scope gate before the litmus test ever fires, and no mental health records are derived for any party.
+
+No mental health records. No son. No insured. Output is empty as intended.
