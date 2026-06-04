@@ -356,7 +356,7 @@ These document types have already been derived from INVESTIGATION PROCESSES. Use
 2. Locate the claimant's first-hand account of this claim in INITIAL REVIEW — the narrative describing what happened, as reported by the claimant for THIS claim. This is NOT IRO analysis, background checks, or prior claims history. This narrative may appear under headings such as "Claim Lodgement", "Loss Description", "Circumstances", "What Happened", "Verint", "Nice", "Genysis", "Calls", or any similar heading, or without an explicit heading.
 3. FIRST, apply the Investigation Type Relevance Gate: identify the core question of the INVESTIGATION_TYPE. Then, from the claimant's narrative, derive 1-2 document types that help answer THAT core question — and nothing else.
 
-   SECOND, apply the Source Guardrail rule.
+   SECOND, apply the Source Guardrail rule. If Source Guardrail blocks the record, do NOT derive it.
 
    THIRD, apply Party Scope: the records must belong to and be about a direct party — the insured, claimant, or another party directly involved in THIS claim. If a person mentioned in the narrative is not a direct party (e.g., family member, witness, third party), do NOT derive any records belonging to or about that person. If Party Scope blocks the record, do NOT derive it.
 
