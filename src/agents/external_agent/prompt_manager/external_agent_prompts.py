@@ -361,7 +361,7 @@ These document types have already been derived from INVESTIGATION PROCESSES. Use
    — Party Scope
 
    Derive from two sources:
-   a. Standard: the claimant explicitly states they possess, have, or obtained a specific record. A mention of a location, event, or activity does not establish a record. Examples: "I have the receipt for the watch" → derive receipt. "I was at the beach" → nothing.
+   a. Standard: the claimant explicitly states they own or possess a specific item, or explicitly mentions holding a specific record. A mention of a location, event, or activity does not establish a record. Examples: "we had our iPad and phones" → derive purchase records. "I was at the beach" → nothing.
    b. Causal Explanation: when the narrative states a reason (Y) for a circumstance (X) that enabled the incident, apply the Causal Explanation rule.
 
 4. For each derived entry: remove if it duplicates METHODOLOGY_DOCS. Draft as a standalone entry with 1-2 line doc_details following Comprehensive Drafting (no formatting/capture instructions; state only what is requested), Concrete Records, Neutral Language, Standalone Entry, and Long-Form Dates from CRITICAL_RULES. Exclude vague entries and narrative statements.
