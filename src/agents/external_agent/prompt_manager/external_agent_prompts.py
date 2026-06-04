@@ -358,7 +358,7 @@ These document types have already been derived from INVESTIGATION PROCESSES. Use
 
    SECOND, apply Source Guardrail: for every detail you consider deriving from, confirm it appears in the claimant's own first-hand account — NOT in IRO analysis, background checks, document metadata (timestamps, file info, device model), or any non-narrative section of INITIAL REVIEW. If you cannot point to the claimant's own sentence, EXCLUDE. Do NOT infer the existence of a record from a narrative detail alone. A mention of an event or circumstance is not evidence that a document or recording of it exists.
 
-   Check each derived type against Party Scope: the records must belong to and be about a direct party. If Party Scope blocks the record, do NOT derive it.
+   THIRD, apply Party Scope: the records must belong to and be about a direct party — the insured, claimant, or another party directly involved in THIS claim. If a person mentioned in the narrative is not a direct party (e.g., family member, witness, third party), do NOT derive any records belonging to or about that person. If Party Scope blocks the record, do NOT derive it.
 
    Examples: receipts for items the claimant purchased; records from a business, service provider, or venue the claimant names (e.g., service logs, booking confirmations, invoices); correspondence the claimant mentions. Prefer concrete records over narrative statements.
 4. When the narrative cites an explanation for a circumstance or decision, apply the Causal Explanation rule. If the rule's criteria and Party Scope are satisfied, derive the document request. If the rule is blocked (Party Scope fails or Investigation Type Relevance Gate fails), derive nothing.
