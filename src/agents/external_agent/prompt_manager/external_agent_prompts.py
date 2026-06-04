@@ -352,17 +352,21 @@ These document types have already been derived from INVESTIGATION PROCESSES. Use
 </METHODOLOGY_DOCS>
 
 <TASK>
-1. Read the METHODOLOGY_DOCS to understand what has already been requested.
-2. Locate the claimant's first-hand account of this claim in INITIAL REVIEW — the narrative describing what happened, as reported by the claimant for THIS claim. This is NOT IRO analysis, background checks, or prior claims history. This narrative may appear under headings such as "Claim Lodgement", "Loss Description", "Circumstances", "What Happened", "Verint", "Nice", "Genysis", "Calls", or any similar heading, or without an explicit heading.
-3. FIRST, apply the Investigation Type Relevance Gate: identify the core question of the INVESTIGATION_TYPE. Then, from the claimant's narrative, derive 1-2 document types that help answer THAT core question — and nothing else.
+1. Read the METHODOLOGY_DOCS for dedup reference.
+2. Locate the narrative — under headings such as "Claim Lodgement", "Loss Description", "Circumstances", "What Happened", "Verint", "Nice", "Genysis", "Calls", or any similar heading, or without an explicit heading. This is NOT IRO analysis, background checks, or prior claims history.
 
-   SECOND, apply the Source Guardrail rule. If Source Guardrail blocks the record, do NOT derive it.
+3. Derive document requests from the narrative identified in Step 2. Apply these gates to every derivation; if any gate blocks, do NOT derive:
+   — Investigation Type Relevance Gate
+   — Source Guardrail
+   — Party Scope
 
-   THIRD, apply Party Scope: the records must belong to and be about a direct party — the insured, claimant, or another party directly involved in THIS claim. If a person mentioned in the narrative is not a direct party (e.g., family member, witness, third party), do NOT derive any records belonging to or about that person. If Party Scope blocks the record, do NOT derive it.
+   Derive from two sources:
+   a. Standard: the claimant explicitly states they possess, have, or obtained a specific record. A mention of a location, event, or activity does not establish a record. Examples: "I have the receipt for the watch" → derive receipt. "I was at the beach" → nothing.
+   b. Causal Explanation: when the narrative states a reason (Y) for a circumstance (X) that enabled the incident, apply the Causal Explanation rule.
 
-   Examples: receipts for items the claimant purchased; records from a business, service provider, or venue the claimant names (e.g., service logs, booking confirmations, invoices); correspondence the claimant mentions. Prefer concrete records over narrative statements.
-4. When the narrative cites an explanation for a circumstance or decision, apply the Causal Explanation rule. If the rule's criteria and Party Scope are satisfied, derive the document request. If the rule is blocked (Party Scope fails or Investigation Type Relevance Gate fails), derive nothing.
-5. For each derived document type, check all CRITICAL RULES. Confirm each satisfies the Investigation Type Relevance Gate. If a type substantively duplicates a METHODOLOGY_DOCS entry, skip it. If it is a concrete, obtainable document from the claimant's own narrative, create a NEW standalone entry with its own distinct doc_type and concise 1-3 line doc_details (Comprehensive Drafting rule). If it is vague, a narrative statement from an involved party, or from a non-narrative source, exclude it. If you have identified more than 2 document types, keep only the 1-2 most critical. Causal Explanation entries (Step 4) take priority within this cap.
+4. For each derived entry: remove if it duplicates METHODOLOGY_DOCS. Draft as a standalone entry with 1-2 line doc_details following Comprehensive Drafting (no formatting/capture instructions; state only what is requested), Concrete Records, Neutral Language, Standalone Entry, and Long-Form Dates from CRITICAL_RULES. Exclude vague entries and narrative statements.
+
+5. Cap at 1-2 entries. Causal Explanation derivations take priority.
 </TASK>
 
 <CONTEXT>
