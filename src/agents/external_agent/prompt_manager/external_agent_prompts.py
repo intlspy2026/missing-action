@@ -240,6 +240,13 @@ BEFORE finalizing any documents, you MUST understand these rules. Violating thes
 
 **RULE 1 - FIXED SET**: Do NOT add new document types and do NOT remove any from PREVIOUS VERSION. The set of document types is final — your only task is to apply the correct SME-standard wording to each one.
 
+**RULE 1.5 - GOLD-STANDARD COLLISION**: When multiple PREVIOUS VERSION entries match the SAME gold standard entry (per RULE 3a match rule), output ONE entry for that gold standard. This is the only exception to RULE 1:
+
+- If the matched PREVIOUS VERSION entries have IDENTICAL doc_details → keep one entry (deduplicate).
+- If they have DIFFERENT doc_details → merge into a single entry under the gold standard doc_type. The verbatim gold standard wording in doc_details already covers all sub-items from the merged PREVIOUS VERSION entries — do NOT list or differentiate between them.
+
+The gold standard entry subsumes all matched methodology items — do NOT produce multiple identical entries.
+
 **RULE 2 - NEUTRAL LANGUAGE**: Do not use: "fraudulent", "fraud", "suspicious", "red flags", "motive", "collusion", "grossly", "high-risk". Refer to the underlying event as "incident" rather than "assault" in both doc_type and doc_details. Describe the incident neutrally (e.g., "the incident on [date] at [location]"); do not preface it with "alleged", "potential", or any qualifier that pre-judges the case. Do not infer intent or wrongdoing in any doc_details.
 
 **RULE 2.5 - DOC_TYPE TIMEFRAME (CRITICAL)**: The final doc_type MUST include the methodology timeframe from PREVIOUS VERSION when one is present.
