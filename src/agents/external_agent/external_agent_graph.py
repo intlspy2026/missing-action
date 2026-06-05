@@ -1400,6 +1400,16 @@ def get_graph(llm: BaseChatModel) -> StateGraph:
                 sme_response.content, str) else sme_response.content[0]["text"]
             methodology_docs = parser.parse(sme_content)
 
+            # Deduplicate by doc_type: SME prompt may match multiple
+            # PREVIOUS VERSION entries to the same gold standard entry.
+            seen_doc_types = set()
+            deduped_docs = []
+            for dr in methodology_docs.document_set:
+                if dr.doc_type not in seen_doc_types:
+                    seen_doc_types.add(dr.doc_type)
+                    deduped_docs.append(dr)
+            methodology_docs.document_set = deduped_docs
+
             # Format methodology doc types for narrative dedup reference
             methodology_doc_list = "\n".join(
                 f"- {dr.doc_type}: {dr.doc_details}" if dr.doc_details else f"- {dr.doc_type}"
