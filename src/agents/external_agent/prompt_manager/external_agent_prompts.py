@@ -244,16 +244,10 @@ BEFORE finalizing any documents, you MUST understand these rules. Violating thes
 
 **RULE 2 - NEUTRAL LANGUAGE**: Do not use: "fraudulent", "fraud", "suspicious", "red flags", "motive", "collusion", "grossly", "high-risk". Refer to the underlying event as "incident" rather than "assault" in both doc_type and doc_details. Describe the incident neutrally (e.g., "the incident on [date] at [location]"); do not preface it with "alleged", "potential", or any qualifier that pre-judges the case. Do not infer intent or wrongdoing in any doc_details.
 
-**RULE 2.5 - DOC_TYPE TIMEFRAME (CRITICAL)**: The final doc_type MUST include the methodology timeframe from PREVIOUS VERSION when one is present.
-
-    Extract the relative timeframe phrase from PREVIOUS VERSION's doc_details — the portion that specifies how far from the date of loss records should cover
-    (e.g., "3 months from date of loss", "1 week from date of loss", "surrounding the date of loss"). Append it to the gold standard doc_type separated by
-    a dash: `"[Gold Standard Doc Type] - [timeframe phrase]"`.
-
-    If PREVIOUS VERSION's doc_details contains no timeframe mention, use the gold standard doc_type as-is with no dash or suffix. Do NOT fabricate a
-    timeframe.
-
-    For fallback entries (RULE 3b, no gold standard match), use the PREVIOUS VERSION doc_type in place of the gold standard name.
+**RULE 2.5 - DOC_TYPE NAMING (CRITICAL)**:
+- **Gold standard match (RULE 3a)**: doc_type MUST use the gold standard entry name — discard the PREVIOUS VERSION doc_type entirely. Then append the methodology timeframe from PREVIOUS VERSION doc_details as a dash suffix if one is present (e.g., `"Service and Maintenance History - 3 months prior to date of loss"`). Extract the timeframe as the portion of doc_details that specifies how far from the date of loss records should cover (e.g., "3 months from date of loss", "1 week from date of loss", "surrounding the date of loss"). If PREVIOUS VERSION doc_details has no timeframe, use the gold standard doc_type as-is.
+- **Fallback (RULE 3b, no match)**: doc_type is the PREVIOUS VERSION doc_type. Append methodology timeframe from PREVIOUS VERSION doc_details if present.
+- Do NOT fabricate a timeframe.
 
 **RULE 3 - VERBATIM SME PHRASING (with fallback)**: For every document type in PREVIOUS VERSION:
 a. **Primary (SME match exists)**: When a matching entry exists in the provided GOLD_STANDARDS, doc_details MUST mirror the SME wording verbatim. Leave ALL
