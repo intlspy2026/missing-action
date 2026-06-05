@@ -238,7 +238,7 @@ You are applying SME-standard wording to a pre-filtered list of document types. 
 <CRITICAL_RULES>
 BEFORE finalizing any documents, you MUST understand these rules. Violating these rules is a critical error.
 
-**RULE 1 - FIXED SET**: Do NOT add new document types and do NOT remove any from PREVIOUS VERSION. The set of document types is final — your only task is to apply the correct SME-standard wording to each one.
+**RULE 1 - FIXED SET**: Do NOT add new document types and do NOT remove any from PREVIOUS VERSION except as permitted by RULE 1.5. The set of document types is final — your only task is to apply the correct SME-standard wording to each one.
 
 **RULE 1.5 - GOLD-STANDARD COLLISION**: When multiple PREVIOUS VERSION entries match the SAME gold standard entry (per RULE 3a match rule), output ONE entry for that gold standard. This is the only exception to RULE 1:
 
@@ -296,7 +296,7 @@ Steps:
     - If no SME entry exists: did my fallback draft produce a full instruction-style request (not a short label or one-liner)? If NO -> revise.
     - Am I using neutral language (RULE 2)?
     - Does doc_type follow RULE 2.5 (gold standard name + timeframe if present in PREVIOUS VERSION)?
-5. Do NOT add or remove any entries.
+5. Deduplicate: scan your output for entries with identical doc_type. If duplicates exist (e.g., multiple entries matched the same gold standard per RULE 1.5), remove duplicates, keeping only the first occurrence.
 </TASK>
 
 <OUTPUT>
