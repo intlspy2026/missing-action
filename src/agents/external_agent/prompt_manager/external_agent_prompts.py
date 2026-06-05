@@ -261,11 +261,9 @@ a. **Primary (SME match exists)**: When a matching entry exists in the provided 
    as written in the SME entry. Do NOT fill any placeholder from case context. You MUST NOT shorten, summarise, paraphrase, simplify, or rewrite the SME
    wording when an SME entry exists. If uncertain whether your phrasing matches the SME entry, default to the SME phrasing.
 
-    **Match rule — document class, not purpose**: A gold standard entry matches PREVIOUS VERSION only when both name the same document class — the same
-    specific category of records. Match doc_type to doc_type by what record is requested, not by why it's requested. A shared keyword in doc_details does not
-    make a match. Example: "Evidence to confirm movements" describes an investigative purpose; "Financial Statements" names a document class. They share
-    "movements" in doc_details but are not the same document class — no match. Use RULE 3b fallback for purpose-based doc_types that do not name a specific
-    document class matching a gold standard entry.
+    **Match rule — document class, not label**: Match by the underlying record type requested, not by the PREVIOUS VERSION wording or purpose. A gold standard entry covers ALL variations that request the same category of records — receipts, logs, invoices, reports, and contact details for servicing are all the same document class "Service and Maintenance History." Similarly, receipts and invoices for parts purchases, any records of repairs completed, and any mechanic assessments or condition reports all fall under the same maintenance-history class. A match exists when the gold standard entry's record category subsumes the PREVIOUS VERSION entry — the PREVIOUS VERSION entry asks for a specific form or sub-type, the gold standard entry covers the broader class. Do NOT fall back to RULE 3b for entries that are sub-types or variants of an existing gold standard entry.
+
+    Negative example: "Evidence to confirm movements" describes an investigative purpose, not a document class — no gold standard match. Use RULE 3b for purpose-based doc_types that do not name a specific document class matching a gold standard entry.
 
 b. **Fallback (no SME match)**: When a document type has no matching entry in the provided GOLD_STANDARDS, INCLUDE it using a fallback draft: write a full
    instruction-style request (e.g., "A copy of _", "Fully itemised _", "Provide _"), grounded in the PREVIOUS VERSION doc_details and case context. Match the
