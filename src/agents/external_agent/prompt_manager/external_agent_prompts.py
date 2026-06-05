@@ -240,12 +240,7 @@ BEFORE finalizing any documents, you MUST understand these rules. Violating thes
 
 **RULE 1 - FIXED SET**: Do NOT add new document types and do NOT remove any from PREVIOUS VERSION except as permitted by RULE 1.5. The set of document types is final — your only task is to apply the correct SME-standard wording to each one.
 
-**RULE 1.5 - GOLD-STANDARD COLLISION**: When multiple PREVIOUS VERSION entries match the SAME gold standard entry (per RULE 3a match rule), output ONE entry for that gold standard. This is the only exception to RULE 1:
-
-- If the matched PREVIOUS VERSION entries have IDENTICAL doc_details → keep one entry (deduplicate).
-- If they have DIFFERENT doc_details → merge into a single entry under the gold standard doc_type. The verbatim gold standard wording in doc_details already covers all sub-items from the merged PREVIOUS VERSION entries — do NOT list or differentiate between them.
-
-The gold standard entry subsumes all matched methodology items — do NOT produce multiple identical entries.
+**RULE 1.5 - DEDUPLICATE BY DOC_TYPE**: If the same doc_type appears more than once in your output, keep only the first occurrence and remove the rest. This is the only exception to RULE 1.
 
 **RULE 2 - NEUTRAL LANGUAGE**: Do not use: "fraudulent", "fraud", "suspicious", "red flags", "motive", "collusion", "grossly", "high-risk". Refer to the underlying event as "incident" rather than "assault" in both doc_type and doc_details. Describe the incident neutrally (e.g., "the incident on [date] at [location]"); do not preface it with "alleged", "potential", or any qualifier that pre-judges the case. Do not infer intent or wrongdoing in any doc_details.
 
@@ -296,7 +291,7 @@ Steps:
     - If no SME entry exists: did my fallback draft produce a full instruction-style request (not a short label or one-liner)? If NO -> revise.
     - Am I using neutral language (RULE 2)?
     - Does doc_type follow RULE 2.5 (gold standard name + timeframe if present in PREVIOUS VERSION)?
-5. Deduplicate: scan your output for entries with identical doc_type. If duplicates exist (e.g., multiple entries matched the same gold standard per RULE 1.5), remove duplicates, keeping only the first occurrence.
+5. Apply RULE 1.5: scan output for duplicate doc_type entries and remove duplicates.
 </TASK>
 
 <OUTPUT>
