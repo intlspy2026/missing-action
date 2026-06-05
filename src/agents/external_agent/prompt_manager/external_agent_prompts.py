@@ -279,19 +279,24 @@ b. **Fallback (no SME match)**: When a document type has no matching entry in th
 Apply SME-standard wording to each document type in PREVIOUS VERSION:
 
 Steps:
-1. Read PREVIOUS VERSION to understand which document types have been selected.
-2. Read INITIAL REVIEW to identify direct parties (insured, claimant, drivers) for grouping per STYLE only.
-3. For each document type in PREVIOUS VERSION:
-    a. Locate the matching entry in the provided GOLD_STANDARDS. Apply RULE 3a: reuse the SME wording verbatim — do NOT fill any placeholders. Set the
-       doc_type per RULE 2.5 (gold standard name + methodology timeframe from PREVIOUS VERSION doc_details).
-    b. If no matching SME entry exists in GOLD_STANDARDS, apply RULE 3b (fallback): draft a full instruction-style doc_details grounded in the PREVIOUS
-       VERSION doc_details and case context. Set doc_type per RULE 2.5 using PREVIOUS VERSION doc_type in place of gold standard name.
-4. For each entry, validate:
-    - If a matching SME entry exists: did I reuse its wording verbatim with NO placeholder changes? If NO -> revise.
-    - If no SME entry exists: did my fallback draft produce a full instruction-style request (not a short label or one-liner)? If NO -> revise.
-    - Am I using neutral language (RULE 2)?
-    - Does doc_type follow RULE 2.5 (gold standard name + timeframe if present in PREVIOUS VERSION)?
-5. Apply RULE 1.5: scan output for duplicate doc_type entries and remove duplicates.
+1. Read PREVIOUS VERSION to understand which document types have been selected. Read INITIAL REVIEW to identify direct parties (insured, claimant, drivers) for grouping per STYLE only.
+
+2. MATCHING PASS (DO NOT OUTPUT YET):
+   For each PREVIOUS VERSION entry, identify its gold standard match (or note "no match" for RULE 3b fallback). Build a mental list. DO NOT produce any JSON output yet.
+
+3. DEDUP PASS (DO NOT OUTPUT YET):
+   Apply RULE 1.5. Scan the list from Step 2. If multiple entries match the same gold standard (producing identical doc_type), keep only the first occurrence. Remove the rest. DO NOT produce any JSON output yet.
+
+4. OUTPUT PASS:
+   For each unique surviving entry from Step 3:
+   a. Gold standard match → apply RULE 3a (verbatim SME wording, do NOT fill placeholders) + RULE 2.5 (gold standard name + timeframe from PREVIOUS VERSION doc_details if present).
+   b. No match → apply RULE 3b (full instruction-style fallback grounded in PREVIOUS VERSION doc_details and case context) + RULE 2.5 (use PREVIOUS VERSION doc_type if no gold standard name).
+   Validate inline before outputting each entry:
+    - Verbatim SME wording with NO placeholder changes?
+   - Full instruction-style fallback (not a short label or one-liner)?
+   - Neutral language (RULE 2)?
+   - Doc_type follows RULE 2.5?
+   Output as structured JSON.
 </TASK>
 
 <OUTPUT>
