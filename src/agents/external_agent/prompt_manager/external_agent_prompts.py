@@ -279,7 +279,7 @@ b. **Fallback (no SME match)**: When a document type has no matching entry in th
 Apply SME-standard wording to each document type in PREVIOUS VERSION:
 
 Steps:
-1. Read PREVIOUS VERSION to understand which document types have been selected. Read INITIAL REVIEW to identify direct parties (insured, claimant, drivers) for grouping per STYLE only.
+1. Read PREVIOUS VERSION to extract each doc_type and its doc_details (for timeframe extraction per RULE 2.5). Read INITIAL REVIEW to identify direct parties (insured, claimant, drivers) for grouping per STYLE.
 
 2. MATCHING PASS (DO NOT OUTPUT YET):
    For each PREVIOUS VERSION entry, identify its gold standard match (or note "no match" for RULE 3b fallback). Build a mental list. DO NOT produce any JSON output yet.
