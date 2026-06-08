@@ -60,6 +60,8 @@ def categorise_parties(
         if is_business:
             if "director" in key_lower or "main contact" in key_lower:
                 driver_names.append(value)
+            elif "driver" in key_lower:
+                driver_names.append(value)
             elif "business" in key_lower or "company" in key_lower or "entity" in key_lower:
                 insured_names.append(value)
             else:
