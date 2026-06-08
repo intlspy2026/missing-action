@@ -131,7 +131,7 @@ class ExternalAgentState(MessagesState):
     lob: str
     investigation_type: List[str]
     investigation_scope: str
-    insured: Optional[str] = None
+    insured_type: Optional[str] = None
     interviewee_details: Optional[dict[str, str]] = None
 
     # User-selected sections (key_concerns always generated regardless)
