@@ -1070,7 +1070,7 @@ def get_graph(llm: BaseChatModel) -> StateGraph:
             initial_review = hitl_artifact.get("initial_review")
             additional_info = hitl_artifact.get("additional_info")
             insured_type = hitl_artifact.get("insured_type")
-            interviewee_details = hitl_artifact.get("interviewee_details")
+            insured_details = hitl_artifact.get("insured_details")
             selected_sections = hitl_artifact.get(
                 "selected_sections", ["doc_request", "additional_enquiries"])
 
@@ -1086,7 +1086,7 @@ def get_graph(llm: BaseChatModel) -> StateGraph:
                         "initial_review": initial_review,
                         "additional_info": additional_info,
                         "insured_type": insured_type,
-                        "interviewee_details": interviewee_details,
+                        "insured_details": insured_details,
                         "selected_sections": selected_sections,
                         "hitl_decision": decision,
                         "hitl_artifact": None,

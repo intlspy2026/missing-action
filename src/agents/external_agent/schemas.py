@@ -132,7 +132,7 @@ class ExternalAgentState(MessagesState):
     investigation_type: List[str]
     investigation_scope: str
     insured_type: Optional[str] = None
-    interviewee_details: Optional[dict[str, str]] = None
+    insured_details: Optional[dict[str, str]] = None
 
     # User-selected sections (key_concerns always generated regardless)
     selected_sections: List[Literal["doc_request", "additional_enquiries", "interview_plan"]]

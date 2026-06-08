@@ -80,8 +80,8 @@ def build_form_info(form_config: Dict) -> List[Dict[str, Any]]:
                     "components": [
                         {
                             "type": "keyvalue_mapper",
-                            "id": "interviewee_details",
-                            "label": "Provide interviewee details",
+                            "id": "insured_details",
+                            "label": "Provide insured details",
                             "required": True,
                             "data": keyvalue_data,
                         }
@@ -92,7 +92,7 @@ def build_form_info(form_config: Dict) -> List[Dict[str, Any]]:
             "components": [
                 {
                     "type": "lookup",
-                    "id": f"interviewee_details_lob_{insured_item['value']}",
+                    "id": f"insured_details_lob_{insured_item['value']}",
                     "metadata": {
                         "field_id": "lob"
                     },
@@ -147,7 +147,7 @@ def build_form_info(form_config: Dict) -> List[Dict[str, Any]]:
         },
         {
             "type": "lookup",
-            "id": "interviewee_details_lookup",
+            "id": "insured_details_lookup",
             "metadata": {
                 "field_id": "insured_type"
             },
