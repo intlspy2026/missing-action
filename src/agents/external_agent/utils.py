@@ -50,6 +50,57 @@ def build_form_info(form_config: Dict) -> List[Dict[str, Any]]:
         for group in form_config["lob"]
     ]
 
+    insured_options = [
+        {
+            "value": item["value"],
+            "label": item["label"]
+        }
+        for item in form_config["insured_type"]
+    ]
+
+    insured_lookup_data: List[Dict[str, Any]] = []
+    for insured_item in form_config["insured_type"]:
+        lob_components: List[Dict[str, Any]] = []
+        for lob_component in insured_item["components"]:
+            for lob_key, fields in lob_component.items():
+                lob_value = next(
+                    (g["value"] for g in form_config["lob"]
+                     if g["value"].lower() == lob_key.lower()),
+                    lob_key
+                )
+                keyvalue_data = [
+                    {
+                        "value": field["value"],
+                        "label": field["label"]
+                    }
+                    for field in fields
+                ]
+                lob_components.append({
+                    "value": lob_value,
+                    "components": [
+                        {
+                            "type": "keyvalue_mapper",
+                            "id": "interviewee_details",
+                            "label": "Provide interviewee details",
+                            "required": True,
+                            "data": keyvalue_data,
+                        }
+                    ],
+                })
+        insured_lookup_data.append({
+            "value": insured_item["value"],
+            "components": [
+                {
+                    "type": "lookup",
+                    "id": f"interviewee_details_lob_{insured_item['value']}",
+                    "metadata": {
+                        "field_id": "lob"
+                    },
+                    "data": lob_components,
+                }
+            ],
+        })
+
     form_data: List[Dict[str, Any]] = [
         {
             "type": "text",
@@ -85,6 +136,22 @@ def build_form_info(form_config: Dict) -> List[Dict[str, Any]]:
                 "field_id": "lob"
             },
             "data": lob_groups,
+        },
+        {
+            "type": "select",
+            "id": "insured_type",
+            "label": "Is the insured policy holder a business?",
+            "placeholder": "Choose an option",
+            "required": True,
+            "data": insured_options,
+        },
+        {
+            "type": "lookup",
+            "id": "interviewee_details_lookup",
+            "metadata": {
+                "field_id": "insured_type"
+            },
+            "data": insured_lookup_data,
         },
         {
             "type": "textarea",
