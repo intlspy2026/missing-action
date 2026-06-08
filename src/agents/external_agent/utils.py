@@ -13,10 +13,6 @@ from agents.external_agent.schemas import (
 logger = logging.getLogger(__name__)
 
 
-def _to_title_case(key: str) -> str:
-    return " ".join(w.capitalize() for w in key.replace("_", " ").split())
-
-
 def build_chips_from_insured_details(
     insured_details: Optional[Dict[str, str]]
 ) -> List[Dict[str, Any]]:
@@ -24,7 +20,7 @@ def build_chips_from_insured_details(
         return []
     return [
         {
-            "label": _to_title_case(k),
+            "label": k,
             "value": k,
             "description": f"Assign to {v}",
         }
