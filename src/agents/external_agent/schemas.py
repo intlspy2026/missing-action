@@ -58,6 +58,7 @@ class KeyConcernSet(BaseModel):
 class DocRequest(BaseModel):
     doc_type: str
     doc_details: str
+    assigned_parties: Optional[List[str]] = None
 
 
 class DocRequestSet(BaseModel):
@@ -117,7 +118,7 @@ class KnowledgeSet(BaseModel):
 
 
 class HITLDecision(BaseModel):
-    intent: Literal["accept", "feedback", "unrelated"]
+    intent: Literal["accept", "feedback", "unrelated", "preview_update"]
     task_summary: str
 
 

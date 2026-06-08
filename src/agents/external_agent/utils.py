@@ -1,6 +1,7 @@
 import re
+import logging
 from collections import defaultdict
-from typing import List, Dict, Any, Optional
+from typing import List, Dict, Any, Optional, Tuple
 from agents.external_agent.schemas import (
     KeyConcern, KeyConcernSet,
     DocRequest, DocRequestSet,
@@ -8,6 +9,181 @@ from agents.external_agent.schemas import (
     InterviewQuestion, InterviewQuestionSets,
     ExternalAgentPlan,
 )
+
+logger = logging.getLogger(__name__)
+
+
+def _to_title_case(key: str) -> str:
+    return " ".join(w.capitalize() for w in key.replace("_", " ").split())
+
+
+def build_chips_from_insured_details(
+    insured_details: Optional[Dict[str, str]]
+) -> List[Dict[str, Any]]:
+    if not insured_details:
+        return []
+    return [
+        {
+            "label": _to_title_case(k),
+            "value": k,
+            "description": f"Assign to {v}",
+        }
+        for k, v in insured_details.items()
+        if v and str(v).strip()
+    ]
+
+
+def build_quick_action_preview_update() -> Dict[str, Any]:
+    return {
+        "type": "quick_action",
+        "data": [
+            {
+                "label": "Preview update",
+                "prompt": "Preview update document requests with assigned parties",
+            }
+        ],
+    }
+
+
+def categorise_parties(
+    assigned_keys: List[str],
+    insured_details: Dict[str, str],
+    insured_type: Optional[str],
+) -> Tuple[List[str], List[str], List[str]]:
+    insured_names: List[str] = []
+    driver_names: List[str] = []
+    other_names: List[str] = []
+
+    is_business = (insured_type or "").strip().lower() == "yes"
+
+    for key in assigned_keys:
+        value = (insured_details.get(key) or "").strip()
+        if not value:
+            continue
+        key_lower = key.lower()
+        if is_business:
+            if "director" in key_lower or "main contact" in key_lower:
+                driver_names.append(value)
+            elif "business" in key_lower or "company" in key_lower or "entity" in key_lower:
+                insured_names.append(value)
+            else:
+                other_names.append(value)
+        else:
+            if "driver" in key_lower:
+                driver_names.append(value)
+            elif "additional" in key_lower and "insured" in key_lower:
+                insured_names.append(value)
+            elif "insured" in key_lower:
+                insured_names.insert(0, value)
+            else:
+                other_names.append(value)
+
+    return insured_names, driver_names, other_names
+
+
+def build_party_possessive_phrase(
+    insured_names: List[str],
+    driver_names: List[str],
+    other_names: List[str],
+    insured_type: Optional[str],
+) -> Optional[str]:
+    is_business = (insured_type or "").strip().lower() == "yes"
+
+    all_names = insured_names + driver_names + other_names
+    if not all_names:
+        return None
+
+    if is_business:
+        parts = [f"{name}'s" for name in all_names]
+    elif len(all_names) == 1 and not driver_names and not other_names:
+        return "your"
+    else:
+        parts: List[str] = []
+        if insured_names and len(insured_names) == 1:
+            parts.append("your")
+        else:
+            for name in insured_names:
+                parts.append(f"{name}'s")
+        for name in driver_names:
+            parts.append(f"{name}'s")
+        for name in other_names:
+            parts.append(f"{name}'s")
+
+    if not parts:
+        return None
+    if len(parts) == 1:
+        return parts[0]
+    if len(parts) == 2:
+        return f"{parts[0]} and {parts[1]}"
+    return f"{', '.join(parts[:-1])}, and {parts[-1]}"
+
+
+def apply_party_names_to_doc_details(
+    doc_details: str,
+    assigned_keys: List[str],
+    insured_details: Dict[str, str],
+    insured_type: Optional[str],
+) -> str:
+    if not assigned_keys or not insured_details:
+        return doc_details
+
+    insured_names, driver_names, other_names = categorise_parties(
+        assigned_keys, insured_details, insured_type
+    )
+
+    phrase = build_party_possessive_phrase(
+        insured_names, driver_names, other_names, insured_type
+    )
+
+    if not phrase:
+        return doc_details
+
+    is_business = (insured_type or "").strip().lower() == "yes"
+
+    has_personal_ref = bool(
+        re.search(r"\byour\b", doc_details, re.IGNORECASE)
+        or re.search(r"\byou\b", doc_details, re.IGNORECASE)
+        or re.search(r"\[Name\]|\[INSERT NAME\]|enter name of person", doc_details, re.IGNORECASE)
+    )
+
+    if not has_personal_ref:
+        pattern = r"^(A copy of )"
+        if re.search(pattern, doc_details):
+            doc_details = re.sub(pattern, rf"\1{phrase} ", doc_details, count=1)
+        return doc_details
+
+    if is_business:
+        doc_details = re.sub(
+            r"\byour\b", lambda m: f"{insured_names[0]}'s" if insured_names else m.group(),
+            doc_details, flags=re.IGNORECASE
+        )
+        doc_details = re.sub(
+            r"\byou\b", lambda m: insured_names[0] if insured_names else "you",
+            doc_details, flags=re.IGNORECASE
+        )
+        doc_details = re.sub(
+            r"\[Name\]|\[INSERT NAME\]|enter name of person",
+            lambda m: insured_names[0] if insured_names else m.group(),
+            doc_details, flags=re.IGNORECASE
+        )
+    else:
+        if phrase == "your":
+            return doc_details
+
+        doc_details = re.sub(
+            r"\byour\b", phrase, doc_details, count=1, flags=re.IGNORECASE
+        )
+        doc_details = re.sub(
+            r"\[Name\]|\[INSERT NAME\]|enter name of person",
+            phrase, doc_details, count=1, flags=re.IGNORECASE
+        )
+
+    return doc_details
+
+
+# ------------------------------------
+# Form builders: initial info form
+# ------------------------------------
 
 
 def build_form_info(form_config: Dict) -> List[Dict[str, Any]]:
@@ -243,9 +419,14 @@ def build_form_key_concerns(key_concerns: KeyConcernSet) -> List[Dict[str, Any]]
     }]
 
 
-def build_form_doc_request(doc_request: DocRequestSet) -> List[Dict[str, Any]]:
-    """Build editable review form for document requests."""
+def build_form_doc_request(
+    doc_request: DocRequestSet,
+    insured_details: Optional[Dict[str, str]] = None,
+) -> List[Dict[str, Any]]:
+    """Build editable review form for document requests with optional party chips."""
     components: List[Dict[str, Any]] = []
+
+    chip_data = build_chips_from_insured_details(insured_details)
 
     for idx, dr in enumerate(doc_request.document_set, start=1):
         components.append({
@@ -262,6 +443,19 @@ def build_form_doc_request(doc_request: DocRequestSet) -> List[Dict[str, Any]]:
             "placeholder": dr.doc_details,
             "required": False,
         })
+        if chip_data:
+            default_chips = (dr.assigned_parties or [])
+            components.append({
+                "type": "info_chipbox",
+                "id": f"doc_{idx}_chips",
+                "label": "Assign Party",
+                "data": chip_data,
+                "required": False,
+                "notApplicable": True,
+                "defaultValue": default_chips,
+                "description": "Review this information and mark N/A if it does not apply.",
+                "hint": "Select the parties this document request applies to",
+            })
 
     view_data: List[Dict[str, Any]] = [
         {"type": "markdown", "data": {"content": "## Document Requests"}},
@@ -436,6 +630,7 @@ def parse_form_to_doc_request(
     """Parse flat form payload back into DocRequestSet."""
     doc_types: Dict[int, str] = {}
     doc_details: Dict[int, str] = {}
+    doc_chips: Dict[int, List[str]] = {}
 
     for k, v in (form_payload or {}).items():
         m = re.fullmatch(r"doc_type_(\d+)", str(k))
@@ -444,6 +639,12 @@ def parse_form_to_doc_request(
         m = re.fullmatch(r"doc_details_(\d+)", str(k))
         if m:
             doc_details[int(m.group(1))] = (v or "").strip()
+        m = re.fullmatch(r"doc_(\d+)_chips", str(k))
+        if m:
+            val = v or []
+            if isinstance(val, str):
+                val = [val]
+            doc_chips[int(m.group(1))] = [x.strip() for x in val if x and str(x).strip()]
 
     indices = sorted(set(doc_types) | set(doc_details))
 
@@ -454,13 +655,20 @@ def parse_form_to_doc_request(
         doc_type_text = doc_types.get(idx, "")
         doc_details_text = doc_details.get(idx, "")
 
-        # Carry forward details if doc_type unchanged
         if not doc_details_text and i < len(prev_items):
             if doc_type_text == prev_items[i].doc_type:
                 doc_details_text = prev_items[i].doc_details
 
+        chips = doc_chips.get(idx, [])
+        if not chips and i < len(prev_items) and prev_items[i].assigned_parties:
+            chips = prev_items[i].assigned_parties
+
         if doc_type_text:
-            items.append(DocRequest(doc_type=doc_type_text, doc_details=doc_details_text))
+            items.append(DocRequest(
+                doc_type=doc_type_text,
+                doc_details=doc_details_text,
+                assigned_parties=chips if chips else None,
+            ))
 
     return DocRequestSet(
         document_set=items,

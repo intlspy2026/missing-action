@@ -728,3 +728,54 @@ Here is the INVESTIGATION PROCESSES to guide you:
 {knowledge}
 </INVESTIGATION PROCESSES>
 """
+
+PARTY_NAME_INSERTION_PROMPT = """
+<ROLE>
+You are an expert in insurance document request wording. Your task is to insert party names into a document request detail text following correct English grammar for possessives.
+</ROLE>
+
+<RULES>
+1. Identify where in the text the party names naturally fit — usually before the document type/description (e.g., before "Work Roster/Timesheet", "Financial Statements", "Telephone Records").
+
+2. Apply these grammar rules for possessive forms:
+   - **1 person (insured only)**: use "your" — never use a name for a single individual insured.
+   - **2 people**: "[Name1]'s and [Name2]'s"
+   - **3 or more people**: "[Name1]'s, [Name2]'s, and [Name3]'s" (Oxford comma required)
+   - **Insured + Driver**: "your and [Driver]'s"
+   - **Insured + other parties**: "your, [Name1]'s and [Name2]'s" (or just "your and [Name]'s" for one other)
+   - **Business insured**: use the business name in place of "your". Use possessive form ("[Business Name]'s").
+
+3. When the insured is among the assigned parties:
+   - If ONLY the insured is assigned (no other parties): keep "your" as-is
+   - If insured AND other parties are assigned: "your and [Other]'s" or "your, [Other1]'s and [Other2]'s"
+   - If insured is NOT assigned but others are: use "[Name1]'s" etc. — no "your"
+
+4. The word "your" elsewhere in the text that refers to the insured's personal circumstances (e.g., "your Manager", "your employer", "your version of events") should remain as "your" — only replace references that scope the document request itself.
+
+5. Insert the party phrase at the natural grammatical position. For most documents, this is right before the document name (e.g., "A copy of [PARTIES] Work Roster/Timesheet from..."). If the text doesn't use "your" at all (e.g., "Provide a copy of Medical Records"), prepend the party phrase: "Provide a copy of [PARTIES] Medical Records".
+
+6. Other pronouns/cases: "you" in the text (e.g., "information requested from you") is scoped to the recipient/sender and should NOT be changed.
+
+7. If no "your" or similar placeholder exists and the text doesn't follow a "copy of" / "provide" pattern, identify the document subject noun phrase and insert the party names as the possessor: "[PARTIES] [document subject]".
+
+8. If no natural insertion point is found, prepend the party possessive at the very beginning of the text.
+
+9. NEVER change any other part of the text — only insert/replace party references. All <INSERT ...> placeholders, dates, and other details must remain exactly as-is.
+
+10. Return ONLY the modified document detail text. Do NOT include explanations, notes, or markdown formatting.
+</RULES>
+
+<TASK>
+Document Type: {doc_type}
+
+Original Document Details:
+{doc_details}
+
+Parties to assign (the actual names to use in the wording):
+{party_names_list}
+
+Insured Type: {insured_type}
+
+Modify the document details to include the assigned parties with correct English possessive grammar. Return only the modified text.
+</TASK>
+"""

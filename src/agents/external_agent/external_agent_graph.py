@@ -24,6 +24,7 @@ from agents.external_agent.prompt_manager.external_agent_prompts import (
     INTERVIEW_PLAN_DRAFT_PROMPT,
     SECTION_FEEDBACK_PROMPT,
     SECTION_FEEDBACK_KNOWLEDGE_BLOCK,
+    PARTY_NAME_INSERTION_PROMPT,
 )
 from agents.external_agent.prompt_manager.standards import (
     MOTOR_DOC_REQUEST_GOLD_STANDARDS,
@@ -46,6 +47,8 @@ from agents.external_agent.utils import (
     build_form_enquiries, parse_form_to_enquiries,
     build_form_interview_plan, parse_form_to_interview_plan,
     build_form_final,
+    build_quick_action_preview_update,
+    apply_party_names_to_doc_details,
 )
 from smart_investigator.foundation.utils.utils import prepare_thinking_message, prepare_hitl_task
 from agents.external_agent.schemas import (
@@ -359,8 +362,8 @@ def get_graph(llm: BaseChatModel) -> StateGraph:
         if pending_step in step_to_parser:
             parser_fn, state_key = step_to_parser[pending_step]
             previous = state.get(state_key)
-            # Parse on accept and feedback so FE edits/NA-drops survive into state.
-            if incoming_artifact and intent in ("accept", "feedback"):
+            # Parse on accept, feedback, and preview_update so FE edits/NA-drops survive into state.
+            if incoming_artifact and intent in ("accept", "feedback", "preview_update"):
                 try:
                     parsed = parser_fn(incoming_artifact, previous=previous)
                     # If parsing produced empty output but previous has content,
@@ -951,6 +954,13 @@ def get_graph(llm: BaseChatModel) -> StateGraph:
         hitl_task = state.get("hitl_task")
         prev_decision = state.get("hitl_decision")
 
+        step_to_state_key = {
+            "key_concerns_review": "key_concerns",
+            "doc_request_review": "doc_request",
+            "enquiries_review": "additional_enquiries",
+            "interview_plan_review": "interview_plan",
+        }
+
         # - First pass: pauses execution here.
         # - Resume: returns immediately with resume payload (text).
         _ = interrupt(hitl_task)
@@ -963,6 +973,30 @@ def get_graph(llm: BaseChatModel) -> StateGraph:
             or artifact_payload.get("form_data")
             or {}
         )
+
+        if "preview update" in hitl_text.lower() and pending_step == "doc_request_review":
+            hitl_decision = HITLDecision(intent="preview_update", task_summary="Preview update document requests with assigned parties")
+            hitl_artifact = _resolve_hitl_artifact(
+                state, pending_step, incoming_artifact, intent="preview_update")
+
+            canonical_update: dict = {}
+            sk = step_to_state_key.get(pending_step)
+            if sk and isinstance(hitl_artifact, (KeyConcernSet, DocRequestSet,
+                                                  AdditionalEnquiriesSet, InterviewQuestionSets)):
+                canonical_update[sk] = hitl_artifact
+
+            return Command(
+                goto="generate_doc_request",
+                update={
+                    "resume": False,
+                    "hitl_decision": hitl_decision,
+                    "hitl_artifact": hitl_artifact,
+                    "hitl_task": None,
+                    **canonical_update,
+                    "messages": messages + [AIMessage(f"HITL decision: preview_update (step={pending_step})")],
+                },
+            )
+
         prev_task = prev_decision.task_summary if prev_decision else ""
 
         hitl_decision = _classify_hitl(hitl_text, incoming_artifact, prev_task, pending_step)
@@ -1024,16 +1058,6 @@ def get_graph(llm: BaseChatModel) -> StateGraph:
 
         goto = _route_from_pending_step(pending_step)
 
-        # Persist FE-edited version into the canonical state slot so section
-        # nodes can read it directly without re-deriving from hitl_artifact.
-        # Guard with isinstance: if resolution didn't yield a valid section
-        # object, leave canonical state untouched.
-        step_to_state_key = {
-            "key_concerns_review": "key_concerns",
-            "doc_request_review": "doc_request",
-            "enquiries_review": "additional_enquiries",
-            "interview_plan_review": "interview_plan",
-        }
         canonical_update: dict = {}
         sk = step_to_state_key.get(pending_step)
         if sk and isinstance(hitl_artifact, (KeyConcernSet, DocRequestSet,
@@ -1263,6 +1287,69 @@ def get_graph(llm: BaseChatModel) -> StateGraph:
                 },
             )
 
+        # --- Preview update path: apply party names to doc_details ---
+        if decision and decision.intent == "preview_update":
+            insured_details = state.get("insured_details") or {}
+            insured_type = state.get("insured_type")
+            doc_request = state.get("doc_request")
+
+            if doc_request and insured_details:
+                writer(prepare_thinking_message(
+                    EXTERNAL_AGENT_NAME, "Applying party names to document details..."))
+
+                updated_docs: List[DocRequest] = []
+                for dr in doc_request.document_set:
+                    assigned_keys = dr.assigned_parties or []
+                    if assigned_keys:
+                        updated_details = apply_party_names_to_doc_details(
+                            dr.doc_details,
+                            assigned_keys,
+                            insured_details,
+                            insured_type,
+                        )
+                        updated_docs.append(DocRequest(
+                            doc_type=dr.doc_type,
+                            doc_details=updated_details,
+                            assigned_parties=dr.assigned_parties,
+                        ))
+                    else:
+                        updated_docs.append(dr)
+
+                parsed = DocRequestSet(
+                    document_set=updated_docs,
+                    version=doc_request.version,
+                )
+            elif doc_request:
+                parsed = doc_request
+            else:
+                parsed = DocRequestSet(document_set=[], version=1)
+
+            artifact = build_form_doc_request(parsed, insured_details)
+            if insured_details:
+                artifact.append(build_quick_action_preview_update())
+
+            text = "Document requests updated with assigned parties. Review and accept or provide feedback."
+            hitl_task = prepare_hitl_task(
+                agent_name=EXTERNAL_AGENT_NAME,
+                text=text,
+                context="User must review updated document requests with party names and either accept, edit+submit, or provide feedback.",
+                state={} if use_checkpointer else {
+                    **state, "messages": messages + [AIMessage(text)]},
+                artifact=artifact,
+            )
+
+            return Command(
+                goto="route_interrupt",
+                update={
+                    "doc_request": parsed,
+                    "pending_step": "doc_request_review",
+                    "hitl_task": hitl_task,
+                    "hitl_decision": None,
+                    "hitl_artifact": None,
+                    "messages": messages + [AIMessage("Document requests updated with party names. Awaiting review.")],
+                },
+            )
+
         initial_review = state.get("initial_review", "")
         additional_info = state.get("additional_info", "")
         system_prompt = EXTERNAL_AGENT_SYSTEM_PROMPT
@@ -1449,7 +1536,10 @@ def get_graph(llm: BaseChatModel) -> StateGraph:
             )
 
         # Send to HITL review
-        artifact = build_form_doc_request(parsed)
+        insured_details = state.get("insured_details")
+        artifact = build_form_doc_request(parsed, insured_details)
+        if insured_details:
+            artifact.append(build_quick_action_preview_update())
         text = "Document requests drafted. Please review and provide feedback or accept."
         hitl_task = prepare_hitl_task(
             agent_name=EXTERNAL_AGENT_NAME,
