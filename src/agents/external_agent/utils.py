@@ -658,9 +658,12 @@ def parse_form_to_doc_request(
         doc_type_text = prev_items[idx - 1].doc_type
         doc_details_text = doc_details[idx]
 
-        chips = doc_chips.get(idx, [])
-        if not chips and idx - 1 < len(prev_items) and prev_items[idx - 1].assigned_parties:
+        if idx in doc_chips:
+            chips = doc_chips[idx]
+        elif idx - 1 < len(prev_items) and prev_items[idx - 1].assigned_parties:
             chips = prev_items[idx - 1].assigned_parties
+        else:
+            chips = []
 
         if doc_type_text:
             items.append(DocRequest(
