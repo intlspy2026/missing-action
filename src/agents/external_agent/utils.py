@@ -429,33 +429,19 @@ def build_form_doc_request(
     chip_data = build_chips_from_insured_details(insured_details)
 
     for idx, dr in enumerate(doc_request.document_set, start=1):
-        components.append({
-            "type": "text",
-            "id": f"doc_type_{idx}",
-            "label": f"Document Type {idx}",
-            "placeholder": dr.doc_type,
+        default_chips = (dr.assigned_parties or [])
+        chipbox: Dict[str, Any] = {
+            "type": "info_chipbox",
+            "id": f"doc_{idx}_chips",
+            "label": dr.doc_type,
+            "description": dr.doc_details,
             "required": False,
-        })
-        components.append({
-            "type": "textarea",
-            "id": f"doc_details_{idx}",
-            "label": "Details",
-            "placeholder": dr.doc_details,
-            "required": False,
-        })
+            "notApplicable": True,
+            "defaultValue": default_chips,
+        }
         if chip_data:
-            default_chips = (dr.assigned_parties or [])
-            components.append({
-                "type": "info_chipbox",
-                "id": f"doc_{idx}_chips",
-                "label": "Assign Party",
-                "data": chip_data,
-                "required": False,
-                "notApplicable": True,
-                "defaultValue": default_chips,
-                "description": "Review this information and mark N/A if it does not apply.",
-                "hint": "Select the parties this document request applies to",
-            })
+            chipbox["data"] = chip_data
+        components.append(chipbox)
 
     view_data: List[Dict[str, Any]] = [
         {"type": "markdown", "data": {"content": "## Document Requests"}},
@@ -464,7 +450,7 @@ def build_form_doc_request(
 
     form_data: List[Dict[str, Any]] = [
         {
-            "type": "accordion",
+            "type": "title",
             "id": "document_set",
             "data": [{"value": "Document Requests", "components": components}],
         }
@@ -631,15 +617,12 @@ def parse_form_to_doc_request(
 ) -> DocRequestSet:
     """Parse flat form payload back into DocRequestSet.
 
-    Only doc_details_{N} is in the payload (doc_type is the display label, not editable).
-    doc_type is recovered from `previous` by 1-based position.
+    Only doc_{N}_chips is in the payload. doc_type and doc_details are
+    display-only (label/description on chipbox), recovered from `previous`
+    by 1-based position.
     """
-    doc_details: Dict[int, str] = {}
     doc_chips: Dict[int, List[str]] = {}
     for k, v in (form_payload or {}).items():
-        m = re.fullmatch(r"doc_details_(\d+)", str(k))
-        if m:
-            doc_details[int(m.group(1))] = (v or "").strip()
         m = re.fullmatch(r"doc_(\d+)_chips", str(k))
         if m:
             val = v or []
@@ -652,41 +635,21 @@ def parse_form_to_doc_request(
     )
     items: List[DocRequest] = []
 
-    for idx in sorted(doc_details):
-        if idx - 1 >= len(prev_items):
-            continue
-        doc_type_text = prev_items[idx - 1].doc_type
-        doc_details_text = doc_details[idx]
-
+    for i, prev in enumerate(prev_items):
+        idx = i + 1
         if idx in doc_chips:
             chips = doc_chips[idx]
-        elif idx - 1 < len(prev_items) and prev_items[idx - 1].assigned_parties:
-            chips = prev_items[idx - 1].assigned_parties
+        elif prev.assigned_parties:
+            chips = prev.assigned_parties
         else:
             chips = []
 
-        if doc_type_text:
+        if prev.doc_type:
             items.append(DocRequest(
-                doc_type=doc_type_text,
-                doc_details=doc_details_text,
+                doc_type=prev.doc_type,
+                doc_details=prev.doc_details,
                 assigned_parties=chips if chips else None,
             ))
-
-    return DocRequestSet(
-        document_set=items,
-        version=(previous.version if previous else 0) + 1,
-        update_notes=None,
-    )
-    items: List[DocRequest] = []
-
-    for idx in sorted(doc_details):
-        if idx - 1 >= len(prev_items):
-            continue
-        doc_type_text = prev_items[idx - 1].doc_type
-        doc_details_text = doc_details[idx]
-        if doc_type_text:
-            items.append(DocRequest(doc_type=doc_type_text,
-                                    doc_details=doc_details_text))
 
     return DocRequestSet(
         document_set=items,
