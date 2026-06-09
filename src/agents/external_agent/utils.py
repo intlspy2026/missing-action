@@ -46,6 +46,26 @@ def categorise_parties(
     insured_details: Dict[str, str],
     insured_type: Optional[str],
 ) -> Tuple[List[str], List[str], List[str]]:
+    """Categorise assigned-party keys into insured, driver, and other name buckets.
+
+    Returns three ordered lists of *actual names* (values from insured_details),
+    not the keys themselves.  Keys are classified by substring matching:
+
+    **Business** (insured_type == "yes"):
+        ``"director"/"main contact"`` → driver_names
+        ``"driver"``                 → driver_names
+        ``"business"/"company"/"entity"`` → insured_names
+        everything else              → other_names
+
+    **Individual** (non-business):
+        ``"driver"``                           → driver_names
+        ``"additional insured"``               → insured_names (appended)
+        ``"insured"`` (primary, no "additional") → insured_names (prepended, position 0)
+        everything else                        → other_names
+
+    The primary insured always sits at ``insured_names[0]`` for individual cases
+    because of the ``insert(0, ...)`` on the bare ``"insured"`` key.
+    """
     insured_names: List[str] = []
     driver_names: List[str] = []
     other_names: List[str] = []
@@ -85,6 +105,29 @@ def build_party_possessive_phrase(
     other_names: List[str],
     insured_type: Optional[str],
 ) -> Optional[str]:
+    """Build a possessive phrase string from categorised party name lists.
+
+    Returns ``None`` if there are no names at all.
+
+    **Business** (insured_type == "yes"):
+        All names get possessive form, e.g. ``"Merc's and Alex's"``.
+
+    **Individual, single insured only** (no drivers/others):
+        Returns ``"your"`` — the generic personal pronoun.
+
+    **Individual, multiple parties**:
+        First insured → ``"your"``; all remaining insureds, drivers, and others
+        → possessive form (``"{name}'s"``).  Joined with Oxford-comma rules:
+            1 item  → ``"your"`` or ``"John's"``
+            2 items → ``"your and Jane's"``
+            3+ items→ ``"your, Jane's, and Tom's"``
+
+    Examples:
+        Individual, chips=[Insured=John]                     → "your"
+        Individual, chips=[Insured=John, Driver=Jane]        → "your and Jane's"
+        Individual, chips=[Insured=John, AddlIns=Mike, Other=Tom] → "your, Mike's, and Tom's"
+        Business,   chips=[Insured=Acme, Driver=Bob]         → "Acme's and Bob's"
+    """
     is_business = (insured_type or "").strip().lower() == "yes"
 
     all_names = insured_names + driver_names + other_names
@@ -122,6 +165,31 @@ def apply_party_names_to_doc_details(
     insured_details: Dict[str, str],
     insured_type: Optional[str],
 ) -> str:
+    """Insert party names into a document-request description string.
+
+    Called once per doc during the "Preview update" flow (and never on the
+    same already-modified text, since callers use ``doc_details_original``).
+
+    Two insertion strategies depending on whether the template carries a
+    personal reference:
+
+    **Has personal reference** (``"your"``, ``"you"``, or placeholders like
+    ``[Name]``):
+        *Replace* the reference markers with the possessive phrase.
+        For business: all occurrences of ``"your"/"you"`` → phrase;
+        placeholders → phrase.
+        For individual: first ``"your"`` → phrase; first placeholder → phrase
+        (``count=1`` — later ``"your"`` refs like "your Manager" are left alone).
+
+    **No personal reference** (impersonal template, e.g. "A copy of the
+    vehicle registration"):
+        *Prepend* ``"A copy of "`` → ``"A copy of {phrase} "``.
+        Only applied once — callers should pass ``doc_details_original``
+        to keep this idempotent.
+
+    Returns the modified doc_details string (may be unchanged if there are
+    no assigned parties or no name-bearing insured details).
+    """
     if not assigned_keys or not insured_details:
         return doc_details
 
@@ -153,18 +221,14 @@ def apply_party_names_to_doc_details(
 
     if is_business:
         doc_details = re.sub(
-            r"\byour\b", lambda m: f"{insured_names[0]}'s" if insured_names else m.group(
-            ),
-            doc_details, flags=re.IGNORECASE
+            r"\byour\b", phrase, doc_details, count=1, flags=re.IGNORECASE
         )
         doc_details = re.sub(
-            r"\byou\b", lambda m: insured_names[0] if insured_names else "you",
-            doc_details, flags=re.IGNORECASE
+            r"\byou\b", phrase, doc_details, count=1, flags=re.IGNORECASE
         )
         doc_details = re.sub(
             r"\[Name\]|\[INSERT NAME\]|enter name of person",
-            lambda m: insured_names[0] if insured_names else m.group(),
-            doc_details, flags=re.IGNORECASE
+            phrase, doc_details, count=1, flags=re.IGNORECASE
         )
     else:
         if phrase == "your":
@@ -628,7 +692,8 @@ def parse_form_to_doc_request(
             val = v or []
             if isinstance(val, str):
                 val = [val]
-            doc_chips[int(m.group(1))] = [x.strip() for x in val if x and str(x).strip()]
+            doc_chips[int(m.group(1))] = [x.strip()
+                                          for x in val if x and str(x).strip()]
 
     prev_items = list(
         previous.document_set if previous and previous.document_set else []
