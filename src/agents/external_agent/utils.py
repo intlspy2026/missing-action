@@ -147,12 +147,14 @@ def apply_party_names_to_doc_details(
     if not has_personal_ref:
         pattern = r"^(A copy of )"
         if re.search(pattern, doc_details):
-            doc_details = re.sub(pattern, rf"\1{phrase} ", doc_details, count=1)
+            doc_details = re.sub(
+                pattern, rf"\1{phrase} ", doc_details, count=1)
         return doc_details
 
     if is_business:
         doc_details = re.sub(
-            r"\byour\b", lambda m: f"{insured_names[0]}'s" if insured_names else m.group(),
+            r"\byour\b", lambda m: f"{insured_names[0]}'s" if insured_names else m.group(
+            ),
             doc_details, flags=re.IGNORECASE
         )
         doc_details = re.sub(
@@ -598,7 +600,8 @@ def parse_form_to_key_concerns(
 
     indices = sorted(set(concerns) | set(rationales))
 
-    prev_items = list(previous.concern_set) if previous and previous.concern_set else []
+    prev_items = list(
+        previous.concern_set) if previous and previous.concern_set else []
     items: List[KeyConcern] = []
 
     for i, idx in enumerate(indices):
@@ -611,7 +614,8 @@ def parse_form_to_key_concerns(
                 rationale_text = prev_items[i].rationale
 
         if concern_text:
-            items.append(KeyConcern(concern=concern_text, rationale=rationale_text))
+            items.append(KeyConcern(concern=concern_text,
+                         rationale=rationale_text))
 
     return KeyConcernSet(
         concern_set=items,
@@ -625,15 +629,14 @@ def parse_form_to_doc_request(
     *,
     previous: Optional[DocRequestSet] = None,
 ) -> DocRequestSet:
-    """Parse flat form payload back into DocRequestSet."""
-    doc_types: Dict[int, str] = {}
+    """Parse flat form payload back into DocRequestSet.
+
+    Only doc_details_{N} is in the payload (doc_type is the display label, not editable).
+    doc_type is recovered from `previous` by 1-based position.
+    """
     doc_details: Dict[int, str] = {}
     doc_chips: Dict[int, List[str]] = {}
-
     for k, v in (form_payload or {}).items():
-        m = re.fullmatch(r"doc_type_(\d+)", str(k))
-        if m:
-            doc_types[int(m.group(1))] = (v or "").strip()
         m = re.fullmatch(r"doc_details_(\d+)", str(k))
         if m:
             doc_details[int(m.group(1))] = (v or "").strip()
@@ -644,22 +647,20 @@ def parse_form_to_doc_request(
                 val = [val]
             doc_chips[int(m.group(1))] = [x.strip() for x in val if x and str(x).strip()]
 
-    indices = sorted(set(doc_types) | set(doc_details))
-
-    prev_items = list(previous.document_set) if previous and previous.document_set else []
+    prev_items = list(
+        previous.document_set if previous and previous.document_set else []
+    )
     items: List[DocRequest] = []
 
-    for i, idx in enumerate(indices):
-        doc_type_text = doc_types.get(idx, "")
-        doc_details_text = doc_details.get(idx, "")
-
-        if not doc_details_text and i < len(prev_items):
-            if doc_type_text == prev_items[i].doc_type:
-                doc_details_text = prev_items[i].doc_details
+    for idx in sorted(doc_details):
+        if idx - 1 >= len(prev_items):
+            continue
+        doc_type_text = prev_items[idx - 1].doc_type
+        doc_details_text = doc_details[idx]
 
         chips = doc_chips.get(idx, [])
-        if not chips and i < len(prev_items) and prev_items[i].assigned_parties:
-            chips = prev_items[i].assigned_parties
+        if not chips and idx - 1 < len(prev_items) and prev_items[idx - 1].assigned_parties:
+            chips = prev_items[idx - 1].assigned_parties
 
         if doc_type_text:
             items.append(DocRequest(
@@ -667,6 +668,22 @@ def parse_form_to_doc_request(
                 doc_details=doc_details_text,
                 assigned_parties=chips if chips else None,
             ))
+
+    return DocRequestSet(
+        document_set=items,
+        version=(previous.version if previous else 0) + 1,
+        update_notes=None,
+    )
+    items: List[DocRequest] = []
+
+    for idx in sorted(doc_details):
+        if idx - 1 >= len(prev_items):
+            continue
+        doc_type_text = prev_items[idx - 1].doc_type
+        doc_details_text = doc_details[idx]
+        if doc_type_text:
+            items.append(DocRequest(doc_type=doc_type_text,
+                                    doc_details=doc_details_text))
 
     return DocRequestSet(
         document_set=items,
@@ -694,7 +711,8 @@ def parse_form_to_enquiries(
 
     indices = sorted(set(enquiries) | set(enquiry_details))
 
-    prev_items = list(previous.enquiries_set) if previous and previous.enquiries_set else []
+    prev_items = list(
+        previous.enquiries_set) if previous and previous.enquiries_set else []
     items: List[AdditionalEnquiries] = []
 
     for i, idx in enumerate(indices):
@@ -707,7 +725,8 @@ def parse_form_to_enquiries(
                 detail_text = prev_items[i].enquiry_detail
 
         if enquiry_text:
-            items.append(AdditionalEnquiries(enquiry=enquiry_text, enquiry_detail=detail_text))
+            items.append(AdditionalEnquiries(
+                enquiry=enquiry_text, enquiry_detail=detail_text))
 
     return AdditionalEnquiriesSet(
         enquiries_set=items,
@@ -770,7 +789,8 @@ def build_form_final(claim_id: str, external_agent_plan: ExternalAgentPlan) -> L
         if kc.rationale:
             concern_lines.append(f"> {kc.rationale}")
         concern_lines.append("")
-    concerns_markdown = "\n".join(concern_lines).strip() or "_No key concerns._"
+    concerns_markdown = "\n".join(
+        concern_lines).strip() or "_No key concerns._"
 
     # Document Requests section
     doc_lines = ["### Document Requests\n"]
@@ -784,7 +804,8 @@ def build_form_final(claim_id: str, external_agent_plan: ExternalAgentPlan) -> L
     for eq in external_agent_plan.enquiry_set.enquiries_set or []:
         enq_lines.append(f"**{eq.enquiry}:** {eq.enquiry_detail}")
         enq_lines.append("")
-    enquiries_markdown = "\n".join(enq_lines).strip() or "_No additional enquiries._"
+    enquiries_markdown = "\n".join(
+        enq_lines).strip() or "_No additional enquiries._"
 
     view_data: List[Dict[str, Any]] = [
         {"type": "markdown", "data": {"content": "## Final External Agent Plan"}},
