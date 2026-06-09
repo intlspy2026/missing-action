@@ -182,7 +182,9 @@ def apply_party_names_to_doc_details(
         (``count=1`` — later ``"your"`` refs like "your Manager" are left alone).
 
     **No personal reference** (impersonal template):
-        Returned unchanged — no blind prepend is applied.
+        *Prepend* ``"A copy of "`` → ``"A copy of {phrase} "``.
+        Only applied once — callers should pass ``doc_details_original``
+        to keep this idempotent.
 
     Returns the modified doc_details string (may be unchanged if there are
     no assigned parties or no name-bearing insured details).
@@ -210,6 +212,10 @@ def apply_party_names_to_doc_details(
     )
 
     if not has_personal_ref:
+        pattern = r"^(A copy of )"
+        if re.search(pattern, doc_details):
+            doc_details = re.sub(
+                pattern, rf"\1{phrase} ", doc_details, count=1)
         return doc_details
 
     doc_details = re.sub(
