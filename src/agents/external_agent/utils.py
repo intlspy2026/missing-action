@@ -170,22 +170,19 @@ def apply_party_names_to_doc_details(
     Called once per doc during the "Preview update" flow (and never on the
     same already-modified text, since callers use ``doc_details_original``).
 
-    Two insertion strategies depending on whether the template carries a
-    personal reference:
-
     **Has personal reference** (``"your"``, ``"you"``, or placeholders like
-    ``[Name]``):
-        *Replace* the reference markers with the possessive phrase.
-        For business: all occurrences of ``"your"/"you"`` → phrase;
-        placeholders → phrase.
+    ``[Name]``, ``<INSERT NAME>``, ``<INSERT WITNESS>``,
+    ``enter name of person``):
+        ``"your/enter name of person's"`` alternative constructs are replaced
+        atomically first, preventing redundant double-replacement of the
+        ``/``-separated halves.
+
+        For business: first ``"your"/"you"`` → phrase; first placeholder → phrase.
         For individual: first ``"your"`` → phrase; first placeholder → phrase
         (``count=1`` — later ``"your"`` refs like "your Manager" are left alone).
 
-    **No personal reference** (impersonal template, e.g. "A copy of the
-    vehicle registration"):
-        *Prepend* ``"A copy of "`` → ``"A copy of {phrase} "``.
-        Only applied once — callers should pass ``doc_details_original``
-        to keep this idempotent.
+    **No personal reference** (impersonal template):
+        Returned unchanged — no blind prepend is applied.
 
     Returns the modified doc_details string (may be unchanged if there are
     no assigned parties or no name-bearing insured details).
@@ -209,15 +206,19 @@ def apply_party_names_to_doc_details(
     has_personal_ref = bool(
         re.search(r"\byour\b", doc_details, re.IGNORECASE)
         or re.search(r"\byou\b", doc_details, re.IGNORECASE)
-        or re.search(r"\[Name\]|\[INSERT NAME\]|enter name of person", doc_details, re.IGNORECASE)
+        or re.search(r"\[Name\]|\[INSERT NAME\]|enter name of person|<INSERT\s+NAME>|<INSERT\s+WITNESS>", doc_details, re.IGNORECASE)
     )
 
     if not has_personal_ref:
-        pattern = r"^(A copy of )"
-        if re.search(pattern, doc_details):
-            doc_details = re.sub(
-                pattern, rf"\1{phrase} ", doc_details, count=1)
         return doc_details
+
+    doc_details = re.sub(
+        r"\byour/enter name of person'?s?\b",
+        phrase,
+        doc_details,
+        count=1,
+        flags=re.IGNORECASE,
+    )
 
     if is_business:
         doc_details = re.sub(
@@ -227,7 +228,7 @@ def apply_party_names_to_doc_details(
             r"\byou\b", phrase, doc_details, count=1, flags=re.IGNORECASE
         )
         doc_details = re.sub(
-            r"\[Name\]|\[INSERT NAME\]|enter name of person",
+            r"\[Name\]|\[INSERT NAME\]|enter name of person|<INSERT\s+NAME>|<INSERT\s+WITNESS>",
             phrase, doc_details, count=1, flags=re.IGNORECASE
         )
     else:
@@ -238,7 +239,7 @@ def apply_party_names_to_doc_details(
             r"\byour\b", phrase, doc_details, count=1, flags=re.IGNORECASE
         )
         doc_details = re.sub(
-            r"\[Name\]|\[INSERT NAME\]|enter name of person",
+            r"\[Name\]|\[INSERT NAME\]|enter name of person|<INSERT\s+NAME>|<INSERT\s+WITNESS>",
             phrase, doc_details, count=1, flags=re.IGNORECASE
         )
 
