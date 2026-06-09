@@ -1300,9 +1300,10 @@ def get_graph(llm: BaseChatModel) -> StateGraph:
                 updated_docs: List[DocRequest] = []
                 for dr in doc_request.document_set:
                     assigned_keys = dr.assigned_parties or []
+                    original = dr.doc_details_original or dr.doc_details
                     if assigned_keys:
                         updated_details = apply_party_names_to_doc_details(
-                            dr.doc_details,
+                            original,
                             assigned_keys,
                             insured_details,
                             insured_type,
@@ -1311,9 +1312,15 @@ def get_graph(llm: BaseChatModel) -> StateGraph:
                             doc_type=dr.doc_type,
                             doc_details=updated_details,
                             assigned_parties=dr.assigned_parties,
+                            doc_details_original=dr.doc_details_original or dr.doc_details,
                         ))
                     else:
-                        updated_docs.append(dr)
+                        updated_docs.append(DocRequest(
+                            doc_type=dr.doc_type,
+                            doc_details=original,
+                            assigned_parties=None,
+                            doc_details_original=dr.doc_details_original or dr.doc_details,
+                        ))
 
                 parsed = DocRequestSet(
                     document_set=updated_docs,
@@ -1534,6 +1541,10 @@ def get_graph(llm: BaseChatModel) -> StateGraph:
                 document_set=methodology_docs.document_set + narrative_docs.document_set,
                 version=1,
             )
+
+        for dr in parsed.document_set:
+            if not dr.doc_details_original:
+                dr.doc_details_original = dr.doc_details
 
         # Send to HITL review
         insured_details = state.get("insured_details")

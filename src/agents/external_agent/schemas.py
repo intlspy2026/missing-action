@@ -59,6 +59,7 @@ class DocRequest(BaseModel):
     doc_type: str
     doc_details: str
     assigned_parties: Optional[List[str]] = None
+    doc_details_original: Optional[str] = None
 
 
 class DocRequestSet(BaseModel):

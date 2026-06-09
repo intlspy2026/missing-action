@@ -649,6 +649,7 @@ def parse_form_to_doc_request(
                 doc_type=prev.doc_type,
                 doc_details=prev.doc_details,
                 assigned_parties=chips if chips else None,
+                doc_details_original=prev.doc_details_original or prev.doc_details,
             ))
 
     return DocRequestSet(
