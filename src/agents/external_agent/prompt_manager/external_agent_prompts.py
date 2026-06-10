@@ -737,12 +737,7 @@ You are an expert in UK English insurance document request wording. Your task is
 <RULES>
 1. **UK English**: Use UK English spelling and grammar conventions throughout (e.g. "licence" not "license", "organisation" not "organization"). The text is already in UK English — preserve that.
 
-2. **"your" and "you" replacement**:
-   Replace EVERY occurrence of "your" and "you" in the text that refers to the assigned parties. Use the possessive and pronoun rules from Rules 3–5.
-   There may be multiple instances in a single sentence — replace ALL of them, not just the first one.
-   Do NOT attempt to distinguish between "document-scoping" and "personal circumstances" — replace every "your"/"you" that refers to an assigned party uniformly.
-
-3. **Possessive Form Rules — Individual (non-business) insured type**:
+2. **Possessive Form Rules — Individual (non-business) insured type**:
    - **SINGLE insured assigned, NO other parties**: Keep "your" as-is. Do NOT insert any name.
      EXCEPTION: If the prompt states "Multiple insureds in policy: true", then even a single assigned insured must be replaced with their possessive name form ("[Name]'s") — never use "your".
    - **Insured + other parties (e.g. driver, witness)**: "your" for the insured, "'s" for all other names.
@@ -751,20 +746,22 @@ You are an expert in UK English insurance document request wording. Your task is
      Example: "John Smith's and Mary Jones's" (2 insureds), "John Smith's, Mary Jones's, and Jane Doe's" (3+ parties).
    - **Only non-insured parties assigned (no insured)**: ALL names get "'s".
      Example: "Jane Doe's" (single), "Jane Doe's and Bob Smith's" (multiple).
+   When the insured is joined by other assigned parties, a sentence may contain multiple "your"/"you" references — replace ALL that refer to the assigned parties, not just the first one.
 
-4. **Possessive Form Rules — Business insured type**:
+3. **Possessive Form Rules — Business insured type**:
    - Replace EVERY "your" and "you" in the text with the business/company name in possessive form ("[Business Name]'s").
    - All other assigned parties also get "'s" and are joined with Oxford comma.
      Example: "Acme Corp's and John Smith's" (business + director).
+   A sentence may contain multiple "your"/"you" references — replace ALL that refer to the assigned parties, not just the first one.
 
-5. **Collective Pronoun Shift**:
+4. **Collective Pronoun Shift**:
    When 2 or more parties are assigned to the same document, institutional/shared references shift from singular ("your") to plural ("their"):
    - "your transport department" → "their transport department"
    - "your telephone service provider" → "their telephone service provider"
    - "your toll account" → "their toll account"
    - "your financier" → "their financier"
 
-6. **Insertion Position**:
+5. **Insertion Position**:
    Place the party possessive phrase at the natural grammatical position — typically immediately before the document name or noun phrase being requested.
    - "A copy of [PARTIES] Work Roster/Timesheet from..."
    - "A copy of [PARTIES] full financial statements for all accounts..."
@@ -772,12 +769,13 @@ You are an expert in UK English insurance document request wording. Your task is
    - "Provide [PARTIES] full National Criminal History..."
    If no natural document noun phrase is identifiable, prepend the party possessive at the start.
 
-7. **Preserve Everything Else**:
+6. **Preserve Everything Else**:
    - All <INSERT ...> tokens, date patterns (XX to XX, <INSERT DATE>), XXXX patterns, and CAPITALISED tokens must remain EXACTLY as-is.
+
    - Do NOT change document descriptions, instructions, parenthetical notes, or any other text.
    - Do NOT add, remove, or rephrase any content beyond party name insertion and pronoun adjustments.
 
-8. **Output Format**:
+7. **Output Format**:
    Return ONLY a JSON object with a single field "doc_details" containing the complete modified text.
    Format: {{"doc_details": "<modified text>"}}
    No markdown, no code fences, no explanation.
