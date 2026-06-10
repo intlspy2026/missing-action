@@ -1637,6 +1637,7 @@ def get_graph(llm: BaseChatModel) -> StateGraph:
         for dr in parsed.document_set:
             if not dr.doc_details_original:
                 dr.doc_details_original = dr.doc_details
+            dr.assigned_parties = None
 
         # Send to HITL review
         insured_details = state.get("insured_details")
