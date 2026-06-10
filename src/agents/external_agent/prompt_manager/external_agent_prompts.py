@@ -261,9 +261,19 @@ a. **Primary (SME match exists)**: When a matching entry exists in the provided 
 
 b. **Fallback (no SME match)**: When a document type has no matching entry in the provided GOLD_STANDARDS, INCLUDE it using a fallback draft: write a full
    instruction-style request (e.g., "A copy of _", "Fully itemised _", "Provide _"), grounded in the PREVIOUS VERSION doc_details and case context. Match the
-   cadence and neutral tone of the SME exemplars. Do NOT produce short labels or one-line summaries. MUST NOT list as examples any document type that has a
-   standalone entry in GOLD_STANDARDS (e.g., work rosters, timesheets, rideshare receipts, toll records, police documents, medical records). Those pass or
-   fail on their own relevance — re-listing them in a fallback entry's doc_details bypasses the methodology.
+    cadence and neutral tone of the SME exemplars. Do NOT produce short labels or one-line summaries. MUST NOT list as examples any document type that has a
+    standalone entry in GOLD_STANDARDS (e.g., work rosters, timesheets, rideshare receipts, toll records, police documents, medical records). Those pass or
+    fail on their own relevance — re-listing them in a fallback entry's doc_details bypasses the methodology.
+
+**RULE 3c - PLACEHOLDER FILLING EXCEPTION**: RULE 3a requires ALL placeholders to pass through verbatim. However, for the following THREE specific gold standard entries ONLY, you MUST fill the indicated placeholder with case-specific information from the context:
+
+1. **Signed Authorities**: Replace `<INSERT AUTHORITY>` with the authority type. Determine the authority from the investigation methodology and information in INITIAL REVIEW and ADDITIONAL INFORMATION. If the correct authority cannot be determined, leave the placeholder unchanged.
+
+2. **Witness Contact Details (Known)**: Check INITIAL REVIEW and ADDITIONAL INFORMATION for an identified witness.
+   - **Witness IS identified**: Replace `<INSERT WITNESS>` (Motor) or `<INSERT NAME>` (Property) with the witness's full name. Keep the "Witness Contact Details (Known)" doc_type.
+   - **No witness identified**: Discard the "Witness Contact Details (Known)" match entirely. Instead, match this entry to the **"Witness Contacts Details (Unknown)"** gold standard entry — apply its doc_type and wording verbatim (no placeholder to fill).
+
+3. **Financial Statements (Business)**: Replace `<INSERT BUSINESS NAMES>` with the business name from BUSINESS NAME below. If no business name is provided, leave the placeholder unchanged.
 </CRITICAL_RULES>
 
 <TASK>
@@ -281,10 +291,10 @@ Steps:
 
 4. OUTPUT PASS:
    For each unique surviving entry from Step 3:
-   a. Gold standard match → apply RULE 3a (verbatim SME wording, do NOT fill placeholders) + RULE 2.5 (gold standard name + timeframe from PREVIOUS VERSION doc_details if present).
+   a. Gold standard match → apply RULE 3a (verbatim SME wording). For "Signed Authorities", "Witness Contact Details (Known)", and "Financial Statements (Business)", apply RULE 3c (fill placeholders from context) instead of RULE 3a (verbatim). Apply RULE 2.5 (gold standard name + timeframe from PREVIOUS VERSION doc_details if present).
    b. No match → apply RULE 3b (full instruction-style fallback grounded in PREVIOUS VERSION doc_details and case context) + RULE 2.5 (use PREVIOUS VERSION doc_type if no gold standard name).
    Validate inline before outputting each entry:
-    - Verbatim SME wording with NO placeholder changes?
+    - Verbatim SME wording (or RULE 3c placeholder filling for the 3 exception types)?
    - Full instruction-style fallback (not a short label or one-liner)?
    - Neutral language (RULE 2)?
    - Doc_type follows RULE 2.5?
@@ -315,6 +325,11 @@ The ADDITIONAL INFORMATION includes additional notes on the claim:
 <ADDITIONAL INFORMATION>
 {additional_info}
 </ADDITIONAL INFORMATION>
+
+The BUSINESS NAME for Financial Statements (Business) insertion (RULE 3c):
+<BUSINESS NAME>
+{business_name}
+</BUSINESS NAME>
 </CONTEXT>
 """
 

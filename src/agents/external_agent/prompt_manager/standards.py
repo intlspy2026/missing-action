@@ -14,10 +14,14 @@ To update the gold standards, edit the raw constant only; the block constant is
 derived automatically.
 
 Placeholder conventions inside SME entries:
-- All placeholders — `<INSERT ...>` tokens, X-patterns (XXX, XXXX, XX to XX),
+- Most placeholders — `<INSERT ...>` tokens, X-patterns (XXX, XXXX, XX to XX),
   generic anchors, and CAPITALISED tokens (e.g., START/END, ENTRY/EXIT) — pass
   through to the output verbatim. The AI does NOT fill or compute any values;
   they remain as literal tokens for manual completion.
+- EXCEPTION (RULE 3c): For "Signed Authorities" (`<INSERT AUTHORITY>`),
+  "Witness Contact Details (Known)" (`<INSERT WITNESS>` / `<INSERT NAME>`),
+  and "Financial Statements (Business)" (`<INSERT BUSINESS NAMES>`), the AI
+  fills the placeholder from case context during the SME wording step.
 """
 24
 MOTOR_DOC_REQUEST_GOLD_STANDARDS = """
