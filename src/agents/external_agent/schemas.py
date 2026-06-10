@@ -118,6 +118,10 @@ class KnowledgeSet(BaseModel):
 #     interview_plan: InterviewQuestionSets
 
 
+class PartyNameInsertionOutput(BaseModel):
+    doc_details: str
+
+
 class HITLDecision(BaseModel):
     intent: Literal["accept", "feedback", "unrelated", "preview_update"]
     task_summary: str

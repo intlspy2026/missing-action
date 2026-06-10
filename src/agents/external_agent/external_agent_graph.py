@@ -59,6 +59,7 @@ from agents.external_agent.schemas import (
     KeyConcern, KeyConcernSet,
     ExternalAgentPlan,
     AdditionalEnquiriesSet, AdditionalEnquiries,
+    PartyNameInsertionOutput,
 )
 # --- Commented out: unused schema imports ---
 # from agents.external_agent.schemas import InterviewStrategy, InterviewPlan, KnowledgeReport, InterviewPlanState
@@ -234,6 +235,46 @@ def strip_hard_exclusions(doc_list_data: dict, initial_review: str,
                       len(stripped), stripped)
     doc_list_data["document_set"] = result
     return doc_list_data
+
+
+# ---------------------------------------------------------------------------
+# Party name insertion helpers
+# ---------------------------------------------------------------------------
+
+_NAME_PLACEHOLDER_RE = _re.compile(
+    r"<INSERT\s+NAME>|<INSERT\s+WITNESS>",
+    _re.IGNORECASE,
+)
+
+
+def _has_name_placeholder(doc_details: str) -> bool:
+    return bool(_NAME_PLACEHOLDER_RE.search(doc_details))
+
+
+def _check_multiple_insureds(insured_details: Dict[str, str]) -> bool:
+    insured_val: str = ""
+    additional_val: str = ""
+    for key, value in insured_details.items():
+        if not value or not str(value).strip():
+            continue
+        key_lower = key.lower()
+        if "additional" in key_lower and "insured" in key_lower:
+            additional_val = value.strip()
+        elif "insured" in key_lower:
+            insured_val = value.strip()
+    return bool(insured_val and additional_val)
+
+
+def _format_party_data(
+    assigned_keys: List[str],
+    insured_details: Dict[str, str],
+) -> str:
+    lines: List[str] = []
+    for key in assigned_keys:
+        value = (insured_details.get(key) or "").strip()
+        if value:
+            lines.append(f"- {key}: {value}")
+    return "\n".join(lines)
 
 
 def get_graph(llm: BaseChatModel) -> StateGraph:
@@ -1274,6 +1315,16 @@ def get_graph(llm: BaseChatModel) -> StateGraph:
         feedback = decision.task_summary if decision and decision.intent == "feedback" else ""
         selected_sections = state.get("selected_sections", []) or []
 
+        lob = state.get("lob", "")
+        if lob == "Motor":
+            gold_standards = MOTOR_DOC_REQUEST_GOLD_STANDARDS
+            gold_standards_block = MOTOR_DOC_REQUEST_GOLD_STANDARDS_BLOCK
+        elif lob == "Property":
+            gold_standards = PROPERTY_DOC_REQUEST_GOLD_STANDARDS
+            gold_standards_block = PROPERTY_DOC_REQUEST_GOLD_STANDARDS_BLOCK
+        else:
+            raise ValueError(f"Unsupported LOB: {lob}. Expected 'Motor' or 'Property'.")
+
         # --- Accept path: state["doc_request"] is already canonical (written by route_interrupt) ---
         if decision and decision.intent == "accept":
             goto = _next_section("doc_request", selected_sections)
@@ -1293,37 +1344,93 @@ def get_graph(llm: BaseChatModel) -> StateGraph:
             insured_type = state.get("insured_type")
             doc_request = state.get("doc_request")
 
+            insured_type_label = (
+                "business" if (insured_type or "").strip().lower() == "yes"
+                else "individual"
+            )
+
             if doc_request and insured_details:
                 writer(prepare_thinking_message(
                     EXTERNAL_AGENT_NAME, "Applying party names to document details..."))
 
-                updated_docs: List[DocRequest] = []
-                for dr in doc_request.document_set:
-                    assigned_keys = dr.assigned_parties or []
-                    original = dr.doc_details_original or dr.doc_details
-                    if assigned_keys:
+                async def _insert_party_names_async(dr: DocRequest) -> DocRequest:
+                    try:
+                        assigned_keys = dr.assigned_parties or []
+                        original = dr.doc_details_original or dr.doc_details
+                        if not assigned_keys:
+                            return DocRequest(
+                                doc_type=dr.doc_type,
+                                doc_details=original,
+                                assigned_parties=None,
+                                doc_details_original=dr.doc_details_original or dr.doc_details,
+                            )
+                        if _has_name_placeholder(original):
+                            return DocRequest(
+                                doc_type=dr.doc_type,
+                                doc_details=original,
+                                assigned_parties=dr.assigned_parties,
+                                doc_details_original=dr.doc_details_original or dr.doc_details,
+                            )
+                        party_data = _format_party_data(assigned_keys, insured_details)
+                        if not party_data:
+                            return DocRequest(
+                                doc_type=dr.doc_type,
+                                doc_details=original,
+                                assigned_parties=dr.assigned_parties,
+                                doc_details_original=dr.doc_details_original or dr.doc_details,
+                            )
+                        multiple_insureds_line = (
+                            "Multiple insureds in policy: true"
+                            if _check_multiple_insureds(insured_details)
+                            else ""
+                        )
+                        prompt = PARTY_NAME_INSERTION_PROMPT.format(
+                            doc_type=dr.doc_type,
+                            standard_reference=gold_standards_block,
+                            party_data=party_data,
+                            insured_type=insured_type_label,
+                            multiple_insureds_line=multiple_insureds_line,
+                            doc_details=original,
+                        )
+                        response = await asyncio.to_thread(
+                            llm.invoke,
+                            input=[HumanMessage(content=prompt)],
+                            temperature=0.0,
+                            max_tokens=2000,
+                            response_format={"type": "json_object"},
+                        )
+                        content = (
+                            response.content if isinstance(response.content, str)
+                            else response.content[0]["text"]
+                        )
+                        parsed = PartyNameInsertionOutput.model_validate_json(content)
+                        updated_details = parsed.doc_details
+                    except Exception:
+                        logger.warning(
+                            "AI party name insertion failed for doc_type=%r. "
+                            "Falling back to deterministic approach.",
+                            dr.doc_type,
+                            exc_info=True,
+                        )
                         updated_details = apply_party_names_to_doc_details(
                             original,
                             assigned_keys,
                             insured_details,
                             insured_type,
                         )
-                        updated_docs.append(DocRequest(
-                            doc_type=dr.doc_type,
-                            doc_details=updated_details,
-                            assigned_parties=dr.assigned_parties,
-                            doc_details_original=dr.doc_details_original or dr.doc_details,
-                        ))
-                    else:
-                        updated_docs.append(DocRequest(
-                            doc_type=dr.doc_type,
-                            doc_details=original,
-                            assigned_parties=None,
-                            doc_details_original=dr.doc_details_original or dr.doc_details,
-                        ))
+                    return DocRequest(
+                        doc_type=dr.doc_type,
+                        doc_details=updated_details,
+                        assigned_parties=dr.assigned_parties,
+                        doc_details_original=dr.doc_details_original or dr.doc_details,
+                    )
+
+                updated_docs = await asyncio.gather(
+                    *[_insert_party_names_async(dr) for dr in doc_request.document_set]
+                )
 
                 parsed = DocRequestSet(
-                    document_set=updated_docs,
+                    document_set=list(updated_docs),
                     version=doc_request.version,
                 )
             elif doc_request:
@@ -1362,16 +1469,6 @@ def get_graph(llm: BaseChatModel) -> StateGraph:
         system_prompt = EXTERNAL_AGENT_SYSTEM_PROMPT
         parser = PydanticOutputParser(pydantic_object=DocRequestSet)
         knowledge_json = None
-
-        lob = state.get("lob", "")
-        if lob == "Motor":
-            gold_standards = MOTOR_DOC_REQUEST_GOLD_STANDARDS
-            gold_standards_block = MOTOR_DOC_REQUEST_GOLD_STANDARDS_BLOCK
-        elif lob == "Property":
-            gold_standards = PROPERTY_DOC_REQUEST_GOLD_STANDARDS
-            gold_standards_block = PROPERTY_DOC_REQUEST_GOLD_STANDARDS_BLOCK
-        else:
-            raise ValueError(f"Unsupported LOB: {lob}. Expected 'Motor' or 'Property'.")
 
         # --- Feedback path ---
         if feedback:
