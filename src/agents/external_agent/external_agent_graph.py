@@ -48,7 +48,6 @@ from agents.external_agent.utils import (
     build_form_interview_plan, parse_form_to_interview_plan,
     build_form_final,
     build_quick_action_preview_update,
-    apply_party_names_to_doc_details,
 )
 from smart_investigator.foundation.utils.utils import prepare_thinking_message, prepare_hitl_task
 from agents.external_agent.schemas import (
@@ -1408,16 +1407,11 @@ def get_graph(llm: BaseChatModel) -> StateGraph:
                     except Exception:
                         logger.warning(
                             "AI party name insertion failed for doc_type=%r. "
-                            "Falling back to deterministic approach.",
+                            "Keeping original details.",
                             dr.doc_type,
                             exc_info=True,
                         )
-                        updated_details = apply_party_names_to_doc_details(
-                            original,
-                            assigned_keys,
-                            insured_details,
-                            insured_type,
-                        )
+                        updated_details = original
                     return DocRequest(
                         doc_type=dr.doc_type,
                         doc_details=updated_details,
