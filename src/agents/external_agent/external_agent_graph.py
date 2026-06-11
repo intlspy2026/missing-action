@@ -1407,11 +1407,11 @@ def get_graph(llm: BaseChatModel) -> StateGraph:
                     except Exception:
                         logger.warning(
                             "AI party name insertion failed for doc_type=%r. "
-                            "Keeping original details.",
+                            "Falling back to current details.",
                             dr.doc_type,
                             exc_info=True,
                         )
-                        updated_details = original
+                        updated_details = dr.doc_details or original
                     return DocRequest(
                         doc_type=dr.doc_type,
                         doc_details=updated_details,
@@ -1419,9 +1419,9 @@ def get_graph(llm: BaseChatModel) -> StateGraph:
                         doc_details_original=dr.doc_details_original or dr.doc_details,
                     )
 
-                updated_docs = await asyncio.gather(
-                    *[_insert_party_names_async(dr) for dr in doc_request.document_set]
-                )
+                updated_docs = []
+                for dr in doc_request.document_set:
+                    updated_docs.append(await _insert_party_names_async(dr))
 
                 parsed = DocRequestSet(
                     document_set=list(updated_docs),
