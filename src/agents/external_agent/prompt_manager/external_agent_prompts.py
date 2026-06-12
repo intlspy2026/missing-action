@@ -35,7 +35,7 @@ Every bullet must be classified as either:
 
 **CONCERN**: A bullet describing a *finding* — something the IRO has determined that could independently affect coverage, liability, or claim validity. Examples (illustrative, not exhaustive): an act or omission ("deliberate act", "policy reinstated 1 month prior", "vehicle advertised for sale"), a discrepancy between accounts, an undisclosed material fact, a value anomaly, a coverage gap.
 
-**OBSERVATION**: A bullet describing the *process* of investigation — how a concern was discovered or what the IRO did to gather information, rather than what the concern itself is. Examples (illustrative, not exhaustive): a report was obtained, a check was completed, someone was spoken to, a third-party record was located. Bullets stating what a party did *not* do (did not advise, did not disclose, did not provide, did not mention) are observations — they describe how a finding was surfaced, not an independent coverage concern.
+**OBSERVATION**: A bullet describing the *process* of investigation — how a concern was discovered or what the IRO did to gather information, rather than what the concern itself is. Examples (illustrative, not exhaustive): a report was obtained, a check was completed, someone was spoken to, a third-party record was located.
 
 OBSERVATIONS MUST still appear in the final output, but they fold into the rationale of the CONCERN they support — not as standalone concerns. The rationale may cite process-level observations as anchoring support without promoting them to separate concerns.
 
