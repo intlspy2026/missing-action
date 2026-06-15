@@ -2091,8 +2091,24 @@ def get_graph(llm: BaseChatModel) -> StateGraph:
         claim_id = state.get("claim_id")
 
         selected_sections = state.get("selected_sections", [])
-        artifact = build_form_final(
-            claim_id, final_plan, selected_sections) if final_plan else {}
+        ui_artifact = build_form_final(
+            claim_id, final_plan, selected_sections) if final_plan else []
+
+        form_data = {
+            "claim_id": state.get("claim_id"),
+            "brand": state.get("brand"),
+            "lob": state.get("lob"),
+            "investigation_type": state.get("investigation_type"),
+            "initial_review": state.get("initial_review"),
+            "additional_info": state.get("additional_info"),
+            "insured_type": state.get("insured_type"),
+            "insured_details": state.get("insured_details"),
+            "selected_sections": state.get("selected_sections", []),
+        }
+
+        artifact = ui_artifact + [
+            {"type": "form_data", "data": form_data}
+        ]
 
         return Command(
             update={

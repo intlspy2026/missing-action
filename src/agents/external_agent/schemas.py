@@ -158,7 +158,7 @@ class ExternalAgentState(MessagesState):
     external_agent_plan: Optional[ExternalAgentPlan] = None
 
     # HITL / control flow
-    artifact: dict[str, Any]
+    artifact: Any
     resume: bool
     pending_step: Optional[str] = None
     hitl_decision: Optional[HITLDecision] = None
