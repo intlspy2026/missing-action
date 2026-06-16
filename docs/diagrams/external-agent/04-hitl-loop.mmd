@@ -1,0 +1,16 @@
+sequenceDiagram
+    participant Graph as LangGraph Node
+    participant Router as route_interrupt
+    participant Frontend as Frontend Form
+
+    Graph->>Router: Section draft complete
+    Router->>Frontend: interrupt(hitl_task)
+    Frontend-->>Router: User response
+    Router->>Router: _classify_hitl(intent)
+    alt accept
+        Router->>Graph: Route to next section
+    else feedback
+        Router->>Graph: Regenerate with feedback prompt
+    else preview_update
+        Router->>Graph: Re-run party insertion only
+    end

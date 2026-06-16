@@ -1,0 +1,25 @@
+flowchart LR
+    START([START])
+    INIT["initialise_query"]
+    DISPATCH["dispatch_sections"]
+    KC["generate_key_concerns"]
+    AE["generate_enquiries"]
+    DR["generate_doc_request"]
+    ASSEMBLE["assemble_plan"]
+    FINALISE["finalise_plan"]
+    END([END])
+
+    START --> INIT
+    INIT --> DISPATCH
+    DISPATCH --> KC
+    KC -->|HITL review| KC_LOOP[" "]
+    KC_LOOP --> KC
+    KC --> AE
+    AE -->|HITL review| AE_LOOP[" "]
+    AE_LOOP --> AE
+    AE --> DR
+    DR -->|HITL review| DR_LOOP[" "]
+    DR_LOOP --> DR
+    DR --> ASSEMBLE
+    ASSEMBLE --> FINALISE
+    FINALISE --> END

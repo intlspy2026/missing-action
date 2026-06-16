@@ -1,0 +1,9 @@
+flowchart TB
+    A["Raw methodology + claim context"] --> B["strip_hard_exclusions"]
+    B --> C["Call 1: Relevance filter"]
+    C --> D["Call 2: SME gold-standard wording"]
+    D --> E["Call 3: Narrative derivation"]
+    E --> F["Cross-type deduplication"]
+    F --> G["Party assignment"]
+    G --> H["Party name insertion"]
+    H --> I["DocRequestSet"]

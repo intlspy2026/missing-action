@@ -1,0 +1,9 @@
+sequenceDiagram
+    participant Frontend
+    participant Router as route_interrupt
+    participant LLM
+
+    Frontend->>Router: User assigns parties + clicks Preview update
+    Router->>LLM: PARTY_NAME_INSERTION_PROMPT
+    LLM-->>Router: Grammatically adjusted doc_details
+    Router->>Frontend: Updated preview

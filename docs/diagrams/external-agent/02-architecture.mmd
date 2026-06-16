@@ -1,0 +1,28 @@
+flowchart TB
+    subgraph EntryLayer["Entry Layer"]
+        EA_PY["external_agent.py MLflow ResponsesAgent"]
+    end
+
+    subgraph GraphLayer["Graph Layer"]
+        GRAPH["external_agent_graph.py StateGraph"]
+        ROUTER["route_interrupt HITL classifier"]
+    end
+
+    subgraph PromptLayer["Prompt Layer"]
+        PROMPTS["external_agent_prompts.py"]
+        KNOWLEDGE["knowledge_prompts.py"]
+        STANDARDS["standards.py SME wording"]
+    end
+
+    subgraph SchemaUILayer["Schema / UI Layer"]
+        SCHEMAS["schemas.py Pydantic models"]
+        UTILS["utils.py Form builders / parsers"]
+    end
+
+    EA_PY --> GRAPH
+    GRAPH --> ROUTER
+    GRAPH --> PROMPTS
+    GRAPH --> KNOWLEDGE
+    GRAPH --> STANDARDS
+    GRAPH --> SCHEMAS
+    GRAPH --> UTILS

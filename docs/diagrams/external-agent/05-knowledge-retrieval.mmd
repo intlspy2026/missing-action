@@ -1,0 +1,7 @@
+flowchart LR
+    A["Claim context LOB + investigation types"] --> B["Load textbook delta table chunks"]
+    B --> C["Filter by LOB / fraud type / stage"]
+    C --> D["Run extraction prompt"]
+    D --> E["Section-specific knowledge"]
+    E --> F["Section-specific knowledge cache"]
+    F --> G["Drafting nodes"]

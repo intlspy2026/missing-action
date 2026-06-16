@@ -21,19 +21,7 @@ Each section is drafted, presented in an editable smart form, reviewed by a huma
 
 ### Integration context
 
-```mermaid
-flowchart LR
-    Orchestrator["Master / Orchestrator Agent"]
-    EA["External Agent<br/>(MLflow ResponsesAgent)"]
-    LLM["Azure OpenAI LLM"]
-    Textbook["Textbook Delta Table<br/>(Methodology chunks)"]
-    Frontend["Frontend HITL Forms"]
-
-    Orchestrator -->|ResponsesAgent request| EA
-    EA -->|LLM calls| LLM
-    EA -->|Read chunks| Textbook
-    EA <-->|Interrupt / Resume| Frontend
-```
+![Integration context](./diagrams/external-agent/01-integration-context.svg)
 
 - **Entry point:** `external_agent.py` exposes `ExternalAgentResponsesAgent`.
 - **Runtime context:** injected by the orchestrator — `request` and `forms` config.
@@ -45,36 +33,7 @@ flowchart LR
 
 ### 2.1 Component diagram
 
-```mermaid
-flowchart TB
-    subgraph "Entry Layer"
-        EA_PY["external_agent.py<br/>MLflow ResponsesAgent"]
-    end
-
-    subgraph "Graph Layer"
-        GRAPH["external_agent_graph.py<br/>StateGraph"]
-        ROUTER["route_interrupt<br/>HITL classifier"]
-    end
-
-    subgraph "Prompt Layer"
-        PROMPTS["external_agent_prompts.py"]
-        KNOWLEDGE["knowledge_prompts.py"]
-        STANDARDS["standards.py<br/>SME wording"]
-    end
-
-    subgraph "Schema / UI Layer"
-        SCHEMAS["schemas.py<br/>Pydantic models"]
-        UTILS["utils.py<br/>Form builders / parsers"]
-    end
-
-    EA_PY --> GRAPH
-    GRAPH --> ROUTER
-    GRAPH --> PROMPTS
-    GRAPH --> KNOWLEDGE
-    GRAPH --> STANDARDS
-    GRAPH --> SCHEMAS
-    GRAPH --> UTILS
-```
+![Architecture component diagram](./diagrams/external-agent/02-architecture.svg)
 
 ### 2.2 File responsibilities
 
@@ -105,30 +64,7 @@ flowchart TB
 
 ### 3.1 Graph flow
 
-```mermaid
-flowchart LR
-    START([START])
-    INIT["initialise_query"]
-    DISPATCH["dispatch_sections"]
-    KC["generate_key_concerns"]
-    AE["generate_enquiries"]
-    DR["generate_doc_request"]
-    ASSEMBLE["assemble_plan"]
-    FINALISE["finalise_plan"]
-    END([END])
-
-    START --> INIT
-    INIT --> DISPATCH
-    DISPATCH --> KC
-    KC -->|HITL review| KC
-    KC --> AE
-    AE -->|HITL review| AE
-    AE --> DR
-    DR -->|HITL review| DR
-    DR --> ASSEMBLE
-    ASSEMBLE --> FINALISE
-    FINALISE --> END
-```
+![Graph flow diagram](./diagrams/external-agent/03-graph-flow.svg)
 
 ### 3.2 Execution order
 
@@ -154,24 +90,7 @@ The graph executes sections **sequentially** so the frontend can review one sect
 
 After each generation node, `route_interrupt` pauses execution and sends a HITL task to the frontend.
 
-```mermaid
-sequenceDiagram
-    participant Graph as LangGraph Node
-    participant Router as route_interrupt
-    participant Frontend as Frontend Form
-
-    Graph->>Router: Section draft complete
-    Router->>Frontend: interrupt(hitl_task)
-    Frontend-->>Router: User response (accept / feedback / preview_update)
-    Router->>Router: _classify_hitl(intent)
-    alt accept
-        Router->>Graph: Route to next section
-    else feedback
-        Router->>Graph: Regenerate with feedback prompt
-    else preview_update
-        Router->>Graph: Re-run party insertion only
-    end
-```
+![HITL pause / resume loop](./diagrams/external-agent/04-hitl-loop.svg)
 
 The classifier resolves the user's intent into one of:
 
@@ -189,33 +108,7 @@ The classifier resolves the user's intent into one of:
 
 `ExternalAgentState` extends LangGraph's `MessagesState` and carries:
 
-```mermaid
-classDiagram
-    class ExternalAgentState {
-        +string claim_id
-        +string brand
-        +string lob
-        +List~string~ investigation_type
-        +string investigation_scope
-        +string initial_review
-        +string additional_info
-        +string insured_type
-        +dict insured_details
-        +List~string~ selected_sections
-        +KeyConcernSet key_concerns
-        +DocRequestSet doc_request
-        +AdditionalEnquiriesSet additional_enquiries
-        +dict doc_request_knowledge
-        +dict enquiries_knowledge
-        +ExternalAgentPlan external_agent_plan
-        +dict artifact
-        +dict resume
-        +string pending_step
-        +HITLDecision hitl_decision
-        +dict hitl_artifact
-        +dict hitl_task
-    }
-```
+![ExternalAgentState schema](./diagrams/external-agent/08-state-schema.svg)
 
 ### 4.2 Output schemas
 
@@ -250,15 +143,7 @@ The agent retrieves investigation methodology relevant to the claim's line of bu
 
 ### 5.1 Retrieval flow
 
-```mermaid
-flowchart LR
-    A["Claim context<br/>(LOB + investigation types)"] --> B["Load textbook delta table chunks"]
-    B --> C["Filter by LOB / fraud type / stage"]
-    C --> D["Run extraction prompt"]
-    D --> E["Section-specific knowledge"]
-    E --> F["Section-specific knowledge cache"]
-    F --> G["Drafting nodes"]
-```
+![Knowledge retrieval flow](./diagrams/external-agent/05-knowledge-retrieval.svg)
 
 ### 5.2 Chunk retrieval and synthesis
 
@@ -322,17 +207,7 @@ When multiple investigation types are selected, `_dedup_section_items()` runs an
 
 The document request node runs a **3-call pipeline** plus a deterministic pre-filter:
 
-```mermaid
-flowchart TB
-    A["Raw methodology + claim context"] --> B["strip_hard_exclusions"]
-    B --> C["Call 1: Relevance filter"]
-    C --> D["Call 2: SME gold-standard wording"]
-    D --> E["Call 3: Narrative derivation"]
-    E --> F["Cross-type deduplication"]
-    F --> G["Party assignment"]
-    G --> H["Party name insertion"]
-    H --> I["DocRequestSet"]
-```
+![Document request pipeline](./diagrams/external-agent/06-document-request-pipeline.svg)
 
 #### 6.3.1 Layer 0 — Hard-exclusion pre-filter
 
@@ -363,17 +238,7 @@ Scope is intentionally limited to **objective, verifiable causes** — work arra
 
 Document requests support party assignment chips in the frontend.
 
-```mermaid
-sequenceDiagram
-    participant Frontend
-    participant Router as route_interrupt
-    participant LLM
-
-    Frontend->>Router: User assigns parties + clicks Preview update
-    Router->>LLM: PARTY_NAME_INSERTION_PROMPT
-    LLM-->>Router: Grammatically adjusted doc_details
-    Router->>Frontend: Updated preview
-```
+![Party name insertion flow](./diagrams/external-agent/07-party-insertion.svg)
 
 `PARTY_NAME_INSERTION_PROMPT` inserts grammatically correct possessive party names into `doc_details`. The original unmodified text is preserved in `doc_details_original` for idempotency.
 
@@ -478,7 +343,13 @@ A global `use_checkpointer` toggle controls whether state is maintained by a che
 
 ## Confluence Upload Notes
 
-- **Diagrams** are provided as Mermaid source blocks. In Confluence Cloud, use the **Mermaid** macro or paste into [mermaid.live](https://mermaid.live) and export as PNG.
+- **Diagrams** are embedded as **SVG images** in the Markdown doc. In Confluence, they will import as static image attachments.
+- To make a diagram editable in Confluence:
+  1. Download the corresponding **SVG file** from `docs/diagrams/external-agent/`.
+  2. In Confluence, insert a **Gliffy** diagram.
+  3. Use **File → Import → SVG** to import the SVG into Gliffy.
+  4. Gliffy will convert the shapes to editable objects. Save the diagram as `.gliffy` in Confluence.
+- The `.mmd` source files are kept alongside the SVGs for future regeneration if needed.
 - **Code blocks** use Markdown fenced syntax; Confluence will render them as code macros on Markdown import.
 - **Info / warning callouts** can be converted to Confluence `info` / `warning` macros.
 - If publishing via the Atlassian MCP, convert this Markdown body to **Confluence storage-format XHTML** before calling `createConfluencePage`.

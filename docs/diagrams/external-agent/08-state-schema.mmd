@@ -1,0 +1,25 @@
+classDiagram
+    class ExternalAgentState {
+        +string claim_id
+        +string brand
+        +string lob
+        +List~string~ investigation_type
+        +string investigation_scope
+        +string initial_review
+        +string additional_info
+        +string insured_type
+        +dict insured_details
+        +List~string~ selected_sections
+        +KeyConcernSet key_concerns
+        +DocRequestSet doc_request
+        +AdditionalEnquiriesSet additional_enquiries
+        +dict doc_request_knowledge
+        +dict enquiries_knowledge
+        +ExternalAgentPlan external_agent_plan
+        +dict artifact
+        +dict resume
+        +string pending_step
+        +HITLDecision hitl_decision
+        +dict hitl_artifact
+        +dict hitl_task
+    }

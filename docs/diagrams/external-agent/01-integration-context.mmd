@@ -1,0 +1,12 @@
+flowchart LR
+    Orchestrator["Master / Orchestrator Agent"]
+    EA["External Agent MLflow ResponsesAgent"]
+    LLM["Azure OpenAI LLM"]
+    Textbook["Textbook Delta Table Methodology chunks"]
+    Frontend["Frontend HITL Forms"]
+
+    Orchestrator -->|ResponsesAgent request| EA
+    EA -->|LLM calls| LLM
+    EA -->|Read chunks| Textbook
+    Frontend -->|Interrupt response| EA
+    EA -->|HITL task| Frontend
