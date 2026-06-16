@@ -1,0 +1,85 @@
+{
+  "contentType": "application/gliffy+json",
+  "version": "1.3",
+  "stage": {
+    "objects": [
+      {
+        "x": 100,
+        "y": 100,
+        "width": 140,
+        "height": 70,
+        "rotation": 0,
+        "text": "Test Box",
+        "graphic": {
+          "type": "Shape",
+          "Shape": {
+            "tid": "com.gliffy.stencil.rectangle.basic_v1",
+            "strokeWidth": 2,
+            "strokeColor": "#333333",
+            "fillColor": "#FFFFFF",
+            "gradient": false,
+            "dropShadow": false,
+            "state": 0,
+            "shadowX": 0,
+            "shadowY": 0,
+            "opacity": 1
+          }
+        },
+        "children": null,
+        "hidden": false,
+        "locked": false
+      },
+      {
+        "x": 240,
+        "y": 120,
+        "width": 100,
+        "height": 60,
+        "rotation": 0,
+        "text": "Target",
+        "graphic": {
+          "type": "Shape",
+          "Shape": {
+            "tid": "com.gliffy.stencil.rectangle.basic_v1",
+            "strokeWidth": 2,
+            "strokeColor": "#333333",
+            "fillColor": "#FFFFFF",
+            "gradient": false,
+            "dropShadow": false,
+            "state": 0,
+            "shadowX": 0,
+            "shadowY": 0,
+            "opacity": 1
+          }
+        },
+        "children": null,
+        "hidden": false,
+        "locked": false
+      },
+      {
+        "x": 240,
+        "y": 135,
+        "width": 100,
+        "height": 30,
+        "rotation": 0,
+        "text": "",
+        "graphic": {
+          "type": "Line",
+          "Line": {
+            "controlPath": [
+              [0, 15],
+              [100, 15]
+            ],
+            "startArrow": 0,
+            "endArrow": 1,
+            "strokeWidth": 2,
+            "strokeColor": "#333333",
+            "fillColor": "#FFFFFF"
+          }
+        },
+        "children": null,
+        "hidden": false,
+        "locked": false
+      }
+    ]
+  }
+}
