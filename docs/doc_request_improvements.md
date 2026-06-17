@@ -39,3 +39,17 @@ The `DOC_REQUEST_RELEVANCE_PROMPT` enforces a strict include-only relevance filt
 - **CORE METHODOLOGY ITEMS exemption:** Financial statements and bank records always included for fraud investigations
 - **Validation gate:** Per-item relevance checking against narrative content (not investigation type label)
 - **Sub-item filtering:** Catch-all entries assessed sub-item by sub-item; empty after filtering → excluded entirely
+
+---
+
+## Issue 3: Contents-theft templates applied to building-damage claims
+
+**Problem:** Methodology templates for Policy Exclusion / malicious damage can include contents-theft items such as mobile-phone IMEI records and standalone purchase receipts. When the actual claim concerns building fixtures (e.g., metal piping, screen doors), these items are irrelevant. At the same time, phone records were being excluded too narrowly even when they were needed to confirm the exact sequence of events, and tenancy-specific records (entry/exit condition reports) were not being derived from the narrative.
+
+**Resolution:** Added prompt-level rules in `DOC_REQUEST_RELEVANCE_PROMPT` and `NARRATIVE_DOC_REQUEST_DRAFT_PROMPT`:
+
+- **Mobile Phone Related Documents:** Included only when a mobile phone or similar device is claimed as stolen, damaged, or otherwise part of the loss.
+- **Standalone receipt of purchase:** Included only for individual consumer contents (electronics, jewellery, furniture, appliances). Excluded for building fixtures, structural components, plumbing, metal piping, and security fixtures. Evidence of ownership for such items is sought under the existing "Evidence of Ownership" entry.
+- **Phone records:** Included when the exact circumstances, sequence of events, or timing around the date of loss need confirmation — for example, communications with tenants, property managers, friends, or other parties regarding access, move-out, or discovery of damage.
+- **Tenancy transition narrative rule:** When the claimant's narrative states tenants moved into or out of the insured property close to the date of loss, derive a request for the entry/exit condition report or tenant inspection report for that tenancy change.
+- Regression test fixture added in `tests/agents/external_agent/test_doc_request_prompts.py`.
