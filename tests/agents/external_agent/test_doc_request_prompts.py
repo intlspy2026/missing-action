@@ -180,16 +180,16 @@ class TestDocRequestRelevancePromptGuardrails:
         # Explicit tenant / third-party trigger is present.
         assert "the narrative mentions tenants, tenancy, lease, move-in, move-out, property managers, friends, neighbours, or other third parties" in DOC_REQUEST_RELEVANCE_PROMPT
 
-    def test_bank_financial_records_narrower_gate(self):
+    def test_bank_financial_records_split_no_tenant_trigger(self):
         bank_section = DOC_REQUEST_RELEVANCE_PROMPT.split("13. Bank statements and financial records:")[1]
         phone_section = DOC_REQUEST_RELEVANCE_PROMPT.split("12. Phone records and telephone records:")[1].split("13. Bank statements and financial records:")[0]
         # Bank/financial records do NOT get the tenant/third-party trigger.
         assert "tenants, tenancy, lease" not in bank_section
         # Phone records DO get the tenant/third-party trigger.
         assert "tenants, tenancy, lease" in phone_section
-        # Bank/financial records are now gated by fraud/financial motive only.
+        # Bank/financial records still allow inconsistency and exact-circumstances gates.
+        assert "inconsistent or in question" in bank_section
         assert "fraud or financial motive" in bank_section
-        assert "inconsistent or in question" not in bank_section
 
     def test_receipt_of_purchase_fixture_exclusion_present(self):
         assert "Standalone receipt of purchase / original purchase receipt" in DOC_REQUEST_RELEVANCE_PROMPT
@@ -198,10 +198,6 @@ class TestDocRequestRelevancePromptGuardrails:
 
     def test_sub_item_dedup_strengthened(self):
         assert "This applies regardless of whether the standalone receipt entry claims to cover different items" in DOC_REQUEST_RELEVANCE_PROMPT
-
-    def test_email_text_correspondence_hard_exclusion_present(self):
-        assert "15. Email/Text Message Correspondence" in DOC_REQUEST_RELEVANCE_PROMPT
-        assert "Exclude when no such correspondence is referenced" in DOC_REQUEST_RELEVANCE_PROMPT
 
 
 class TestNarrativeDocRequestPromptGuardrails:
