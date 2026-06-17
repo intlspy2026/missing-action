@@ -153,12 +153,13 @@ BEFORE listing any documents, you MUST understand these rules. Violating these r
     2. Insurance claims history: INCLUDE ONLY if INITIAL REVIEW or ADDITIONAL INFORMATION explicitly records prior claims for the INSURED with a non-Suncorp (external) insurer. If no mention of claims outside Suncorp exists, assume no external prior claims and exclude. Prior policies, inactive policies, or third-party claims are NOT the insured's prior claims.
     3. Criminal history or background checks: INCLUDE ONLY if INITIAL REVIEW or ADDITIONAL INFORMATION alleges a criminal element, prior offending, or law enforcement involvement beyond the current incident for a party directly involved in this claim, OR mentions court listings or criminal concerns for a party directly involved in this claim. Exclude criminal history for third parties — they are not direct parties to the claim.
     4. Rideshare, taxi, or transport receipts: INCLUDE ONLY if travel to/from the incident location is explicitly material to the claim. Exclude when the incident occurred at a fixed location and travel routing is not disputed.
-    5. Toll statements: INCLUDE ONLY if toll-based travel is explicitly relevant to the claim's routing or timing.
-    6. Tenancy/rental documents: INCLUDE ONLY when the party is a tenant OR the insured holds a landlord policy (renting the property to others). Exclude for owner-occupiers.
-    7. Contract of sale: INCLUDE ONLY when the party is a buyer or seller. Exclude for tenants.
-    8. CCTV footage: INCLUDE ONLY if INITIAL REVIEW or ADDITIONAL INFORMATION explicitly mentions cameras, CCTV, footage, surveillance, or video recording at or near the incident location.
-    9. MyGov account summaries and Centrelink statements: INCLUDE ONLY for Staged Arson, Staged Theft / Malicious Damage, Staged Collision, and Staged Theft/Malicious Damage. For all other investigation types, exclude.
-    10. Phone records, telephone records, bank statements, and financial statements:
+    5. Tow truck / towing receipts: INCLUDE ONLY if the case explicitly involves a vehicle being towed. Exclude for property claims or fixed-location incidents where no towing is mentioned.
+    6. Toll statements: INCLUDE ONLY if toll-based travel is explicitly relevant to the claim's routing or timing.
+    7. Tenancy/rental documents: INCLUDE ONLY when the party is a tenant OR the insured holds a landlord policy (renting the property to others). Exclude for owner-occupiers.
+    8. Contract of sale: INCLUDE ONLY when the party is a buyer or seller. Exclude for tenants.
+    9. CCTV footage: INCLUDE ONLY if INITIAL REVIEW or ADDITIONAL INFORMATION explicitly mentions cameras, CCTV, footage, surveillance, or video recording at or near the incident location.
+    10. MyGov account summaries and Centrelink statements: INCLUDE ONLY for Staged Arson, Staged Theft / Malicious Damage, Staged Collision, and Staged Theft/Malicious Damage. For all other investigation types, exclude.
+    11. Phone records, telephone records, bank statements, and financial statements:
       INCLUDE ONLY if INITIAL REVIEW or ADDITIONAL INFORMATION:
       - shows the insured's account of the incident is inconsistent or in question (e.g., physical evidence contradicts the account, key facts about who was involved are unclear, the version of events is inconsistent, or movements and whereabouts need verification), OR
       - explicitly alleges fraud or financial motive.

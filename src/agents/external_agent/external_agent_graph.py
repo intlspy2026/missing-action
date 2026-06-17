@@ -124,6 +124,8 @@ _HARD_EXCLUSIONS = {
                           r"\bbolt\b", r"\bola\b"],
     "transport receipt": [r"rideshare", r"taxi", r"\buber\b", r"\bdidi\b",
                           r"\bbolt\b", r"\bola\b"],
+    "towing records":    [r"\btow(?:ing|ed|s|truck)?\b"],
+    "tow truck receipt": [r"\btow(?:ing|ed|s|truck)?\b"],
     "toll":              [r"\btoll\b", r"\bmotorway\b", r"\bexpressway\b",
                           r"\btollway\b"],
     "tenancy":           [r"\btenant\b", r"\btenancy\b", r"\brental\b",
