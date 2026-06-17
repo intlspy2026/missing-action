@@ -205,9 +205,13 @@ def _filter_doc_details(doc_details: str, case_text: str) -> str:
 
 
 def strip_hard_exclusions(doc_list_data: dict, initial_review: str,
-                          additional_info: str) -> dict:
+                          additional_info: str,
+                          investigation_types: list[str] | None = None) -> dict:
     docs = doc_list_data.get("document_set", [])
-    case_text = f"{initial_review or ''} {additional_info or ''}"
+    case_text = (
+        f"{initial_review or ''} {additional_info or ''} "
+        f"{' '.join(investigation_types or [])}"
+    )
     result = []
     stripped = []
     for doc in docs:
@@ -1531,6 +1535,7 @@ def get_graph(llm: BaseChatModel) -> StateGraph:
                             entry["doc_list"].model_dump(exclude_none=True),
                             initial_review,
                             additional_info,
+                            investigation_types,
                         ),
                     }
                     for entry in per_inv_type
