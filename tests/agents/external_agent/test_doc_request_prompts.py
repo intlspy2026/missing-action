@@ -187,6 +187,9 @@ class TestDocRequestRelevancePromptGuardrails:
         assert "tenants, tenancy, lease" not in bank_section
         # Phone records DO get the tenant/third-party trigger.
         assert "tenants, tenancy, lease" in phone_section
+        # Bank/financial records are now gated by fraud/financial motive only.
+        assert "fraud or financial motive" in bank_section
+        assert "inconsistent or in question" not in bank_section
 
     def test_receipt_of_purchase_fixture_exclusion_present(self):
         assert "Standalone receipt of purchase / original purchase receipt" in DOC_REQUEST_RELEVANCE_PROMPT

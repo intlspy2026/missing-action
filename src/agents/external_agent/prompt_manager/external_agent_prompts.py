@@ -168,10 +168,7 @@ BEFORE listing any documents, you MUST understand these rules. Violating these r
       - explicitly alleges fraud or financial motive.
       Without one of these gates, exclude.
     13. Bank statements and financial records:
-      INCLUDE ONLY if INITIAL REVIEW or ADDITIONAL INFORMATION:
-      - shows the insured's account of the incident is inconsistent or in question (e.g., physical evidence contradicts the account, key facts about who were involved are unclear, the version of events is inconsistent, or movements and whereabouts need verification), OR
-      - explicitly alleges fraud or financial motive.
-      Without one of these gates, exclude.
+      INCLUDE ONLY if INITIAL REVIEW or ADDITIONAL INFORMATION explicitly alleges fraud or financial motive. Exclude in all other circumstances, including general policy-exclusion or tenant-damage concerns where no fraud or financial motive is alleged. Staged investigation types already receive financial records through CORE METHODOLOGY ITEMS.
     14. Standalone receipt of purchase / original purchase receipt: INCLUDE ONLY if the claim concerns individual consumer contents typically purchased with receipts (e.g., electronics, jewellery, furniture, appliances). Exclude when the claimed items are building fixtures, structural components, plumbing, metal piping, or security fixtures. Evidence of ownership for such items should be sought under the "Evidence of Ownership" entry instead.
 
     If a document type DOES appear in the HARD EXCLUSIONS list above AND you cannot find the stated fact in INITIAL REVIEW or ADDITIONAL INFORMATION, you MUST EXCLUDE it. Do not rationalise: absence of evidence IS evidence of irrelevance.
