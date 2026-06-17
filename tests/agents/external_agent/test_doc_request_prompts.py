@@ -173,9 +173,20 @@ class TestDocRequestRelevancePromptGuardrails:
         assert "Mobile Phone Related Documents (IDs, serial numbers, IMEI numbers)" in DOC_REQUEST_RELEVANCE_PROMPT
         assert "Exclude when no mobile device is mentioned" in DOC_REQUEST_RELEVANCE_PROMPT
 
-    def test_phone_records_broadened_gate_present(self):
-        assert "the exact circumstances, sequence of events, or timing around the date of loss need to be confirmed" in DOC_REQUEST_RELEVANCE_PROMPT
-        assert "communications with tenants, property managers, friends, or other parties" in DOC_REQUEST_RELEVANCE_PROMPT
+    def test_phone_records_split_and_triggered(self):
+        # Phone records are split out from bank/financial records.
+        assert "12. Phone records and telephone records:" in DOC_REQUEST_RELEVANCE_PROMPT
+        assert "13. Bank statements and financial records:" in DOC_REQUEST_RELEVANCE_PROMPT
+        # Explicit tenant / third-party trigger is present.
+        assert "the narrative mentions tenants, tenancy, lease, move-in, move-out, property managers, friends, neighbours, or other third parties" in DOC_REQUEST_RELEVANCE_PROMPT
+
+    def test_bank_financial_records_narrower_gate(self):
+        bank_section = DOC_REQUEST_RELEVANCE_PROMPT.split("13. Bank statements and financial records:")[1]
+        phone_section = DOC_REQUEST_RELEVANCE_PROMPT.split("12. Phone records and telephone records:")[1].split("13. Bank statements and financial records:")[0]
+        # Bank/financial records do NOT get the tenant/third-party trigger.
+        assert "tenants, tenancy, lease" not in bank_section
+        # Phone records DO get the tenant/third-party trigger.
+        assert "tenants, tenancy, lease" in phone_section
 
     def test_receipt_of_purchase_fixture_exclusion_present(self):
         assert "Standalone receipt of purchase / original purchase receipt" in DOC_REQUEST_RELEVANCE_PROMPT

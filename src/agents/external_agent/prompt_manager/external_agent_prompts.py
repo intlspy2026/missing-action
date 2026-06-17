@@ -160,13 +160,19 @@ BEFORE listing any documents, you MUST understand these rules. Violating these r
     9. CCTV footage: INCLUDE ONLY if INITIAL REVIEW or ADDITIONAL INFORMATION explicitly mentions cameras, CCTV, footage, surveillance, or video recording at or near the incident location.
     10. MyGov account summaries and Centrelink statements: INCLUDE ONLY for Staged Arson, Staged Theft / Malicious Damage, Staged Collision, and Staged Theft/Malicious Damage. For all other investigation types, exclude.
     11. Mobile Phone Related Documents (IDs, serial numbers, IMEI numbers): INCLUDE ONLY if a mobile phone, tablet, or similar personal electronic device is claimed as stolen, damaged, or otherwise part of the claimed loss. Exclude when no mobile device is mentioned.
-    12. Phone records, telephone records, bank statements, and financial statements:
+    12. Phone records and telephone records:
       INCLUDE ONLY if INITIAL REVIEW or ADDITIONAL INFORMATION:
-      - shows the insured's account of the incident is inconsistent or in question (e.g., physical evidence contradicts the account, key facts about who was involved are unclear, the version of events is inconsistent, or movements and whereabouts need verification), OR
-      - the exact circumstances, sequence of events, or timing around the date of loss need to be confirmed (e.g., communications with tenants, property managers, friends, or other parties regarding access, move-out, or discovery of damage), OR
+      - shows the insured's account of the incident is inconsistent or in question (e.g., physical evidence contradicts the account, key facts about who were involved are unclear, the version of events is inconsistent, or movements and whereabouts need verification), OR
+      - the exact circumstances, sequence of events, or timing around the date of loss need to be confirmed, OR
+      - the narrative mentions tenants, tenancy, lease, move-in, move-out, property managers, friends, neighbours, or other third parties accessing or discovering the property around the date of loss, OR
       - explicitly alleges fraud or financial motive.
       Without one of these gates, exclude.
-    13. Standalone receipt of purchase / original purchase receipt: INCLUDE ONLY if the claim concerns individual consumer contents typically purchased with receipts (e.g., electronics, jewellery, furniture, appliances). Exclude when the claimed items are building fixtures, structural components, plumbing, metal piping, or security fixtures. Evidence of ownership for such items should be sought under the "Evidence of Ownership" entry instead.
+    13. Bank statements and financial records:
+      INCLUDE ONLY if INITIAL REVIEW or ADDITIONAL INFORMATION:
+      - shows the insured's account of the incident is inconsistent or in question (e.g., physical evidence contradicts the account, key facts about who were involved are unclear, the version of events is inconsistent, or movements and whereabouts need verification), OR
+      - explicitly alleges fraud or financial motive.
+      Without one of these gates, exclude.
+    14. Standalone receipt of purchase / original purchase receipt: INCLUDE ONLY if the claim concerns individual consumer contents typically purchased with receipts (e.g., electronics, jewellery, furniture, appliances). Exclude when the claimed items are building fixtures, structural components, plumbing, metal piping, or security fixtures. Evidence of ownership for such items should be sought under the "Evidence of Ownership" entry instead.
 
     If a document type DOES appear in the HARD EXCLUSIONS list above AND you cannot find the stated fact in INITIAL REVIEW or ADDITIONAL INFORMATION, you MUST EXCLUDE it. Do not rationalise: absence of evidence IS evidence of irrelevance.
 **RULE 4 - NO DUPLICATES**: Each piece of information must appear under exactly one document type. If the same information could fall under multiple document types, place it under the most specific one and exclude it from the others. Compound aggregator entries titled "other documents", "additional evidence", "other supporting documents", "Documents to confirm duty of disclosure questions/misrepresentation", or similar catch-alls that re-aggregate items already requested under another entry are NOT permitted – every required document must live under its own specific entry.
