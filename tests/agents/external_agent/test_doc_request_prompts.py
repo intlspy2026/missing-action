@@ -199,6 +199,10 @@ class TestDocRequestRelevancePromptGuardrails:
     def test_sub_item_dedup_strengthened(self):
         assert "This applies regardless of whether the standalone receipt entry claims to cover different items" in DOC_REQUEST_RELEVANCE_PROMPT
 
+    def test_email_text_correspondence_hard_exclusion_present(self):
+        assert "15. Email/Text Message Correspondence" in DOC_REQUEST_RELEVANCE_PROMPT
+        assert "Exclude when no such correspondence is referenced" in DOC_REQUEST_RELEVANCE_PROMPT
+
 
 class TestNarrativeDocRequestPromptGuardrails:
     """Verify the narrative-derivation prompt contains the tenancy rule."""
