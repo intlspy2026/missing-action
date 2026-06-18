@@ -41,8 +41,6 @@ def build_quick_action_preview_update() -> Dict[str, Any]:
     }
 
 
-
-
 # ------------------------------------
 # Form builders: initial info form
 # ------------------------------------
@@ -237,44 +235,26 @@ def build_form_info(form_config: Dict) -> List[Dict[str, Any]]:
 # ------------------------------------
 
 def build_form_key_concerns(key_concerns: KeyConcernSet) -> List[Dict[str, Any]]:
-    """Build editable review form for key concerns."""
+    """Build review form for key concerns."""
     components: List[Dict[str, Any]] = []
 
     for idx, kc in enumerate(key_concerns.concern_set, start=1):
+
         components.append({
-            "type": "textarea",
-            "id": f"concern_{idx}",
-            "label": f"Concern {idx}",
-            "placeholder": kc.concern,
-            "required": False,
-        })
-        components.append({
-            "type": "textarea",
+            "type": "info",
             "id": f"rationale_{idx}",
-            "label": "Rationale",
-            "placeholder": kc.rationale,
-            "required": False,
+            "label": f"{idx}. {kc.concern}",
+            "description": kc.rationale,
         })
 
-    view_data: List[Dict[str, Any]] = [
-        {"type": "markdown", "data": {"content": "## Key Concerns"}},
-        {"type": "markdown", "data": {"content": f"Version: {key_concerns.version}"}},
-    ]
-
-    form_data: List[Dict[str, Any]] = [
-        {
-            "type": "accordion",
-            "id": "concern_set",
-            "data": [{"value": "Key Concerns", "components": components}],
-        }
-    ]
+    form_data = components
 
     return [{
         "type": "workflow_stage",
         "data": {
             "name": "Key Concerns",
             "data": [
-                {"type": "smart_view", "data": view_data},
+                # {"type": "smart_view", "data": view_data},
                 {"type": "smart_form", "confirm_submit": True, "data": form_data},
             ],
         },
@@ -331,44 +311,26 @@ def build_form_doc_request(
 
 
 def build_form_enquiries(enquiries: AdditionalEnquiriesSet) -> List[Dict[str, Any]]:
-    """Build editable review form for additional enquiries."""
+    """Build review form for additional enquiries."""
     components: List[Dict[str, Any]] = []
 
     for idx, eq in enumerate(enquiries.enquiries_set, start=1):
+
         components.append({
-            "type": "text",
-            "id": f"enquiry_{idx}",
-            "label": f"Enquiry {idx}",
-            "placeholder": eq.enquiry,
-            "required": False,
-        })
-        components.append({
-            "type": "textarea",
+            "type": "info",
             "id": f"enquiry_detail_{idx}",
-            "label": "Detail",
-            "placeholder": eq.enquiry_detail,
-            "required": False,
+            "label": f"{idx}. {eq.enquiry}",
+            "description": eq.enquiry_detail,
         })
 
-    view_data: List[Dict[str, Any]] = [
-        {"type": "markdown", "data": {"content": "## Additional Enquiries"}},
-        {"type": "markdown", "data": {"content": f"Version: {enquiries.version}"}},
-    ]
-
-    form_data: List[Dict[str, Any]] = [
-        {
-            "type": "accordion",
-            "id": "enquiries_set",
-            "data": [{"value": "Additional Enquiries", "components": components}],
-        }
-    ]
+    form_data = components
 
     return [{
         "type": "workflow_stage",
         "data": {
             "name": "Additional Enquiries",
             "data": [
-                {"type": "smart_view", "data": view_data},
+                # {"type": "smart_view", "data": view_data},
                 {"type": "smart_form", "confirm_submit": True, "data": form_data},
             ],
         },
@@ -427,43 +389,34 @@ def build_form_interview_plan(interview_plan: InterviewQuestionSets) -> List[Dic
 # ------------------------------------
 # Per-section parsers
 # ------------------------------------
-
 def parse_form_to_key_concerns(
     form_payload: Dict[str, Any],
     *,
     previous: Optional[KeyConcernSet] = None,
 ) -> KeyConcernSet:
-    """Parse flat form payload back into KeyConcernSet."""
-    # Collect concern_{N} and rationale_{N} pairs
-    concerns: Dict[int, str] = {}
-    rationales: Dict[int, str] = {}
+    """Parse flat form payload back into KeyConcernSet.
 
+    Only rationale_{N} is in the payload (concern is the display label, not editable).
+    Concern is recovered from `previous` by 1-based position. Used only when a list item marked as NA on front end
+    """
+    rationales: Dict[int, str] = {}
     for k, v in (form_payload or {}).items():
-        m = re.fullmatch(r"concern_(\d+)", str(k))
-        if m:
-            concerns[int(m.group(1))] = (v or "").strip()
         m = re.fullmatch(r"rationale_(\d+)", str(k))
         if m:
             rationales[int(m.group(1))] = (v or "").strip()
-
-    indices = sorted(set(concerns) | set(rationales))
 
     prev_items = list(
         previous.concern_set) if previous and previous.concern_set else []
     items: List[KeyConcern] = []
 
-    for i, idx in enumerate(indices):
-        concern_text = concerns.get(idx, "")
-        rationale_text = rationales.get(idx, "")
-
-        # Carry forward rationale if concern text unchanged
-        if not rationale_text and i < len(prev_items):
-            if concern_text == prev_items[i].concern:
-                rationale_text = prev_items[i].rationale
-
+    for idx in sorted(rationales):
+        if idx - 1 >= len(prev_items):
+            continue
+        concern_text = prev_items[idx - 1].concern
+        rationale_text = rationales[idx]
         if concern_text:
             items.append(KeyConcern(concern=concern_text,
-                         rationale=rationale_text))
+                                    rationale=rationale_text))
 
     return KeyConcernSet(
         concern_set=items,
@@ -527,33 +480,26 @@ def parse_form_to_enquiries(
     *,
     previous: Optional[AdditionalEnquiriesSet] = None,
 ) -> AdditionalEnquiriesSet:
-    """Parse flat form payload back into AdditionalEnquiriesSet."""
-    enquiries: Dict[int, str] = {}
-    enquiry_details: Dict[int, str] = {}
+    """Parse flat form payload back into AdditionalEnquiriesSet.
 
+    Only enquiry_detail_{N} is in the payload (enquiry is the display label, not editable).
+    enquiry is recovered from `previous` by 1-based position.
+    """
+    enquiry_details: Dict[int, str] = {}
     for k, v in (form_payload or {}).items():
-        m = re.fullmatch(r"enquiry_(\d+)", str(k))
-        if m:
-            enquiries[int(m.group(1))] = (v or "").strip()
         m = re.fullmatch(r"enquiry_detail_(\d+)", str(k))
         if m:
             enquiry_details[int(m.group(1))] = (v or "").strip()
-
-    indices = sorted(set(enquiries) | set(enquiry_details))
 
     prev_items = list(
         previous.enquiries_set) if previous and previous.enquiries_set else []
     items: List[AdditionalEnquiries] = []
 
-    for i, idx in enumerate(indices):
-        enquiry_text = enquiries.get(idx, "")
-        detail_text = enquiry_details.get(idx, "")
-
-        # Carry forward detail if enquiry text unchanged
-        if not detail_text and i < len(prev_items):
-            if enquiry_text == prev_items[i].enquiry:
-                detail_text = prev_items[i].enquiry_detail
-
+    for idx in sorted(enquiry_details):
+        if idx - 1 >= len(prev_items):
+            continue
+        enquiry_text = prev_items[idx - 1].enquiry
+        detail_text = enquiry_details[idx]
         if enquiry_text:
             items.append(AdditionalEnquiries(
                 enquiry=enquiry_text, enquiry_detail=detail_text))
