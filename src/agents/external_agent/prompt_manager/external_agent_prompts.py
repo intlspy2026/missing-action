@@ -295,7 +295,11 @@ b. **Fallback (no SME match)**: When a document type has no matching entry in th
    - **Witness IS identified**: Replace `<INSERT WITNESS>` (Motor) or `<INSERT NAME>` (Property) with the witness's full name. Keep the "Witness Contact Details (Known)" doc_type.
    - **No witness identified**: Discard the "Witness Contact Details (Known)" match entirely. Instead, match this entry to the **"Witness Contacts Details (Unknown)"** gold standard entry — apply its doc_type and wording verbatim (no placeholder to fill).
 
-3. **Financial Statements (Business)**: Replace `<INSERT BUSINESS NAMES>` with the business name from BUSINESS NAME below. If no business name is provided, leave the placeholder unchanged.
+3. **Financial Statements (Business)**:
+   - If a director name is provided in DIRECTOR NAME below, replace `you/insert name` with the director name and fix grammar to singular (`hold directorships in` → `holds directorships in`).
+   - Replace `<INSERT BUSINESS NAMES>` with `({business_name})`, where `{business_name}` is the business name from BUSINESS NAME below.
+   - If no business name is provided, leave `<INSERT BUSINESS NAMES>` unchanged.
+   - If no director name is provided, leave `you/insert name` unchanged.
 </CRITICAL_RULES>
 
 <TASK>
@@ -352,6 +356,11 @@ The BUSINESS NAME for Financial Statements (Business) insertion (RULE 3c):
 <BUSINESS NAME>
 {business_name}
 </BUSINESS NAME>
+
+The DIRECTOR NAME for Financial Statements (Business) insertion (RULE 3c):
+<DIRECTOR NAME>
+{director_name}
+</DIRECTOR NAME>
 </CONTEXT>
 """
 
