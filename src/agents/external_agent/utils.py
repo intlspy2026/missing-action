@@ -464,17 +464,20 @@ def parse_form_to_doc_request(
 
     for i, prev in enumerate(prev_items):
         idx = i + 1
-        if idx in doc_chips:
-            chips = doc_chips[idx]
-        elif prev.assigned_parties:
-            chips = prev.assigned_parties
-        else:
-            chips = []
+        # A missing chip key means the user unselected all parties for this doc.
+        chips = doc_chips.get(idx, [])
+
+        # When no parties are assigned, revert to the original doc details.
+        doc_details = (
+            prev.doc_details_original or prev.doc_details
+            if not chips
+            else prev.doc_details
+        )
 
         if prev.doc_type:
             items.append(DocRequest(
                 doc_type=prev.doc_type,
-                doc_details=prev.doc_details,
+                doc_details=doc_details,
                 assigned_parties=chips if chips else None,
                 doc_details_original=prev.doc_details_original or prev.doc_details,
             ))
