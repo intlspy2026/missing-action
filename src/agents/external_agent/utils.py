@@ -12,6 +12,17 @@ from agents.external_agent.schemas import (
 
 logger = logging.getLogger(__name__)
 
+# Matches placeholder tokens like <INSERT DATE>, <INSERT PARTY>, etc.
+_PLACEHOLDER_RE = re.compile(r"<INSERT\s+[A-Z\s]+>")
+
+
+def _escape_placeholders(text: str) -> str:
+    """Escape angle brackets inside <INSERT ...> tokens so Markdown renders them literally."""
+    return _PLACEHOLDER_RE.sub(
+        lambda m: m.group(0).replace("<", r"\<").replace(">", r"\>"),
+        text,
+    )
+
 
 def build_chips_from_insured_details(
     insured_details: Optional[Dict[str, str]]
@@ -571,7 +582,7 @@ def build_form_final(claim_id: str, external_agent_plan: ExternalAgentPlan) -> L
     # Document Requests section
     doc_lines = ["### Document Requests\n"]
     for dr in external_agent_plan.document_set.document_set or []:
-        doc_lines.append(f"**{dr.doc_type}:** {dr.doc_details}")
+        doc_lines.append(f"**{dr.doc_type}:** {_escape_placeholders(dr.doc_details)}")
         doc_lines.append("")
     docs_markdown = "\n".join(doc_lines).strip() or "_No document requests._"
 

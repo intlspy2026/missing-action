@@ -1948,9 +1948,8 @@ def get_graph(llm: BaseChatModel) -> StateGraph:
         final_plan = state.get("external_agent_plan")
         claim_id = state.get("claim_id")
 
-        selected_sections = state.get("selected_sections", [])
         ui_artifact = build_form_final(
-            claim_id, final_plan, selected_sections) if final_plan else []
+            claim_id, final_plan) if final_plan else []
 
         form_data = {
             "claim_id": state.get("claim_id"),
