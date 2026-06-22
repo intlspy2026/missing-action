@@ -256,6 +256,7 @@ def build_form_key_concerns(key_concerns: KeyConcernSet) -> List[Dict[str, Any]]
             "id": f"rationale_{idx}",
             "label": f"{idx}. {kc.concern}",
             "description": kc.rationale,
+            "defaultValue": False,
         })
 
     form_data: List[Dict[str, Any]] = [
@@ -338,6 +339,7 @@ def build_form_enquiries(enquiries: AdditionalEnquiriesSet) -> List[Dict[str, An
             "id": f"enquiry_detail_{idx}",
             "label": f"{idx}. {eq.enquiry}",
             "description": eq.enquiry_detail,
+            "defaultValue": False,
         })
 
     form_data: List[Dict[str, Any]] = [

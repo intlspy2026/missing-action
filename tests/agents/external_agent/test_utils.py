@@ -44,7 +44,7 @@ class TestBuildFormKeyConcerns:
         assert components[0]["id"] == "rationale_1"
         assert components[0]["label"] == "1. Conflicting statements"
         assert components[0]["description"] == "Two versions given."
-        assert "default_value" not in components[0]
+        assert components[0]["defaultValue"] is False
         assert "required" not in components[0]
         assert "not_applicable" not in components[0]
 
@@ -81,7 +81,7 @@ class TestBuildFormEnquiries:
         assert components[0]["id"] == "enquiry_detail_1"
         assert components[0]["label"] == "1. Verify phone usage"
         assert components[0]["description"] == "Check call logs around DOL."
-        assert "default_value" not in components[0]
+        assert components[0]["defaultValue"] is False
         assert "required" not in components[0]
         assert "not_applicable" not in components[0]
 
