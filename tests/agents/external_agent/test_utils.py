@@ -32,9 +32,12 @@ class TestBuildFormKeyConcerns:
 
         artifact = build_form_key_concerns(key_concerns)
         form = artifact[0]["data"]["data"][0]
-        components = form["data"]
+        title_group = form["data"][0]
+        components = title_group["data"][0]["components"]
 
         assert form["type"] == "smart_form"
+        assert title_group["type"] == "title"
+        assert title_group["id"] == "concern_set"
         assert len(components) == 2
 
         assert components[0]["type"] == "info"
@@ -66,9 +69,12 @@ class TestBuildFormEnquiries:
 
         artifact = build_form_enquiries(enquiries)
         form = artifact[0]["data"]["data"][0]
-        components = form["data"]
+        title_group = form["data"][0]
+        components = title_group["data"][0]["components"]
 
         assert form["type"] == "smart_form"
+        assert title_group["type"] == "title"
+        assert title_group["id"] == "enquiries_set"
         assert len(components) == 2
 
         assert components[0]["type"] == "info"
@@ -86,23 +92,25 @@ class TestBuildFormEnquiries:
 
 
 class TestParseFormToKeyConcerns:
-    def test_keeps_present_items_and_uses_payload_value(self):
+    def test_keeps_present_items_and_recovers_from_previous(self):
         previous = KeyConcernSet(
             concern_set=[
                 KeyConcern(concern="Conflicting statements", rationale="Two versions given."),
                 KeyConcern(concern="Delayed reporting", rationale="Reported 3 days later."),
             ]
         )
+        # Frontend returns a present key (value irrelevant for info type) for
+        # kept items; rationale is display-only and recovered from previous.
         payload = {
-            "rationale_1": "Edited rationale.",
-            "rationale_2": "Reported 3 days later.",
+            "rationale_1": False,
+            "rationale_2": False,
         }
 
         result = parse_form_to_key_concerns(payload, previous=previous)
 
         assert len(result.concern_set) == 2
         assert result.concern_set[0].concern == "Conflicting statements"
-        assert result.concern_set[0].rationale == "Edited rationale."
+        assert result.concern_set[0].rationale == "Two versions given."
         assert result.concern_set[1].concern == "Delayed reporting"
         assert result.concern_set[1].rationale == "Reported 3 days later."
         assert result.version == previous.version + 1
@@ -114,16 +122,30 @@ class TestParseFormToKeyConcerns:
                 KeyConcern(concern="Delayed reporting", rationale="Reported 3 days later."),
             ]
         )
-        payload = {"rationale_2": "Reported 3 days later."}
+        # Frontend omits rationale_1 when marked N/A; rationale_2 kept.
+        payload = {"rationale_2": False}
 
         result = parse_form_to_key_concerns(payload, previous=previous)
 
         assert len(result.concern_set) == 1
         assert result.concern_set[0].concern == "Delayed reporting"
+        assert result.concern_set[0].rationale == "Reported 3 days later."
+
+    def test_empty_payload_drops_all(self):
+        previous = KeyConcernSet(
+            concern_set=[
+                KeyConcern(concern="Conflicting statements", rationale="Two versions given."),
+            ]
+        )
+        payload = {}
+
+        result = parse_form_to_key_concerns(payload, previous=previous)
+
+        assert len(result.concern_set) == 0
 
 
 class TestParseFormToEnquiries:
-    def test_keeps_present_items_and_uses_payload_value(self):
+    def test_keeps_present_items_and_recovers_from_previous(self):
         previous = AdditionalEnquiriesSet(
             enquiries_set=[
                 AdditionalEnquiries(
@@ -134,16 +156,18 @@ class TestParseFormToEnquiries:
                 ),
             ]
         )
+        # Frontend returns a present key for kept items; detail is display-only
+        # and recovered from previous.
         payload = {
-            "enquiry_detail_1": "Check all calls on the day.",
-            "enquiry_detail_2": "Contact employer directly.",
+            "enquiry_detail_1": False,
+            "enquiry_detail_2": False,
         }
 
         result = parse_form_to_enquiries(payload, previous=previous)
 
         assert len(result.enquiries_set) == 2
         assert result.enquiries_set[0].enquiry == "Verify phone usage"
-        assert result.enquiries_set[0].enquiry_detail == "Check all calls on the day."
+        assert result.enquiries_set[0].enquiry_detail == "Check call logs around DOL."
         assert result.enquiries_set[1].enquiry == "Confirm employment"
         assert result.enquiries_set[1].enquiry_detail == "Contact employer directly."
         assert result.version == previous.version + 1
@@ -159,12 +183,28 @@ class TestParseFormToEnquiries:
                 ),
             ]
         )
-        payload = {"enquiry_detail_2": "Contact employer directly."}
+        # Frontend omits enquiry_detail_1 when marked N/A; enquiry_detail_2 kept.
+        payload = {"enquiry_detail_2": False}
 
         result = parse_form_to_enquiries(payload, previous=previous)
 
         assert len(result.enquiries_set) == 1
         assert result.enquiries_set[0].enquiry == "Confirm employment"
+        assert result.enquiries_set[0].enquiry_detail == "Contact employer directly."
+
+    def test_empty_payload_drops_all(self):
+        previous = AdditionalEnquiriesSet(
+            enquiries_set=[
+                AdditionalEnquiries(
+                    enquiry="Verify phone usage", enquiry_detail="Check call logs around DOL."
+                ),
+            ]
+        )
+        payload = {}
+
+        result = parse_form_to_enquiries(payload, previous=previous)
+
+        assert len(result.enquiries_set) == 0
 
 
 class TestParseFormToDocRequest:

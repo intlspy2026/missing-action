@@ -258,7 +258,13 @@ def build_form_key_concerns(key_concerns: KeyConcernSet) -> List[Dict[str, Any]]
             "description": kc.rationale,
         })
 
-    form_data = components
+    form_data: List[Dict[str, Any]] = [
+        {
+            "type": "title",
+            "id": "concern_set",
+            "data": [{"value": "Key Concerns", "components": components}],
+        }
+    ]
 
     return [{
         "type": "workflow_stage",
@@ -334,7 +340,13 @@ def build_form_enquiries(enquiries: AdditionalEnquiriesSet) -> List[Dict[str, An
             "description": eq.enquiry_detail,
         })
 
-    form_data = components
+    form_data: List[Dict[str, Any]] = [
+        {
+            "type": "title",
+            "id": "enquiries_set",
+            "data": [{"value": "Additional Enquiries", "components": components}],
+        }
+    ]
 
     return [{
         "type": "workflow_stage",
@@ -407,27 +419,22 @@ def parse_form_to_key_concerns(
 ) -> KeyConcernSet:
     """Parse flat form payload back into KeyConcernSet.
 
-    Only rationale_{N} is in the payload (concern is the display label, not editable).
-    Concern is recovered from `previous` by 1-based position. Used only when a list item marked as NA on front end
+    The rationale is display-only (info component), so it never comes back in
+    the payload. The frontend omits `rationale_{N}` when the item is marked
+    N/A; a present key means "keep". Both concern and rationale are recovered
+    from `previous` by 1-based position.
     """
-    rationales: Dict[int, str] = {}
-    for k, v in (form_payload or {}).items():
-        m = re.fullmatch(r"rationale_(\d+)", str(k))
-        if m:
-            rationales[int(m.group(1))] = (v or "").strip()
-
+    payload = form_payload or {}
     prev_items = list(
         previous.concern_set) if previous and previous.concern_set else []
     items: List[KeyConcern] = []
 
-    for idx in sorted(rationales):
-        if idx - 1 >= len(prev_items):
-            continue
-        concern_text = prev_items[idx - 1].concern
-        rationale_text = rationales[idx]
-        if concern_text:
-            items.append(KeyConcern(concern=concern_text,
-                                    rationale=rationale_text))
+    for idx, prev in enumerate(prev_items, start=1):
+        if f"rationale_{idx}" not in payload:
+            continue  # N/A marked — frontend skips the key
+        if prev.concern:
+            items.append(KeyConcern(concern=prev.concern,
+                                    rationale=prev.rationale))
 
     return KeyConcernSet(
         concern_set=items,
@@ -496,27 +503,22 @@ def parse_form_to_enquiries(
 ) -> AdditionalEnquiriesSet:
     """Parse flat form payload back into AdditionalEnquiriesSet.
 
-    Only enquiry_detail_{N} is in the payload (enquiry is the display label, not editable).
-    enquiry is recovered from `previous` by 1-based position.
+    The enquiry detail is display-only (info component), so it never comes
+    back in the payload. The frontend omits `enquiry_detail_{N}` when the
+    item is marked N/A; a present key means "keep". Both enquiry and
+    enquiry_detail are recovered from `previous` by 1-based position.
     """
-    enquiry_details: Dict[int, str] = {}
-    for k, v in (form_payload or {}).items():
-        m = re.fullmatch(r"enquiry_detail_(\d+)", str(k))
-        if m:
-            enquiry_details[int(m.group(1))] = (v or "").strip()
-
+    payload = form_payload or {}
     prev_items = list(
         previous.enquiries_set) if previous and previous.enquiries_set else []
     items: List[AdditionalEnquiries] = []
 
-    for idx in sorted(enquiry_details):
-        if idx - 1 >= len(prev_items):
-            continue
-        enquiry_text = prev_items[idx - 1].enquiry
-        detail_text = enquiry_details[idx]
-        if enquiry_text:
+    for idx, prev in enumerate(prev_items, start=1):
+        if f"enquiry_detail_{idx}" not in payload:
+            continue  # N/A marked — frontend skips the key
+        if prev.enquiry:
             items.append(AdditionalEnquiries(
-                enquiry=enquiry_text, enquiry_detail=detail_text))
+                enquiry=prev.enquiry, enquiry_detail=prev.enquiry_detail))
 
     return AdditionalEnquiriesSet(
         enquiries_set=items,
