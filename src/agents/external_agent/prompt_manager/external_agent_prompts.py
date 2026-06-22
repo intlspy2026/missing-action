@@ -788,9 +788,12 @@ You are an expert in UK English insurance document request wording. Your task is
 2. **Possessive Form Rules — Individual (non-business) insured type**:
    - **SINGLE insured assigned, NO other parties**: Keep "your" as-is. Do NOT insert any name.
      EXCEPTION: If the context states "Multiple insureds in policy: true", the insured must be replaced with their possessive name form ("[Name]'s") — never use "your". This is because "your" is ambiguous when the policy has multiple insureds.
-   - **Insured + other parties (e.g. driver, witness)**: "your" for the insured, "'s" for all other names. NEVER replace "your" with the insured's actual name.
-     CORRECT: "your and Jane Doe's" (2 parties), "your, Jane Doe's, and Bob Smith's" (3+ parties — Oxford comma required).
-     WRONG: "John's and Jane Doe's" (insured name must not appear — use "your" instead).
+   - **Insured + other parties (e.g. driver, witness)**: Keep "your" for the insured. Insert "'s" for all other party names. NEVER replace "your" with the insured's actual name.
+     Given insured=John, driver=Jane, original text "your telephone records":
+     CORRECT: "your and Jane's telephone records" — "your" kept for insured, "Jane's" inserted for driver.
+     WRONG: "John's and Jane's telephone records" — insured name "John's" must not appear; use "your" instead.
+     WRONG: "your telephone records" — driver name "Jane's" must be inserted; leaving the original unchanged is a failure.
+     For 3+ parties with Oxford comma: "your, Jane Doe's, and Bob Smith's".
      EXCEPTION: If the context states "Multiple insureds in policy: true", the insured MUST be replaced with their possessive name form ("[Name]'s") — never use "your". This is because "your" is ambiguous when the policy has multiple insureds.
      CORRECT (exception): "John Smith's and Jane Doe's" (2 parties).
    - **Multiple insureds assigned (e.g. insured + additional insured)**: ALL names get "'s" with Oxford comma. No "your".
@@ -837,11 +840,12 @@ Steps:
    - Individual insured type, only non-insured parties → Rule 2, sub-bullet 4. All names get "'s".
    - Business insured type → Rule 3. Replace all "your"/"you" with business name + "'s".
 
-2. INSERT NAMES: Apply the matched rule. Place possessive phrases at the natural grammatical position (Rule 5). When 2+ parties are assigned, apply Collective Pronoun Shift (Rule 4).
+2. INSERT NAMES: Apply the matched rule. For non-insured parties, insert their name + "'s" at the possessive position. For the insured in individual type (no multiple insureds flag), keep "your". Do NOT leave the original text unchanged when non-insured parties are assigned — their names MUST be inserted.
 
 3. PRESERVE: Verify all <INSERT ...> tokens, date patterns, CAPITALISED tokens remain unchanged (Rule 6).
 
 4. VERIFY: Before returning, check:
+   - Non-insured party names MUST appear in the output with "'s". If any assigned non-insured party name is missing, the output is incomplete — add it now.
    - If individual insured type with insured + other parties, and NO multiple insureds flag: "your" MUST appear in the output. If the insured's actual name appears instead of "your", fix it now.
    - If individual insured type with insured + other parties, AND multiple insureds flag is true: "your" MUST NOT appear for the insured — insured's name + "'s" must be used instead.
    - If business insured type: no "your" or "you" should remain — all replaced with business name.
