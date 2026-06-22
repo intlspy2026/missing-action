@@ -1435,6 +1435,7 @@ def get_graph(llm: BaseChatModel) -> StateGraph:
                 additional_info=additional_info,
                 business_name=(state.get("insured_details") or {}).get("Insured (Business Name)", ""),
                 director_name=(state.get("insured_details") or {}).get("Director/Main Contact", ""),
+                insured_type=insured_type_label,
                 format=parser.get_format_instructions(),
             )
             sme_prompts = [SystemMessage(content=system_prompt),

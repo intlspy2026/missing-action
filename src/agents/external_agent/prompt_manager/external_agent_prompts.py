@@ -300,6 +300,15 @@ b. **Fallback (no SME match)**: When a document type has no matching entry in th
    - Replace `<INSERT BUSINESS NAMES>` with `({business_name})`, where `{business_name}` is the business name from BUSINESS NAME below.
    - If no business name is provided, leave `<INSERT BUSINESS NAMES>` unchanged.
    - If no director name is provided, leave `you/insert name` unchanged.
+
+**RULE 3d - BUSINESS-SPECIFIC GOLD STANDARD PREFERENCE**:
+When insured type is "business", if a PREVIOUS VERSION entry matches a gold standard entry that has a business-specific variant (identified by "(Business)" suffix or containing "Business" in the entry name), you MUST match to the business-specific variant instead of the normal one.
+
+Example: "Financial Statements" in PREVIOUS VERSION → match to "Financial Statements (Business)" (not "Financial Statements") when insured type is business.
+
+When insured type is "individual", match to the normal variant ("Financial Statements", not "Financial Statements (Business)").
+
+This rule applies to ALL current and future gold standard pairs where a normal and business-specific variant both exist.
 </CRITICAL_RULES>
 
 <TASK>
@@ -311,6 +320,7 @@ Steps:
 
 2. MATCHING PASS (DO NOT OUTPUT YET):
    For each PREVIOUS VERSION entry, identify its gold standard match (or note "no match" for RULE 3b fallback). Build a mental list. DO NOT produce any JSON output yet.
+   If insured type is "business", check whether a business-specific variant exists for each match (look for "(Business)" suffix or "Business" in the gold standard entry name). If it does, match to the business variant instead (RULE 3d).
 
 3. DEDUP PASS (DO NOT OUTPUT YET):
    Apply RULE 1.5. Scan the list from Step 2. If multiple entries match the same gold standard (producing identical doc_type), keep only the first occurrence. Remove the rest. DO NOT produce any JSON output yet.
@@ -321,9 +331,10 @@ Steps:
    b. No match → apply RULE 3b (full instruction-style fallback grounded in PREVIOUS VERSION doc_details and case context) + RULE 2.5 (use PREVIOUS VERSION doc_type if no gold standard name).
    Validate inline before outputting each entry:
     - Verbatim SME wording (or RULE 3c placeholder filling for the 3 exception types)?
-   - Full instruction-style fallback (not a short label or one-liner)?
-   - Neutral language (RULE 2)?
-   - Doc_type follows RULE 2.5?
+    - If insured type is business, business-specific gold standard variants preferred (RULE 3d)?
+    - Full instruction-style fallback (not a short label or one-liner)?
+    - Neutral language (RULE 2)?
+    - Doc_type follows RULE 2.5?
    Output as structured JSON.
 </TASK>
 
@@ -361,6 +372,11 @@ The DIRECTOR NAME for Financial Statements (Business) insertion (RULE 3c):
 <DIRECTOR NAME>
 {director_name}
 </DIRECTOR NAME>
+
+The INSURED TYPE determines business-specific gold standard matching (RULE 3d):
+<INSURED TYPE>
+{insured_type} ("business" or "individual")
+</INSURED TYPE>
 </CONTEXT>
 """
 
