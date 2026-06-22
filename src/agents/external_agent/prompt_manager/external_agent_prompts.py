@@ -279,7 +279,17 @@ a. **Primary (SME match exists)**: When a matching entry exists in the provided 
 
     **Match rule — document class, not label**: Match by the underlying record type requested, not by the PREVIOUS VERSION wording or purpose. A gold standard entry covers ALL variations that request the same category of records — receipts, logs, invoices, reports, and contact details for servicing are all the same document class "Service and Maintenance History." Similarly, receipts and invoices for parts purchases, any records of repairs completed, and any mechanic assessments or condition reports all fall under the same maintenance-history class. A match exists when the gold standard entry's record category subsumes the PREVIOUS VERSION entry — the PREVIOUS VERSION entry asks for a specific form or sub-type, the gold standard entry covers the broader class. Do NOT fall back to RULE 3b for entries that are sub-types or variants of an existing gold standard entry.
 
-    **Business variant selection**: When multiple gold standard entries match the same document class (e.g. "Financial Statements" and "Financial Statements (Business)"), check INSURED TYPE in <CONTEXT> to select the correct variant BEFORE locking in the match. When insured type is "business", match the business-specific variant (identified by "(Business)" suffix or "Business" in the entry name). When insured type is "individual", match the normal variant. Do NOT match the first entry found — check for variants first.
+    **Business variant selection (MANDATORY when insured type is "business")**:
+    When insured type is "business", you MUST search the GOLD_STANDARDS for a business-specific variant of the matched document class before locking in the match. A business-specific variant is identified by "(Business)" suffix or "Business" in the entry name (e.g. "Financial Statements (Business)" is the business variant of "Financial Statements"). If a business variant exists, you MUST select it — do NOT select the normal variant.
+
+    When insured type is "individual", select the normal variant.
+
+    Example: PREVIOUS VERSION has "Financial Statements", INSURED TYPE is "business".
+    Both "Financial Statements" and "Financial Statements (Business)" exist in GOLD_STANDARDS — they are the same document class.
+    CORRECT: match to "Financial Statements (Business)" — then apply RULE 3c to fill placeholders.
+    WRONG: match to "Financial Statements" — this is the individual variant, not for business insured type.
+
+    Currently, "Financial Statements" and "Financial Statements (Business)" are paired variants. When insured type is "business", any PREVIOUS VERSION entry matching this document class MUST be matched to "Financial Statements (Business)".
 
     Negative example: "Evidence to confirm movements" describes an investigative purpose, not a document class — no gold standard match. Use RULE 3b for purpose-based doc_types that do not name a specific document class matching a gold standard entry.
 
@@ -365,7 +375,7 @@ The DIRECTOR NAME for Financial Statements (Business) insertion (RULE 3c):
 {director_name}
 </DIRECTOR NAME>
 
-The INSURED TYPE determines business-specific gold standard matching (RULE 3d):
+The INSURED TYPE determines business-specific gold standard matching (RULE 3a business variant selection):
 <INSURED TYPE>
 {insured_type} ("business" or "individual")
 </INSURED TYPE>
