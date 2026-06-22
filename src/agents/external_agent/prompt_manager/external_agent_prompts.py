@@ -279,6 +279,8 @@ a. **Primary (SME match exists)**: When a matching entry exists in the provided 
 
     **Match rule — document class, not label**: Match by the underlying record type requested, not by the PREVIOUS VERSION wording or purpose. A gold standard entry covers ALL variations that request the same category of records — receipts, logs, invoices, reports, and contact details for servicing are all the same document class "Service and Maintenance History." Similarly, receipts and invoices for parts purchases, any records of repairs completed, and any mechanic assessments or condition reports all fall under the same maintenance-history class. A match exists when the gold standard entry's record category subsumes the PREVIOUS VERSION entry — the PREVIOUS VERSION entry asks for a specific form or sub-type, the gold standard entry covers the broader class. Do NOT fall back to RULE 3b for entries that are sub-types or variants of an existing gold standard entry.
 
+    **Business variant selection**: When multiple gold standard entries match the same document class (e.g. "Financial Statements" and "Financial Statements (Business)"), check INSURED TYPE in <CONTEXT> to select the correct variant BEFORE locking in the match. When insured type is "business", match the business-specific variant (identified by "(Business)" suffix or "Business" in the entry name). When insured type is "individual", match the normal variant. Do NOT match the first entry found — check for variants first.
+
     Negative example: "Evidence to confirm movements" describes an investigative purpose, not a document class — no gold standard match. Use RULE 3b for purpose-based doc_types that do not name a specific document class matching a gold standard entry.
 
 b. **Fallback (no SME match)**: When a document type has no matching entry in the provided GOLD_STANDARDS, INCLUDE it using a fallback draft: write a full
@@ -300,15 +302,6 @@ b. **Fallback (no SME match)**: When a document type has no matching entry in th
    - Replace `<INSERT BUSINESS NAMES>` with `({business_name})`, where `{business_name}` is the business name from BUSINESS NAME below.
    - If no business name is provided, leave `<INSERT BUSINESS NAMES>` unchanged.
    - If no director name is provided, leave `you/insert name` unchanged.
-
-**RULE 3d - BUSINESS-SPECIFIC GOLD STANDARD PREFERENCE**:
-When insured type is "business", if a PREVIOUS VERSION entry matches a gold standard entry that has a business-specific variant (identified by "(Business)" suffix or containing "Business" in the entry name), you MUST match to the business-specific variant instead of the normal one.
-
-Example: "Financial Statements" in PREVIOUS VERSION → match to "Financial Statements (Business)" (not "Financial Statements") when insured type is business.
-
-When insured type is "individual", match to the normal variant ("Financial Statements", not "Financial Statements (Business)").
-
-This rule applies to ALL current and future gold standard pairs where a normal and business-specific variant both exist.
 </CRITICAL_RULES>
 
 <TASK>
@@ -319,19 +312,18 @@ Steps:
 1. Read PREVIOUS VERSION to extract each doc_type and its doc_details (for timeframe extraction per RULE 2.5). Read INITIAL REVIEW to identify direct parties (insured, claimant, drivers) for grouping per STYLE.
 
 2. MATCHING PASS (DO NOT OUTPUT YET):
-   For each PREVIOUS VERSION entry, identify its gold standard match (or note "no match" for RULE 3b fallback). Build a mental list. DO NOT produce any JSON output yet.
-   If insured type is "business", check whether a business-specific variant exists for each match (look for "(Business)" suffix or "Business" in the gold standard entry name). If it does, match to the business variant instead (RULE 3d).
+   For each PREVIOUS VERSION entry, identify its gold standard match (or note "no match" for RULE 3b fallback). When multiple variants exist for the same document class, apply the business variant selection in RULE 3a's match rule. Build a mental list. DO NOT produce any JSON output yet.
 
 3. DEDUP PASS (DO NOT OUTPUT YET):
    Apply RULE 1.5. Scan the list from Step 2. If multiple entries match the same gold standard (producing identical doc_type), keep only the first occurrence. Remove the rest. DO NOT produce any JSON output yet.
 
 4. OUTPUT PASS:
    For each unique surviving entry from Step 3:
-   a. Gold standard match → apply RULE 3a (verbatim SME wording). For "Signed Authorities", "Witness Contact Details (Known)", and "Financial Statements (Business)", apply RULE 3c (fill placeholders from context) instead of RULE 3a (verbatim). Apply RULE 2.5 (gold standard name + timeframe from PREVIOUS VERSION doc_details if present).
+   a. Gold standard match → apply RULE 3a (verbatim SME wording, with business variant selection if applicable). For "Signed Authorities", "Witness Contact Details (Known)", and "Financial Statements (Business)", apply RULE 3c (fill placeholders from context) instead of RULE 3a (verbatim). Apply RULE 2.5 (gold standard name + timeframe from PREVIOUS VERSION doc_details if present).
    b. No match → apply RULE 3b (full instruction-style fallback grounded in PREVIOUS VERSION doc_details and case context) + RULE 2.5 (use PREVIOUS VERSION doc_type if no gold standard name).
    Validate inline before outputting each entry:
     - Verbatim SME wording (or RULE 3c placeholder filling for the 3 exception types)?
-    - If insured type is business, business-specific gold standard variants preferred (RULE 3d)?
+    - If insured type is business, business-specific gold standard variant selected during matching (RULE 3a)?
     - Full instruction-style fallback (not a short label or one-liner)?
     - Neutral language (RULE 2)?
     - Doc_type follows RULE 2.5?
