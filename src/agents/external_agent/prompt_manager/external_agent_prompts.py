@@ -768,11 +768,12 @@ Apply these rules to every NEW document request (one not present in PREVIOUS VER
 
 **RULE C - VERBATIM SME PHRASING (when a match exists)**: When a matching entry exists in GOLD_STANDARDS, doc_details MUST mirror the SME wording VERBATIM. Leave ALL placeholders unchanged — <INSERT ...> tokens, X-patterns (XXX, XXXX, XX to XX, XXXXXXXXXX), and CAPITALISED slots (e.g., START/END) pass through exactly as written in the SME entry. Do NOT fill any placeholder from case context (except the RULE F exceptions). You MUST NOT shorten, summarise, paraphrase, simplify, or rewrite the SME wording when an SME entry exists. If uncertain whether your phrasing matches the SME entry, default to the SME phrasing.
 
-**RULE D - CONCISE FALLBACK (when NO match exists)**: When the requested document has NO matching entry in GOLD_STANDARDS, draft a CONCISE, HIGH-LEVEL request:
-   - State only the document category and the relevant date/period placeholders (e.g., <INSERT DATE> to <INSERT DATE>).
+**RULE D - CONCISE FALLBACK (when NO match exists)**: When the requested document has NO matching entry in GOLD_STANDARDS, draft a CONCISE, HIGH-LEVEL request. The doc_details MUST consist of ONLY two elements: (1) the document category, and (2) the relevant date/period placeholders. Nothing else.
    - Do NOT elaborate with sub-items, examples, or specific details.
+   - Do NOT introduce examples via any pattern — "e.g.", "such as", "including", "for example", "or similar", or parenthetical example lists like "(e.g. X, Y, Z or similar proof)". These are ALL prohibited.
    - Correct: "A copy of your details of your overseas travel from <INSERT DATE> to <INSERT DATE>"
    - Incorrect: "A copy of your details of your overseas travel including flight details, boarding, hotel booking from <INSERT DATE> to <INSERT DATE>"
+   - Incorrect: "A copy of documents confirming your overseas travel (e.g travel itinerary, boarding passes, passport stamps or similar proof) for period <INSERT DATE> to <INSERT DATE>"
 
 **RULE E - DOC_TYPE NAMING**:
    - **Gold standard match (RULE C)**: doc_type MUST use the gold standard entry name. Append the timeframe from the FEEDBACK as a dash suffix if one is present (e.g., "Service and Maintenance History - 3 months prior to date of loss"). The timeframe is the portion that specifies how far from the date of loss records should cover. If no timeframe is present, use the gold standard doc_type as-is.
