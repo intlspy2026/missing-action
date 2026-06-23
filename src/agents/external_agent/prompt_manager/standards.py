@@ -5,7 +5,7 @@ Each constant pair is:
 - `<SECTION>_GOLD_STANDARDS` — raw SME content, dropped inside a wrapper tag in
   the draft prompt (the tag is already in the prompt template).
 - `<SECTION>_GOLD_STANDARDS_BLOCK` — same content pre-wrapped in tags, intended
-  for the SECTION_FEEDBACK_PROMPT slot which uses an include-or-omit pattern.
+  for the DOC_REQUEST_FEEDBACK_PROMPT slot which uses an include-or-omit pattern.
 
 Separated by LOB: Motor vs Property. The calling code selects the appropriate
 constant based on the LOB in state.

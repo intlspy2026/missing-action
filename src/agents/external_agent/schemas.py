@@ -32,18 +32,6 @@ class Reference(BaseModel):
 #     update_notes: Optional[str] = None
 
 
-class InterviewQuestion(BaseModel):
-    question_id: int
-    category: str
-    question_text: str
-
-
-class InterviewQuestionSets(BaseModel):
-    question_sets: List[InterviewQuestion]
-    version: int = 1
-    update_notes: Optional[str] = None
-
-
 class KeyConcern(BaseModel):
     concern: str
     rationale: str
@@ -79,21 +67,10 @@ class AdditionalEnquiriesSet(BaseModel):
     update_notes: Optional[str] = None
 
 
-# --- Commented out: leftover from interview plans agent ---
-# class InterviewPlan(BaseModel):
-#     question_sets: List[InterviewQuestion]
-#     additional_evidence_requests: List[str]
-#     version: int
-#     created_at: str = Field(
-#         default_factory=lambda: datetime.utcnow().isoformat())
-#     update_notes: Optional[str] = None
-
-
 class ExternalAgentPlan(BaseModel):
     concern_set: KeyConcernSet
     document_set: DocRequestSet
     enquiry_set: AdditionalEnquiriesSet
-    # interview_plan: InterviewQuestionSets
     version: int
     created_at: str = Field(
         default_factory=lambda: datetime.utcnow().isoformat())
@@ -109,13 +86,6 @@ class Knowledge(BaseModel):
 
 class KnowledgeSet(BaseModel):
     knowledge: List[Knowledge]
-
-
-# --- Commented out: replaced by per-section synthesis using existing schemas ---
-# class KnowledgeReport(BaseModel):
-#     document_set: DocRequestSet
-#     enquiries_rationale: List[str]
-#     interview_plan: InterviewQuestionSets
 
 
 class PartyNameInsertionOutput(BaseModel):
@@ -141,18 +111,16 @@ class ExternalAgentState(MessagesState):
     insured_details: Optional[dict[str, str]] = None
 
     # User-selected sections (key_concerns always generated regardless)
-    selected_sections: List[Literal["doc_request", "additional_enquiries", "interview_plan"]]
+    selected_sections: List[Literal["doc_request", "additional_enquiries"]]
 
     # Per-section outputs
     key_concerns: Optional[KeyConcernSet] = None
     doc_request: Optional[DocRequestSet] = None
     additional_enquiries: Optional[AdditionalEnquiriesSet] = None
-    interview_plan: Optional[InterviewQuestionSets] = None
 
     # Per-section synthesized knowledge (cached for feedback regeneration)
     doc_request_knowledge: Optional[str] = None
     enquiries_knowledge: Optional[str] = None
-    interview_plan_knowledge: Optional[str] = None
 
     # Final assembled output
     external_agent_plan: Optional[ExternalAgentPlan] = None
@@ -164,10 +132,3 @@ class ExternalAgentState(MessagesState):
     hitl_decision: Optional[HITLDecision] = None
     hitl_artifact: Optional[dict[str, Any]] = None
     hitl_task: Optional[str] = None
-
-
-# --- Commented out: leftover from interview plans agent ---
-# class InterviewPlanStruct(BaseModel):
-#     claim_id: Optional[str] = None
-#     lob: Optional[str] = None
-#     investigation_type: Optional[List[str]] = None

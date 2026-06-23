@@ -1,12 +1,10 @@
 import re
 import logging
-from collections import defaultdict
 from typing import List, Dict, Any, Optional
 from agents.external_agent.schemas import (
     KeyConcern, KeyConcernSet,
     DocRequest, DocRequestSet,
     AdditionalEnquiries, AdditionalEnquiriesSet,
-    InterviewQuestion, InterviewQuestionSets,
     ExternalAgentPlan,
 )
 
@@ -362,55 +360,6 @@ def build_form_enquiries(enquiries: AdditionalEnquiriesSet) -> List[Dict[str, An
     }]
 
 
-def build_form_interview_plan(interview_plan: InterviewQuestionSets) -> List[Dict[str, Any]]:
-    """Build editable review form for interview plan, grouped by category."""
-    grouped: Dict[str, List[InterviewQuestion]] = defaultdict(list)
-    category_order: List[str] = []
-
-    for q in interview_plan.question_sets or []:
-        cat = (q.category or "").strip() or "Other"
-        if cat not in grouped:
-            category_order.append(cat)
-        grouped[cat].append(q)
-
-    accordion_sections: List[Dict[str, Any]] = []
-    for cat in category_order:
-        components: List[Dict[str, Any]] = []
-        for q in grouped[cat]:
-            components.append({
-                "type": "text",
-                "id": f"q_{q.question_id}",
-                "label": f"Question {q.question_id}",
-                "placeholder": q.question_text or "",
-                "required": False,
-            })
-        accordion_sections.append({"value": cat, "components": components})
-
-    view_data: List[Dict[str, Any]] = [
-        {"type": "markdown", "data": {"content": "## Interview Plan"}},
-        {"type": "markdown", "data": {"content": f"Version: {interview_plan.version}"}},
-    ]
-
-    form_data: List[Dict[str, Any]] = [
-        {
-            "type": "accordion",
-            "id": "question_sets",
-            "data": accordion_sections,
-        }
-    ]
-
-    return [{
-        "type": "workflow_stage",
-        "data": {
-            "name": "Interview Plan",
-            "data": [
-                {"type": "smart_view", "data": view_data},
-                {"type": "smart_form", "confirm_submit": True, "data": form_data},
-            ],
-        },
-    }]
-
-
 # ------------------------------------
 # Per-section parsers
 # ------------------------------------
@@ -524,46 +473,6 @@ def parse_form_to_enquiries(
 
     return AdditionalEnquiriesSet(
         enquiries_set=items,
-        version=(previous.version if previous else 0) + 1,
-        update_notes=None,
-    )
-
-
-def parse_form_to_interview_plan(
-    form_payload: Dict[str, Any],
-    *,
-    previous: Optional[InterviewQuestionSets] = None,
-) -> InterviewQuestionSets:
-    """Parse flat form payload back into InterviewQuestionSets."""
-    prev_by_id: Dict[int, InterviewQuestion] = {}
-    if previous and previous.question_sets:
-        for q in previous.question_sets:
-            prev_by_id[q.question_id] = q
-
-    items: List[tuple[int, str]] = []
-    for k, v in (form_payload or {}).items():
-        m = re.fullmatch(r"q_(\d+)", str(k))
-        if not m:
-            continue
-        original_id = int(m.group(1))
-        text = (v or "").strip()
-        if text:
-            items.append((original_id, text))
-
-    items.sort(key=lambda x: x[0])
-
-    questions: List[InterviewQuestion] = []
-    for new_id, (original_id, text) in enumerate(items, start=1):
-        prev_q = prev_by_id.get(original_id)
-        category = prev_q.category if prev_q else "Other"
-        questions.append(InterviewQuestion(
-            question_id=new_id,
-            category=category,
-            question_text=text,
-        ))
-
-    return InterviewQuestionSets(
-        question_sets=questions,
         version=(previous.version if previous else 0) + 1,
         update_notes=None,
     )

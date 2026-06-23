@@ -3,7 +3,6 @@ from smart_investigator.foundation.schemas.schemas import SmartInvestigatorAgent
 from smart_investigator.foundation.tools.tool_names import EXTERNAL_AGENT_NAME
 from agents.external_agent.prompt_manager.knowledge_prompts import (
     KNOWLEDGE_RETRIEVAL_SYSTEM_PROMPT,
-    RETRIEVAL_TASKS,
     KNOWLEDGE_RETRIEVAL_TASK_PROMPT,
     SECTION_KNOWLEDGE_REPORT_SYSTEM_PROMPT,
     SECTION_KNOWLEDGE_REPORT_PROMPT,
@@ -21,8 +20,9 @@ from agents.external_agent.prompt_manager.external_agent_prompts import (
     NARRATIVE_DOC_REQUEST_DRAFT_PROMPT,
     ADDITIONAL_ENQUIRIES_RELEVANCE_PROMPT,
     ADDITIONAL_ENQUIRIES_FINAL_PROMPT,
-    INTERVIEW_PLAN_DRAFT_PROMPT,
-    SECTION_FEEDBACK_PROMPT,
+    KEY_CONCERNS_FEEDBACK_PROMPT,
+    ADDITIONAL_ENQUIRIES_FEEDBACK_PROMPT,
+    DOC_REQUEST_FEEDBACK_PROMPT,
     SECTION_FEEDBACK_KNOWLEDGE_BLOCK,
     PARTY_NAME_INSERTION_PROMPT,
 )
@@ -45,13 +45,11 @@ from agents.external_agent.utils import (
     build_form_key_concerns, parse_form_to_key_concerns,
     build_form_doc_request, parse_form_to_doc_request,
     build_form_enquiries, parse_form_to_enquiries,
-    build_form_interview_plan, parse_form_to_interview_plan,
     build_form_final,
     build_quick_action_preview_update,
 )
 from smart_investigator.foundation.utils.utils import prepare_thinking_message, prepare_hitl_task
 from agents.external_agent.schemas import (
-    InterviewQuestion, InterviewQuestionSets,
     DocRequest, DocRequestSet,
     KnowledgeSet, Knowledge,
     HITLDecision, ExternalAgentState,
@@ -172,7 +170,6 @@ def get_graph(llm: BaseChatModel) -> StateGraph:
             "key_concerns_review": "Key Concerns",
             "doc_request_review": "Document Requests",
             "enquiries_review": "Additional Enquiries",
-            "interview_plan_review": "Interview Plan",
         }
         section_name = _step_to_section.get(pending_step, "")
 
@@ -230,8 +227,6 @@ def get_graph(llm: BaseChatModel) -> StateGraph:
             return "generate_doc_request"
         if pending_step == "enquiries_review":
             return "generate_enquiries"
-        if pending_step == "interview_plan_review":
-            return "generate_interview_plan"
 
         # unknown step -> restart
         return "initialise_query"
@@ -253,7 +248,6 @@ def get_graph(llm: BaseChatModel) -> StateGraph:
             "key_concerns_review": (parse_form_to_key_concerns, "key_concerns"),
             "doc_request_review": (parse_form_to_doc_request, "doc_request"),
             "enquiries_review": (parse_form_to_enquiries, "additional_enquiries"),
-            "interview_plan_review": (parse_form_to_interview_plan, "interview_plan"),
         }
 
         if pending_step in step_to_parser:
@@ -268,8 +262,7 @@ def get_graph(llm: BaseChatModel) -> StateGraph:
                     parsed_list = (
                         getattr(parsed, "concern_set", None) or
                         getattr(parsed, "document_set", None) or
-                        getattr(parsed, "enquiries_set", None) or
-                        getattr(parsed, "question_sets", None)
+                        getattr(parsed, "enquiries_set", None)
                     )
                     if not parsed_list and previous:
                         _, writer, _ = _get_ctx(state)
@@ -289,20 +282,17 @@ def get_graph(llm: BaseChatModel) -> StateGraph:
         """
         Given the current section, return the next section node name
         based on the fixed order and selected_sections.
-        Order: key_concerns → doc_request → additional_enquiries → interview_plan → assemble_plan
+        Order: key_concerns → doc_request → additional_enquiries → assemble_plan
         """
         order = [
             ("doc_request", "generate_doc_request"),
             ("additional_enquiries", "generate_enquiries"),
-            ("interview_plan", "generate_interview_plan"),
         ]
 
         if current == "key_concerns":
             remaining = order
         elif current == "doc_request":
             remaining = order[1:]
-        elif current == "additional_enquiries":
-            remaining = order[2:]
         else:
             return "assemble_plan"
 
@@ -855,7 +845,6 @@ def get_graph(llm: BaseChatModel) -> StateGraph:
             "key_concerns_review": "key_concerns",
             "doc_request_review": "doc_request",
             "enquiries_review": "additional_enquiries",
-            "interview_plan_review": "interview_plan",
         }
 
         # - First pass: pauses execution here.
@@ -879,7 +868,7 @@ def get_graph(llm: BaseChatModel) -> StateGraph:
             canonical_update: dict = {}
             sk = step_to_state_key.get(pending_step)
             if sk and isinstance(hitl_artifact, (KeyConcernSet, DocRequestSet,
-                                                  AdditionalEnquiriesSet, InterviewQuestionSets)):
+                                                  AdditionalEnquiriesSet)):
                 canonical_update[sk] = hitl_artifact
 
             return Command(
@@ -958,7 +947,7 @@ def get_graph(llm: BaseChatModel) -> StateGraph:
         canonical_update: dict = {}
         sk = step_to_state_key.get(pending_step)
         if sk and isinstance(hitl_artifact, (KeyConcernSet, DocRequestSet,
-                                             AdditionalEnquiriesSet, InterviewQuestionSets)):
+                                              AdditionalEnquiriesSet)):
             canonical_update[sk] = hitl_artifact
 
         return Command(
@@ -1104,14 +1093,12 @@ def get_graph(llm: BaseChatModel) -> StateGraph:
             writer(prepare_thinking_message(
                 EXTERNAL_AGENT_NAME, "Revising key concerns based on feedback..."))
 
-            prompt = SECTION_FEEDBACK_PROMPT.format(
+            prompt = KEY_CONCERNS_FEEDBACK_PROMPT.format(
                 section_name="key concerns",
                 prev_version=prev_version_json,
                 feedback=feedback,
                 initial_review=initial_review,
                 additional_info=additional_info,
-                knowledge_block="",
-                gold_standards_block="",
                 investigation_type_block=investigation_type_block,
                 format=parser.get_format_instructions(),
             )
@@ -1320,6 +1307,10 @@ def get_graph(llm: BaseChatModel) -> StateGraph:
         system_prompt = EXTERNAL_AGENT_SYSTEM_PROMPT
         parser = PydanticOutputParser(pydantic_object=DocRequestSet)
         knowledge_json = None
+        insured_type_label = (
+            "business" if (state.get("insured_type") or "").strip().lower() == "yes"
+            else "individual"
+        )
 
         # --- Feedback path ---
         if feedback:
@@ -1339,7 +1330,7 @@ def get_graph(llm: BaseChatModel) -> StateGraph:
             investigation_type_str = ", ".join(investigation_types)
             investigation_type_block = f"<INVESTIGATION TYPE>\n{investigation_type_str}\n</INVESTIGATION TYPE>" if investigation_type_str else ""
 
-            prompt = SECTION_FEEDBACK_PROMPT.format(
+            prompt = DOC_REQUEST_FEEDBACK_PROMPT.format(
                 section_name="document requests",
                 prev_version=prev_version_json,
                 feedback=feedback,
@@ -1348,6 +1339,9 @@ def get_graph(llm: BaseChatModel) -> StateGraph:
                 knowledge_block=knowledge_block,
                 gold_standards_block=gold_standards_block,
                 investigation_type_block=investigation_type_block,
+                insured_type=insured_type_label,
+                business_name=(state.get("insured_details") or {}).get("Insured (Business Name)", ""),
+                director_name=(state.get("insured_details") or {}).get("Director/Main Contact", ""),
                 format=parser.get_format_instructions(),
             )
             prompts = [SystemMessage(content=system_prompt),
@@ -1575,15 +1569,13 @@ def get_graph(llm: BaseChatModel) -> StateGraph:
             knowledge_block = SECTION_FEEDBACK_KNOWLEDGE_BLOCK.format(
                 knowledge=cached_knowledge) if cached_knowledge else ""
 
-            prompt = SECTION_FEEDBACK_PROMPT.format(
+            prompt = ADDITIONAL_ENQUIRIES_FEEDBACK_PROMPT.format(
                 section_name="additional enquiries",
                 prev_version=prev_version_json,
                 feedback=feedback,
                 initial_review=initial_review,
                 additional_info=additional_info,
                 knowledge_block=knowledge_block,
-                gold_standards_block="",
-                investigation_type_block="",
                 format=parser.get_format_instructions(),
             )
         else:
@@ -1709,198 +1701,6 @@ def get_graph(llm: BaseChatModel) -> StateGraph:
             loop = asyncio.get_event_loop()
             return loop.run_until_complete(generate_enquiries_async(state))
 
-    async def generate_interview_plan_async(state: "ExternalAgentState") -> Command:
-        runtime, writer, messages = _get_ctx(state)
-
-        decision = state.get("hitl_decision")
-        feedback = decision.task_summary if decision and decision.intent == "feedback" else ""
-
-        # --- Accept path: state["interview_plan"] is already canonical (written by route_interrupt) ---
-        if decision and decision.intent == "accept":
-            return Command(
-                goto="assemble_plan",
-                update={
-                    "hitl_decision": None,
-                    "hitl_artifact": None,
-                    "pending_step": None,
-                    "messages": messages + [AIMessage("Interview plan accepted.")],
-                },
-            )
-
-        initial_review = state.get("initial_review", "")
-        additional_info = state.get("additional_info", "")
-        system_prompt = EXTERNAL_AGENT_SYSTEM_PROMPT
-        parser = PydanticOutputParser(pydantic_object=InterviewQuestionSets)
-        knowledge_json = None
-
-        # --- Feedback path ---
-        if feedback:
-            prev_output = state.get("interview_plan")
-            prev_version_json = prev_output.model_dump_json(
-                indent=2, exclude_none=True) if prev_output else "{}"
-
-            writer(prepare_thinking_message(
-                EXTERNAL_AGENT_NAME, "Revising interview plan based on feedback..."))
-
-            cached_knowledge = state.get("interview_plan_knowledge") or ""
-            knowledge_block = SECTION_FEEDBACK_KNOWLEDGE_BLOCK.format(
-                knowledge=cached_knowledge) if cached_knowledge else ""
-
-            prompt = SECTION_FEEDBACK_PROMPT.format(
-                section_name="interview plan",
-                prev_version=prev_version_json,
-                feedback=feedback,
-                initial_review=initial_review,
-                additional_info=additional_info,
-                knowledge_block=knowledge_block,
-                gold_standards_block="",
-                investigation_type_block="",
-                format=parser.get_format_instructions(),
-            )
-        else:
-            # --- Draft path (existing logic) ---
-            writer(prepare_thinking_message(
-                EXTERNAL_AGENT_NAME, "Retrieving knowledge for interview plan..."))
-
-            # NOTE: interview plan retrieval tasks are currently commented out in RETRIEVAL_TASKS.
-            # When ready, uncomment "question_categories" and "underwriting_financial" in knowledge_prompts.py.
-            task_key = "interview_plan"
-            task_def = RETRIEVAL_TASKS.get(task_key)
-            if not task_def:
-                writer(prepare_thinking_message(
-                    EXTERNAL_AGENT_NAME, "No retrieval task configured for interview plan, drafting from initial review..."))
-                raw_knowledge = KnowledgeSet(knowledge=[])
-            else:
-                knowledge_endpoint = runtime.context["resources_endpoint_name"]
-                raw_knowledge = await _retrieve_section_knowledge(
-                    task_key=task_key,
-                    task_def=task_def,
-                    state=state,
-                    knowledge_endpoint=knowledge_endpoint,
-                )
-
-            investigation_types = state.get("investigation_type", []) or []
-            if raw_knowledge.knowledge:
-                writer(prepare_thinking_message(
-                    EXTERNAL_AGENT_NAME, "Synthesising interview plan knowledge..."))
-
-                synthesized = _synthesize_section_knowledge(
-                    section_name="interview plan",
-                    knowledge_set=raw_knowledge,
-                    investigation_types=investigation_types,
-                    output_schema=InterviewQuestionSets,
-                )
-                knowledge_json = synthesized.model_dump_json(
-                    indent=2, exclude_none=True)
-            else:
-                knowledge_json = ""
-
-            writer(prepare_thinking_message(
-                EXTERNAL_AGENT_NAME, "Drafting interview plan..."))
-
-            prompt = INTERVIEW_PLAN_DRAFT_PROMPT.format(
-                initial_review=initial_review,
-                knowledge=knowledge_json,
-                format=parser.get_format_instructions(),
-            )
-
-        prompts = [SystemMessage(content=system_prompt),
-                   HumanMessage(content=prompt)]
-
-        response = llm.invoke(
-            input=prompts,
-            temperature=0.0,
-            max_tokens=8192,
-            response_format={"type": "json_object"},
-        )
-        content = response.content if isinstance(
-            response.content, str) else response.content[0]["text"]
-        parsed: InterviewQuestionSets = parser.parse(content)
-
-        # Send to HITL review
-        artifact = build_form_interview_plan(parsed)
-        text = "Interview plan drafted. Please review and provide feedback or accept."
-        hitl_task = prepare_hitl_task(
-            agent_name=EXTERNAL_AGENT_NAME,
-            text=text,
-            context="User must review interview plan and either accept, edit+submit, or provide feedback.",
-            state={} if use_checkpointer else {
-                **state, "messages": messages + [AIMessage(text)]},
-            artifact=artifact,
-        )
-
-        update = {
-            "interview_plan": parsed,
-            "pending_step": "interview_plan_review",
-            "hitl_task": hitl_task,
-            "hitl_decision": None,
-            "hitl_artifact": None,
-            "messages": messages + [AIMessage("Interview plan drafted. Awaiting review.")],
-        }
-        if knowledge_json is not None:
-            update["interview_plan_knowledge"] = knowledge_json
-
-        return Command(goto="route_interrupt", update=update)
-
-    def generate_interview_plan(state: "ExternalAgentState") -> Command:
-        """Sync wrapper for generate_interview_plan_async."""
-        try:
-            return asyncio.run(generate_interview_plan_async(state))
-        except RuntimeError:
-            loop = asyncio.get_event_loop()
-            return loop.run_until_complete(generate_interview_plan_async(state))
-
-    # --- Commented out: replaced by per-section generate nodes ---
-    # def generate_plan(state: "ExternalAgentState") -> Command:
-    #     runtime, writer, messages = _get_ctx(state)
-    #
-    #     decision = state.get("hitl_decision")
-    #     hitl_artifact = state.get("hitl_artifact") or {}
-    #     hitl_feedback = decision.task_summary if decision and decision.intent == "feedback" else ""
-    #
-    #     # Accept => persist edited plan and proceed to finalise
-    #     if decision and decision.intent == "accept" and hitl_artifact:
-    #         interview_plan = hitl_artifact
-    #         return Command(
-    #             goto="finalise_plan",
-    #             update={
-    #                 "interview_plans": interview_plan,
-    #                 "messages": messages + [AIMessage("Interview plan accepted.")],
-    #                 "pending_step": None,
-    #                 "hitl_artifact": None,
-    #             },
-    #         )
-    #
-    #     initial_review = state.get("initial_review", "")
-    #     additional_info = state.get("additional_info", "")
-    #     knowledge_report = state.get("knowledge")
-    #     doc_knowledge_json = knowledge_report.model_dump_json(indent=2, exclude_none=True, include={"document_set"})
-    #     enquiry_knowledge_json = knowledge_report.model_dump_json(indent=2, exclude_none=True, include={"enquiries_rationale"})
-    #
-    #     prev_plan = state.get("interview_plans") or {}
-    #     prev_version = getattr(prev_plan, "version", None)
-    #     if prev_version is None and isinstance(prev_plan, dict):
-    #         prev_version = prev_plan.get("version", 0)
-    #     version = prev_version + 1
-    #
-    #     online_feedback = state.get("online_eval", {}).get("per_metric", [])
-    #     online_feedback_block = (
-    #         "\n\n".join(f"Metric: {f['metric_id']} \nSuggestions: {f['suggestions']}" for f in online_feedback)
-    #         if online_feedback else ""
-    #     )
-    #     feedback = (hitl_feedback).strip()
-    #
-    #     system_prompt = EXTERNAL_AGENT_SYSTEM_PROMPT
-    #
-    #     if feedback:
-    #         # feedback path
-    #         pass
-    #     else:
-    #         # draft path — key concerns, doc request, additional enquiries sequentially
-    #         pass
-    #
-    #     return Command(goto="online_evaluation", update={...})
-
     # ------------------------------------
     # Assembly and finalisation nodes
     # ------------------------------------
@@ -1916,7 +1716,6 @@ def get_graph(llm: BaseChatModel) -> StateGraph:
         key_concerns = state.get("key_concerns")
         doc_request = state.get("doc_request")
         additional_enquiries = state.get("additional_enquiries")
-        # interview_plan = state.get("interview_plan")
 
         plan = ExternalAgentPlan(
             concern_set=key_concerns if key_concerns else KeyConcernSet(
@@ -1925,7 +1724,6 @@ def get_graph(llm: BaseChatModel) -> StateGraph:
                 document_set=[]),
             enquiry_set=additional_enquiries if additional_enquiries else AdditionalEnquiriesSet(
                 enquiries_set=[]),
-            # interview_plan=interview_plan,
             version=1,
             created_at=datetime.utcnow().isoformat(),
             update_notes=None,
@@ -1992,7 +1790,6 @@ def get_graph(llm: BaseChatModel) -> StateGraph:
         .add_node("generate_key_concerns", generate_key_concerns)
         .add_node("generate_doc_request", generate_doc_request)
         .add_node("generate_enquiries", generate_enquiries)
-        .add_node("generate_interview_plan", generate_interview_plan)
         .add_node("assemble_plan", assemble_plan)
         .add_node("finalise_plan", finalise_plan)
         .add_node("route_interrupt", route_interrupt)

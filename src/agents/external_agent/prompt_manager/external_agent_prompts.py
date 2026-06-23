@@ -627,91 +627,50 @@ Example 2:
 </EXAMPLES>
 """
 
-INTERVIEW_PLAN_DRAFT_PROMPT = """
-<CRITICAL_RULES>
-BEFORE drafting any questions, you MUST understand these rules. Violating these rules is a critical error.
-
-**RULE 1 - CONTEXTUALISE**: Every question from INVESTIGATION PROCESSES must be rewritten using case-specific details from INITIAL REVIEW (names, dates, locations, vehicle details). The output must never read like a generic template. A question like "Establish the date and time of the collision" must become specific to this case.
-
-**RULE 2 - RELEVANCE FILTER**: Every question from INVESTIGATION PROCESSES must be included unless it references a scenario that clearly does not exist in this case based on INITIAL REVIEW. When in doubt, include and adapt the question rather than exclude it. The burden is on exclusion, not inclusion.
-
-**RULE 3 - EXPAND BROAD INSTRUCTIONS**: When INVESTIGATION PROCESSES contains broad or general instructions, expand them into multiple specific questions using facts from INITIAL REVIEW. A single broad instruction may become several detailed questions.
-
-**RULE 4 - NO DUPLICATES**: The same question must not appear across multiple categories. If the same question appears in multiple categories in INVESTIGATION PROCESSES, include it only once under the most relevant category — but do not drop the question entirely.
-</CRITICAL_RULES>
-
-<TASK>
-**YOUR TASK**
-Draft an interview plan for the provided investigation type:
-
-Steps:
-1. Read INVESTIGATION PROCESSES first. Identify all question categories and questions within each category. These provide the structure and topics for your interview plan.
-
-2. Read INITIAL REVIEW to extract case-specific details (names, dates, locations, incident type, vehicle details, concerns, prior history).
-
-3. For each question from INVESTIGATION PROCESSES:
-    a. Contextualise it with case-specific details from INITIAL REVIEW (apply RULE 1).
-    b. Check if it is relevant to this case's circumstances — if not, adapt or exclude (apply RULE 2).
-    c. If it is a broad instruction, expand into multiple specific questions using INITIAL REVIEW details (apply RULE 3).
-
-4. Each object must include:
-    - "question_id" -> sequentially numbered starting from 1 in the output (do not carry over IDs from INVESTIGATION PROCESSES).
-    - "category" -> a category label. Do not jump back to a previous category later in the interview.
-    - "question_text" -> the interview question.
-
-5. Review your plan and ensure that you have included all relevant questions. Ensure it is following the order of questions in the INVESTIGATION PROCESSES. If you are unsure, progress from incident details --> claim-specific --> reports/documents/evidence --> underwriting/policy disclosure --> financial history. Any underwriting and/or financial history questions must be at the end.
-</TASK>
-
-<OUTPUT>
-{format}
-</OUTPUT>
-
-<CONTEXT>
-These are the relevant materials for your case:
-
-Here is the INVESTIGATION PROCESSES — this provides the structure and question topics for your interview plan:
+SECTION_FEEDBACK_KNOWLEDGE_BLOCK = """
+Here is the INVESTIGATION PROCESSES to guide you:
 <INVESTIGATION PROCESSES>
 {knowledge}
 </INVESTIGATION PROCESSES>
-
-The INITIAL REVIEW provides case-specific details for contextualisation. Use this to tailor every question to this specific case:
-<INITIAL REVIEW>
-{initial_review}
-</INITIAL REVIEW>
-</CONTEXT>
 """
 
-INTERVIEW_DOC_REQUEST_PROMPT = """
-Your task is to provide a list of additional evidence to obtain from the interviewee based on the interview plan. This may include phone records, bank records, witness details or receipts, depending on the type of claim under investigation.
-
-<INTERVIEW PLAN>
-{interview_plan}
-</INTERVIEW PLAN>
-
-<OUTPUT>
-{format}
-</OUTPUT>
-"""
-
-INTERVIEW_PLAN_FEEDBACK_PROMPT = """
+KEY_CONCERNS_FEEDBACK_PROMPT = """
+{investigation_type_block}
 <TASK>
 **YOUR TASK**
-Revise the PREVIOUS VERSION of the interview plan by:
+Revise the PREVIOUS VERSION of the {section_name} by:
 
 1. Prioritising and applying the FEEDBACK exactly as provided.
 2. Making the **minimum necessary changes** to address the FEEDBACK.
-3. Preserving structure, tone, and compliant PEACE-model sequencing unless FEEDBACK requires otherwise.
+3. Preserving structure, tone, and formatting unless FEEDBACK requires otherwise.
 4. Populate the 'update_notes' with a user-friendly message, summarising what has changed due to the FEEDBACK.
+5. **Scope of change** — split by action:
+   - **Modifying an existing item** (the item is present in PREVIOUS VERSION and the FEEDBACK changes it): apply the FEEDBACK to that item only. All other items MUST remain identical to the PREVIOUS VERSION — do not apply the change elsewhere even if the same value appears in multiple places.
+   - **Adding a new item** (the FEEDBACK requests a concern that is NOT in PREVIOUS VERSION): apply the <NEW_CONCERN_RULES> below to that new item only.
+   - **If PREVIOUS VERSION is empty** (no items): the FEEDBACK is your sole source for items. Apply the <NEW_CONCERN_RULES> to every item. Rules 2 and 3 (minimum changes, preserve structure) do not apply when there is nothing to preserve.
 
 If FEEDBACK is ambiguous, interpret it conservatively and document the intent through improved clarity rather than added scope.
 </TASK>
 
+<NEW_CONCERN_RULES>
+Apply these rules to every NEW key concern (one not present in PREVIOUS VERSION):
+
+- **State what the concern IS, not what the investigator should DO**: Do NOT use verification framing ("verification is required...", "the investigator should...", "to be confirmed...", "should be identified and clarified to confirm whether...", "this matters for assessing..."). Do NOT include any sentence describing what the investigator should do, obtain, verify, confirm, reconcile, cross-check, or determine. Action steps belong elsewhere in the brief, not in key concerns.
+- **No reviewer/process attribution**: Do NOT reference the feedback, the review, or the requester ("the reviewer has requested...", "as requested...", "the reviewer has asked for..."). The concern must read as an identified concern standing on its own — as if surfaced from case analysis, not from a review request.
+- **No downstream-consequence framing**: Do NOT explain what the concern is FOR (downstream consequence, insurer process, legal implication, what it may affect, or why it matters to the claim). State the concern itself.
+- **No preface**: Do NOT preface with "The concern is that.." or "The concern is whether..". State the concern directly.
+- **No filler**: omit hedging boilerplate ("further investigation is warranted...", "it is important to note...").
+- **Length**: 1-3 sentences per rationale. Hard cap. Title = short, descriptive, neutral noun phrase (no "potential _" / "possible _" padding).
+- **No fraud language / no pre-judgement**: Never assert wrongdoing, label intent, or pre-judge outcome. No "fraudulent", "suspicious", "red flags", "motive", "collusion".
+- **Rationale ends after stating the material facts**: Do not append trailing phrases that explain why the concern matters, what other concerns it relates to, or how it connects to the investigation.
+</NEW_CONCERN_RULES>
+
 <OUTPUT>
 {format}
 </OUTPUT>
 
 <CONTEXT>
-You are revising an existing interview plan based on reviewer FEEDBACK.
+You are revising an existing set of {section_name} based on reviewer FEEDBACK.
 
 <PREVIOUS VERSION>
 {prev_version}
@@ -732,17 +691,10 @@ The ADDITIONAL INFORMATION includes additional notes on the claim, which can inc
 <ADDITIONAL INFORMATION>
 {additional_info}
 </ADDITIONAL INFORMATION>
-
-Here is the INVESTIGATION PROCESSES to guide you:
-<INVESTIGATION PROCESSES>
-{knowledge}
-</INVESTIGATION PROCESSES>
 </CONTEXT>
 """
 
-SECTION_FEEDBACK_PROMPT = """
-{gold_standards_block}
-{investigation_type_block}
+ADDITIONAL_ENQUIRIES_FEEDBACK_PROMPT = """
 <TASK>
 **YOUR TASK**
 Revise the PREVIOUS VERSION of the {section_name} by:
@@ -788,11 +740,102 @@ The ADDITIONAL INFORMATION includes additional notes on the claim, which can inc
 </CONTEXT>
 """
 
-SECTION_FEEDBACK_KNOWLEDGE_BLOCK = """
-Here is the INVESTIGATION PROCESSES to guide you:
-<INVESTIGATION PROCESSES>
-{knowledge}
-</INVESTIGATION PROCESSES>
+DOC_REQUEST_FEEDBACK_PROMPT = """
+{investigation_type_block}
+<TASK>
+**YOUR TASK**
+Revise the PREVIOUS VERSION of the {section_name} by:
+
+1. Prioritising and applying the FEEDBACK exactly as provided.
+2. Making the **minimum necessary changes** to address the FEEDBACK.
+3. Preserving structure, tone, and formatting unless FEEDBACK requires otherwise.
+4. Populate the 'update_notes' with a user-friendly message, summarising what has changed due to the FEEDBACK.
+5. **Scope of change** — split by action:
+   - **Modifying an existing item** (the item is present in PREVIOUS VERSION and the FEEDBACK changes it): apply the FEEDBACK to that item only. Do NOT re-match it against GOLD_STANDARDS or rewrite its wording — the existing wording is already SME-approved. All other items MUST remain identical to the PREVIOUS VERSION — do not apply the change elsewhere even if the same value appears in multiple places.
+   - **Adding a new item** (the FEEDBACK requests a document that is NOT in PREVIOUS VERSION): apply the <NEW_DOCUMENT_RULES> below to that new item only.
+   - **If PREVIOUS VERSION is empty** (no items): the FEEDBACK is your sole source for items. Apply the <NEW_DOCUMENT_RULES> to every item. Rules 2 and 3 (minimum changes, preserve structure) do not apply when there is nothing to preserve.
+
+If FEEDBACK is ambiguous, interpret it conservatively and document the intent through improved clarity rather than added scope.
+</TASK>
+
+<NEW_DOCUMENT_RULES>
+Apply these rules to every NEW document request (one not present in PREVIOUS VERSION):
+
+**RULE A - MATCH BY DOCUMENT CLASS**: Match the requested document to a GOLD_STANDARDS entry by the underlying record category requested, NOT by the label or purpose in the FEEDBACK. A gold standard entry covers ALL variations that request the same category of records — receipts, logs, invoices, reports, and contact details for servicing are all the same document class "Service and Maintenance History." A match exists when the gold standard entry's record category subsumes the requested document — the request asks for a specific form or sub-type, and the gold standard entry covers the broader class. Do NOT fall back to RULE D for entries that are sub-types or variants of an existing gold standard entry. Purpose-based requests that do not name a specific document class matching a gold standard entry have no match (use RULE D).
+
+**RULE B - BUSINESS VARIANT SELECTION (MANDATORY when insured type is "business")**: When INSURED TYPE is "business", you MUST search GOLD_STANDARDS for a business-specific variant of the matched document class before locking in the match. A business-specific variant is identified by a "(Business)" suffix or "Business" in the entry name (e.g. "Financial Statements (Business)" is the business variant of "Financial Statements"). If a business variant exists, you MUST select it — do NOT select the normal variant. When INSURED TYPE is "individual", select the normal variant.
+
+**RULE C - VERBATIM SME PHRASING (when a match exists)**: When a matching entry exists in GOLD_STANDARDS, doc_details MUST mirror the SME wording VERBATIM. Leave ALL placeholders unchanged — <INSERT ...> tokens, X-patterns (XXX, XXXX, XX to XX, XXXXXXXXXX), and CAPITALISED slots (e.g., START/END) pass through exactly as written in the SME entry. Do NOT fill any placeholder from case context (except the RULE F exceptions). You MUST NOT shorten, summarise, paraphrase, simplify, or rewrite the SME wording when an SME entry exists. If uncertain whether your phrasing matches the SME entry, default to the SME phrasing.
+
+**RULE D - CONCISE FALLBACK (when NO match exists)**: When the requested document has NO matching entry in GOLD_STANDARDS, draft a CONCISE, HIGH-LEVEL request:
+   - State only the document category and the relevant date/period placeholders (e.g., <INSERT DATE> to <INSERT DATE>).
+   - Do NOT elaborate with sub-items, examples, or specific details.
+   - Correct: "A copy of your details of your overseas travel from <INSERT DATE> to <INSERT DATE>"
+   - Incorrect: "A copy of your details of your overseas travel including flight details, boarding, hotel booking from <INSERT DATE> to <INSERT DATE>"
+
+**RULE E - DOC_TYPE NAMING**:
+   - **Gold standard match (RULE C)**: doc_type MUST use the gold standard entry name. Append the timeframe from the FEEDBACK as a dash suffix if one is present (e.g., "Service and Maintenance History - 3 months prior to date of loss"). The timeframe is the portion that specifies how far from the date of loss records should cover. If no timeframe is present, use the gold standard doc_type as-is.
+   - **No match (RULE D)**: doc_type is the document name from the FEEDBACK. Append the timeframe from the FEEDBACK as a dash suffix if present.
+   - Do NOT fabricate a timeframe.
+
+**RULE F - PLACEHOLDER FILLING EXCEPTIONS**: RULE C requires all placeholders to pass through verbatim. However, for the following THREE specific gold standard entries ONLY, you MUST fill the indicated placeholder with case-specific information from the context:
+   1. **Signed Authorities**: Replace <INSERT AUTHORITY> with the authority type. Determine the authority from the investigation methodology and information in INITIAL REVIEW and ADDITIONAL INFORMATION. If the correct authority cannot be determined, leave the placeholder unchanged.
+   2. **Witness Contact Details (Known)**: Check INITIAL REVIEW and ADDITIONAL INFORMATION for an identified witness.
+      - **Witness IS identified**: Replace <INSERT WITNESS> (Motor) or <INSERT NAME> (Property) with the witness's full name. Keep the "Witness Contact Details (Known)" doc_type.
+      - **No witness identified**: Discard the "Witness Contact Details (Known)" match entirely. Instead, match this entry to the "Witness Contacts Details (Unknown)" gold standard entry — apply its doc_type and wording verbatim (no placeholder to fill).
+   3. **Financial Statements (Business)**:
+      - If a director name is provided in DIRECTOR NAME below, replace "you/insert name" with the director name and fix grammar to singular ("hold directorships in" -> "holds directorships in").
+      - Replace <INSERT BUSINESS NAMES> with "({business_name})", where {business_name} is the business name from BUSINESS NAME below.
+      - If no business name is provided, leave <INSERT BUSINESS NAMES> unchanged.
+      - If no director name is provided, leave "you/insert name" unchanged.
+
+**RULE G - NEUTRAL LANGUAGE**: Do not use: "fraudulent", "fraud", "suspicious", "red flags", "motive", "collusion", "grossly", "high-risk". Refer to the underlying event as "incident" rather than "assault" in both doc_type and doc_details. Describe the incident neutrally (e.g., "the incident on [date] at [location]"); do not preface it with "alleged", "potential", or any qualifier that pre-judges the case. Do not infer intent or wrongdoing in any doc_details.
+</NEW_DOCUMENT_RULES>
+
+<OUTPUT>
+{format}
+</OUTPUT>
+
+<CONTEXT>
+You are revising an existing set of {section_name} based on reviewer FEEDBACK.
+
+<PREVIOUS VERSION>
+{prev_version}
+</PREVIOUS VERSION>
+
+<FEEDBACK>
+{feedback}
+</FEEDBACK>
+
+Here is the supporting context for the case (for reference only - do not re-interpret unless required by feedback):
+
+The INITIAL REVIEW includes notes on the claim, policy and relevant details from searches conducted for the case being investigated.
+<INITIAL REVIEW>
+{initial_review}
+</INITIAL REVIEW>
+
+The ADDITIONAL INFORMATION includes additional notes on the claim, which can include police reports, engineer reports, incident reports, or other evidence.
+<ADDITIONAL INFORMATION>
+{additional_info}
+</ADDITIONAL INFORMATION>
+{knowledge_block}
+{gold_standards_block}
+
+The INSURED TYPE determines business-specific gold standard matching (RULE B):
+<INSURED TYPE>
+{insured_type} ("business" or "individual")
+</INSURED TYPE>
+
+The BUSINESS NAME for Financial Statements (Business) insertion (RULE F):
+<BUSINESS NAME>
+{business_name}
+</BUSINESS NAME>
+
+The DIRECTOR NAME for Financial Statements (Business) insertion (RULE F):
+<DIRECTOR NAME>
+{director_name}
+</DIRECTOR NAME>
+</CONTEXT>
 """
 
 PARTY_NAME_INSERTION_PROMPT = """
