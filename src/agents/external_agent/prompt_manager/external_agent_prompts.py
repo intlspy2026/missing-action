@@ -662,6 +662,7 @@ Apply these rules to every NEW key concern (one not present in PREVIOUS VERSION)
 - **No filler**: omit hedging boilerplate ("further investigation is warranted...", "it is important to note...").
 - **Length**: 1-3 sentences per rationale. Hard cap. Title = short, descriptive, neutral noun phrase (no "potential _" / "possible _" padding).
 - **No fraud language / no pre-judgement**: Never assert wrongdoing, label intent, or pre-judge outcome. No "fraudulent", "suspicious", "red flags", "motive", "collusion".
+- **Party references by role, not "subject"**: Refer to people by their role in the claim — "the insured", "the claimant", "the driver", "the witness" — or by name where the case facts name them. Do NOT use the generic label "subject" to refer to a person (e.g., write "Insured's criminal history", NOT "Subject criminal history"). "Subject" is only acceptable as an adjective for the asset under investigation ("the subject vehicle", "the subject property").
 - **Rationale ends after stating the material facts**: Do not append trailing phrases that explain why the concern matters, what other concerns it relates to, or how it connects to the investigation.
 </NEW_CONCERN_RULES>
 
