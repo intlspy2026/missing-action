@@ -130,7 +130,7 @@ BEFORE listing any documents, you MUST understand these rules. Violating these r
 
 **RULE 2 - PARTY SCOPE**: Only request documents from parties directly involved in the current claim under investigation. Use INITIAL REVIEW and ADDITIONAL INFORMATION to identify who the direct parties are. Individuals mentioned in prior claims, historical associations, or background checks within INITIAL REVIEW or ADDITIONAL INFORMATION are NOT direct parties to the current claim. Do not request documents from associated individuals who are not direct parties. Replace generic references in INVESTIGATION PROCESSES with the specific individuals identified from INITIAL REVIEW and ADDITIONAL INFORMATION.
 
-**RULE 3 - RELEVANCE FILTER (INCLUDE-ONLY)**: You START from the position that EVERY document type from INVESTIGATION PROCESSES is EXCLUDED. A document type is INCLUDED ONLY when it is either (i) core to the investigation type — the allegation itself creates a need for it — or (ii) supported by a SPECIFIC FACT in the narrative content of INITIAL REVIEW or ADDITIONAL INFORMATION. Determine the current investigation type from INVESTIGATION TYPE in the context below.
+**RULE 3 - RELEVANCE FILTER (INCLUDE-ONLY)**: You START from the position that EVERY document type from INVESTIGATION PROCESSES is EXCLUDED. A document type is INCLUDED ONLY when it is either (i) core to the investigation type — the allegation itself creates a need for it — or (ii) supported by a SPECIFIC FACT in the content of INITIAL REVIEW or ADDITIONAL INFORMATION (including search/background-check sections such as Caspar, RP Data, social media, and similar database outputs). Determine the current investigation type from INVESTIGATION TYPE in the context below.
 
     CORE METHODOLOGY ITEMS are document types that are inherent to investigating a given allegation type regardless of case specifics. These ALWAYS pass the relevance filter:
     - Traffic history: core for all Motor investigation types — no factual hook required.
@@ -203,7 +203,7 @@ Steps:
     b. THEN, assess relevance against INITIAL REVIEW and ADDITIONAL INFORMATION (apply RULE 3b). Only move from EXCLUDED to INCLUDED if you can cite a specific sentence.
 
 5. **Validation gate**: Before including each non-core document type in your output, confirm:
-    - Can I point to a specific fact in the narrative content of INITIAL REVIEW or ADDITIONAL INFORMATION that makes this document type relevant to this claim? If I cannot articulate a fact-based connection, exclude it.
+    - Can I point to a specific fact in the content of INITIAL REVIEW or ADDITIONAL INFORMATION (including search/background-check sections) that makes this document type relevant to this claim? If I cannot articulate a fact-based connection, exclude it.
     - Can I point to the specific entry in INVESTIGATION PROCESSES that this document type comes from? If not -> exclude it.
     - Am I requesting documents from someone who is NOT a direct party to the claim? If YES -> remove that person. Being mentioned in INITIAL REVIEW or ADDITIONAL INFORMATION does not make someone a direct party.
     - For each detail in this document type, check if the same detail appears under any other document type in your output. If YES -> remove the duplicate from the document type where it is less central to the overall purpose.
