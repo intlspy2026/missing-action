@@ -95,15 +95,6 @@ from agents.external_agent.hard_exclusions import strip_hard_exclusions
 # Party name insertion helpers
 # ---------------------------------------------------------------------------
 
-_NAME_PLACEHOLDER_RE = _re.compile(
-    r"<INSERT\s+NAME>|<INSERT\s+WITNESS>",
-    _re.IGNORECASE,
-)
-
-
-def _has_name_placeholder(doc_details: str) -> bool:
-    return bool(_NAME_PLACEHOLDER_RE.search(doc_details))
-
 
 def _check_multiple_insureds(insured_details: Dict[str, str]) -> bool:
     insured_val: str = ""
@@ -1205,13 +1196,6 @@ def get_graph(llm: BaseChatModel) -> StateGraph:
                                 doc_type=dr.doc_type,
                                 doc_details=original,
                                 assigned_parties=None,
-                                doc_details_original=dr.doc_details_original or dr.doc_details,
-                            )
-                        if _has_name_placeholder(original):
-                            return DocRequest(
-                                doc_type=dr.doc_type,
-                                doc_details=original,
-                                assigned_parties=dr.assigned_parties,
                                 doc_details_original=dr.doc_details_original or dr.doc_details,
                             )
                         party_data = _format_party_data(assigned_keys, insured_details)
