@@ -267,39 +267,25 @@ BEFORE finalizing any documents, you MUST understand these rules. Violating thes
 **RULE 2 - NEUTRAL LANGUAGE**: Do not use: "fraudulent", "fraud", "suspicious", "red flags", "motive", "collusion", "grossly", "high-risk". Refer to the underlying event as "incident" rather than "assault" in both doc_type and doc_details. Describe the incident neutrally (e.g., "the incident on [date] at [location]"); do not preface it with "alleged", "potential", or any qualifier that pre-judges the case. Do not infer intent or wrongdoing in any doc_details.
 
 **RULE 2.5 - DOC_TYPE NAMING (CRITICAL)**:
-- **Gold standard match (RULE 3a)**: doc_type MUST use the gold standard entry name — discard the PREVIOUS VERSION doc_type entirely. Then append the methodology timeframe from PREVIOUS VERSION doc_details as a dash suffix if one is present (e.g., `"Service and Maintenance History - 3 months prior to date of loss"`). Extract the timeframe as the portion of doc_details that specifies how far from the date of loss records should cover (e.g., "3 months from date of loss", "1 week from date of loss", "surrounding the date of loss"). If PREVIOUS VERSION doc_details has no timeframe, use the gold standard doc_type as-is.
-- **Fallback (RULE 3b, no match)**: doc_type is the PREVIOUS VERSION doc_type. Append methodology timeframe from PREVIOUS VERSION doc_details if present.
+- **Gold standard match (RULE 3b)**: doc_type MUST use the gold standard entry name — discard the PREVIOUS VERSION doc_type entirely. Then append the methodology timeframe from PREVIOUS VERSION doc_details as a dash suffix if one is present (e.g., `"Service and Maintenance History - 3 months prior to date of loss"`). Extract the timeframe as the portion of doc_details that specifies how far from the date of loss records should cover (e.g., "3 months from date of loss", "1 week from date of loss", "surrounding the date of loss"). If PREVIOUS VERSION doc_details has no timeframe, use the gold standard doc_type as-is.
+- **Fallback (RULE 3c, no match)**: doc_type is the PREVIOUS VERSION doc_type. Append methodology timeframe from PREVIOUS VERSION doc_details if present.
 - Do NOT fabricate a timeframe.
 
-**RULE 3 - VERBATIM SME PHRASING (with fallback)**: For every document type in PREVIOUS VERSION:
-a. **Primary (SME match exists)**: When a matching entry exists in the provided GOLD_STANDARDS, doc_details MUST mirror the SME wording verbatim. Leave ALL
+**RULE 3a - FINANCIAL STATEMENTS BUSINESS VARIANT (applies when INSURED TYPE is "business")**:
+When INSURED TYPE is "business" and PREVIOUS VERSION contains any "Financial Statements" entry, you MUST match it to the "Financial Statements (Business)" gold standard entry — NOT the normal "Financial Statements" entry. "Financial Statements" and "Financial Statements (Business)" are the same document class; the choice between them is decided by INSURED TYPE only, never by name similarity to the PREVIOUS VERSION doc_type. This rule overrides exact-name matching. When INSURED TYPE is "individual", match the normal "Financial Statements" entry.
+
+**RULE 3b - VERBATIM SME PHRASING (SME match exists)**: For every document type in PREVIOUS VERSION, when a matching entry exists in the provided GOLD_STANDARDS, doc_details MUST mirror the SME wording verbatim. Leave ALL
    placeholders unchanged — `<INSERT ...>` tokens, X-patterns (XXX, XXXX, XX to XX, XXXXXXXXXX), and CAPITALISED slots (e.g., START/END) pass through exactly
    as written in the SME entry. Do NOT fill any placeholder from case context. You MUST NOT shorten, summarise, paraphrase, simplify, or rewrite the SME
    wording when an SME entry exists. If uncertain whether your phrasing matches the SME entry, default to the SME phrasing.
 
-    **Match rule — document class, not label**: Match by the underlying record type requested, not by the PREVIOUS VERSION wording or purpose. A gold standard entry covers ALL variations that request the same category of records — receipts, logs, invoices, reports, and contact details for servicing are all the same document class "Service and Maintenance History." Similarly, receipts and invoices for parts purchases, any records of repairs completed, and any mechanic assessments or condition reports all fall under the same maintenance-history class. A match exists when the gold standard entry's record category subsumes the PREVIOUS VERSION entry — the PREVIOUS VERSION entry asks for a specific form or sub-type, the gold standard entry covers the broader class. Do NOT fall back to RULE 3b for entries that are sub-types or variants of an existing gold standard entry.
+    **Match rule — document class, not label**: Match by the underlying record type requested, not by the PREVIOUS VERSION wording or purpose. A gold standard entry covers ALL variations that request the same category of records — receipts, logs, invoices, reports, and contact details for servicing are all the same document class "Service and Maintenance History." Similarly, receipts and invoices for parts purchases, any records of repairs completed, and any mechanic assessments or condition reports all fall under the same maintenance-history class. A match exists when the gold standard entry's record category subsumes the PREVIOUS VERSION entry — the PREVIOUS VERSION entry asks for a specific form or sub-type, the gold standard entry covers the broader class. Do NOT fall back to RULE 3c for entries that are sub-types or variants of an existing gold standard entry.
 
-    **Business variant selection (MANDATORY when insured type is "business")**:
-    When insured type is "business", you MUST search the GOLD_STANDARDS for a business-specific variant of the matched document class before locking in the match. A business-specific variant is identified by "(Business)" suffix or "Business" in the entry name (e.g. "Financial Statements (Business)" is the business variant of "Financial Statements"). If a business variant exists, you MUST select it — do NOT select the normal variant.
+    Negative example: "Evidence to confirm movements" describes an investigative purpose, not a document class — no gold standard match. Use RULE 3c for purpose-based doc_types that do not name a specific document class matching a gold standard entry.
 
-    When insured type is "individual", select the normal variant.
+**RULE 3c - FALLBACK (no SME match)**: When a document type has no matching entry in the provided GOLD_STANDARDS, INCLUDE it using a fallback draft: write a full instruction-style request (e.g., "A copy of _", "Fully itemised _", "Provide _"), grounded in the PREVIOUS VERSION doc_details and case context. Match the cadence and neutral tone of the SME exemplars. Do NOT produce short labels or one-line summaries. MUST NOT list as examples any document type that has a standalone entry in GOLD_STANDARDS (e.g., work rosters, timesheets, rideshare receipts, toll records, police documents, medical records). Those pass or fail on their own relevance — re-listing them in a fallback entry's doc_details bypasses the methodology.
 
-    Example: PREVIOUS VERSION has "Financial Statements", INSURED TYPE is "business".
-    Both "Financial Statements" and "Financial Statements (Business)" exist in GOLD_STANDARDS — they are the same document class.
-    CORRECT: match to "Financial Statements (Business)" — then apply RULE 3c to fill placeholders.
-    WRONG: match to "Financial Statements" — this is the individual variant, not for business insured type.
-
-    Currently, "Financial Statements" and "Financial Statements (Business)" are paired variants. When insured type is "business", any PREVIOUS VERSION entry matching this document class MUST be matched to "Financial Statements (Business)".
-
-    Negative example: "Evidence to confirm movements" describes an investigative purpose, not a document class — no gold standard match. Use RULE 3b for purpose-based doc_types that do not name a specific document class matching a gold standard entry.
-
-b. **Fallback (no SME match)**: When a document type has no matching entry in the provided GOLD_STANDARDS, INCLUDE it using a fallback draft: write a full
-   instruction-style request (e.g., "A copy of _", "Fully itemised _", "Provide _"), grounded in the PREVIOUS VERSION doc_details and case context. Match the
-    cadence and neutral tone of the SME exemplars. Do NOT produce short labels or one-line summaries. MUST NOT list as examples any document type that has a
-    standalone entry in GOLD_STANDARDS (e.g., work rosters, timesheets, rideshare receipts, toll records, police documents, medical records). Those pass or
-    fail on their own relevance — re-listing them in a fallback entry's doc_details bypasses the methodology.
-
-**RULE 3c - PLACEHOLDER FILLING EXCEPTION**: RULE 3a requires ALL placeholders to pass through verbatim. However, for the following THREE specific gold standard entries ONLY, you MUST fill the indicated placeholder with case-specific information from the context:
+**RULE 3d - PLACEHOLDER FILLING EXCEPTION**: RULE 3b requires ALL placeholders to pass through verbatim. However, for the following THREE specific gold standard entries ONLY, you MUST fill the indicated placeholder with case-specific information from the context:
 
 1. **Signed Authorities**: Replace `<INSERT AUTHORITY>` with the authority type. Determine the authority from the investigation methodology and information in INITIAL REVIEW and ADDITIONAL INFORMATION. If the correct authority cannot be determined, leave the placeholder unchanged.
 
@@ -322,17 +308,17 @@ Steps:
 1. Read PREVIOUS VERSION to extract each doc_type and its doc_details (for timeframe extraction per RULE 2.5). Read INITIAL REVIEW to identify direct parties (insured, claimant, drivers) for grouping per STYLE.
 
 2. MATCHING PASS (DO NOT OUTPUT YET):
-   For each PREVIOUS VERSION entry, identify its gold standard match (or note "no match" for RULE 3b fallback). When multiple variants exist for the same document class, apply the business variant selection in RULE 3a's match rule. Build a mental list. DO NOT produce any JSON output yet.
+   For each PREVIOUS VERSION entry, identify its gold standard match (or note "no match" for RULE 3c fallback). When INSURED TYPE is "business" and the entry is a "Financial Statements" class entry, apply RULE 3a to select the "Financial Statements (Business)" variant. Build a mental list. DO NOT produce any JSON output yet.
 
 3. DEDUP PASS (DO NOT OUTPUT YET):
    Apply RULE 1.5. Scan the list from Step 2. If multiple entries match the same gold standard (producing identical doc_type), keep only the first occurrence. Remove the rest. DO NOT produce any JSON output yet.
 
 4. OUTPUT PASS:
    For each unique surviving entry from Step 3:
-   a. Gold standard match → apply RULE 3a (verbatim SME wording, with business variant selection if applicable). For "Signed Authorities", "Witness Contact Details (Known)", and "Financial Statements (Business)", apply RULE 3c (fill placeholders from context) instead of RULE 3a (verbatim). Apply RULE 2.5 (gold standard name + timeframe from PREVIOUS VERSION doc_details if present).
-   b. No match → apply RULE 3b (full instruction-style fallback grounded in PREVIOUS VERSION doc_details and case context) + RULE 2.5 (use PREVIOUS VERSION doc_type if no gold standard name).
+   a. Gold standard match → apply RULE 3a first (Financial Statements business variant selection, when INSURED TYPE is "business"), then apply RULE 3b (verbatim SME wording). For "Signed Authorities", "Witness Contact Details (Known)", and "Financial Statements (Business)", apply RULE 3d (fill placeholders from context) instead of RULE 3b (verbatim). Apply RULE 2.5 (gold standard name + timeframe from PREVIOUS VERSION doc_details if present).
+   b. No match → apply RULE 3c (full instruction-style fallback grounded in PREVIOUS VERSION doc_details and case context) + RULE 2.5 (use PREVIOUS VERSION doc_type if no gold standard name).
    Validate inline before outputting each entry:
-    - Verbatim SME wording (or RULE 3c placeholder filling for the 3 exception types)?
+    - Verbatim SME wording (or RULE 3d placeholder filling for the 3 exception types)?
     - If insured type is business, business-specific gold standard variant selected during matching (RULE 3a)?
     - Full instruction-style fallback (not a short label or one-liner)?
     - Neutral language (RULE 2)?
@@ -365,19 +351,19 @@ The ADDITIONAL INFORMATION includes additional notes on the claim:
 {additional_info}
 </ADDITIONAL INFORMATION>
 
-The BUSINESS NAME for Financial Statements (Business) insertion (RULE 3c):
+The BUSINESS NAME for Financial Statements (Business) insertion (RULE 3d):
 <BUSINESS NAME>
 {business_name}
 </BUSINESS NAME>
 
-The DIRECTOR NAME for Financial Statements (Business) insertion (RULE 3c):
+The DIRECTOR NAME for Financial Statements (Business) insertion (RULE 3d):
 <DIRECTOR NAME>
 {director_name}
 </DIRECTOR NAME>
 
-The INSURED TYPE determines business-specific gold standard matching (RULE 3a business variant selection):
+The INSURED TYPE for this case (drives RULE 3a — Financial Statements business variant selection):
 <INSURED TYPE>
-{insured_type} ("business" or "individual")
+{insured_type}
 </INSURED TYPE>
 </CONTEXT>
 """
@@ -824,9 +810,9 @@ The ADDITIONAL INFORMATION includes additional notes on the claim, which can inc
 {knowledge_block}
 {gold_standards_block}
 
-The INSURED TYPE determines business-specific gold standard matching (RULE B):
+The INSURED TYPE for this case (drives RULE B — business-specific gold standard matching):
 <INSURED TYPE>
-{insured_type} ("business" or "individual")
+{insured_type}
 </INSURED TYPE>
 
 The BUSINESS NAME for Financial Statements (Business) insertion (RULE F):
@@ -951,7 +937,7 @@ Document Type: {doc_type}
 Parties to assign:
 {party_data}
 
-Insured Type: {insured_type} ("business" or "individual")
+Insured Type: {insured_type}
 {multiple_insureds_line}
 
 Original document details:
