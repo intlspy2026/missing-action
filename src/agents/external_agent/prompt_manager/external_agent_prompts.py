@@ -272,7 +272,9 @@ BEFORE finalizing any documents, you MUST understand these rules. Violating thes
 - Do NOT fabricate a timeframe.
 
 **RULE 3a - FINANCIAL STATEMENTS BUSINESS VARIANT (applies when INSURED TYPE is "business")**:
-When INSURED TYPE is "business" and PREVIOUS VERSION contains any "Financial Statements" entry, you MUST match it to the "Financial Statements (Business)" gold standard entry — NOT the normal "Financial Statements" entry. "Financial Statements" and "Financial Statements (Business)" are the same document class; the choice between them is decided by INSURED TYPE only, never by name similarity to the PREVIOUS VERSION doc_type. This rule overrides exact-name matching. When INSURED TYPE is "individual", match the normal "Financial Statements" entry.
+When INSURED TYPE is "business" and a PREVIOUS VERSION entry is matched (per RULE 3b's document-class matching) to the Financial Statements document class — regardless of how the PREVIOUS VERSION doc_type is worded or suffixed — you MUST select the "Financial Statements (Business)" gold standard entry, NOT the normal "Financial Statements" entry. "Financial Statements" and "Financial Statements (Business)" are the same document class; the choice between them is decided by INSURED TYPE only. This overrides exact-name matching. When INSURED TYPE is "individual", select the normal "Financial Statements" entry.
+
+Example: PREVIOUS VERSION doc_type is "Financial Statements around time of incident", INSURED TYPE is "business". RULE 3b class-matches this to the Financial Statements class (the timeframe suffix does not change the class). CORRECT: select "Financial Statements (Business)" → apply RULE 3d. WRONG: select "Financial Statements" (normal — individual variant).
 
 **RULE 3b - VERBATIM SME PHRASING (SME match exists)**: For every document type in PREVIOUS VERSION, when a matching entry exists in the provided GOLD_STANDARDS, doc_details MUST mirror the SME wording verbatim. Leave ALL
    placeholders unchanged — `<INSERT ...>` tokens, X-patterns (XXX, XXXX, XX to XX, XXXXXXXXXX), and CAPITALISED slots (e.g., START/END) pass through exactly
@@ -308,7 +310,7 @@ Steps:
 1. Read PREVIOUS VERSION to extract each doc_type and its doc_details (for timeframe extraction per RULE 2.5). Read INITIAL REVIEW to identify direct parties (insured, claimant, drivers) for grouping per STYLE.
 
 2. MATCHING PASS (DO NOT OUTPUT YET):
-   For each PREVIOUS VERSION entry, identify its gold standard match (or note "no match" for RULE 3c fallback). When INSURED TYPE is "business" and the entry is a "Financial Statements" class entry, apply RULE 3a to select the "Financial Statements (Business)" variant. Build a mental list. DO NOT produce any JSON output yet.
+   For each PREVIOUS VERSION entry, identify its gold standard match (or note "no match" for RULE 3c fallback). When INSURED TYPE is "business" and RULE 3b matches the entry to the Financial Statements document class, apply RULE 3a to select the "Financial Statements (Business)" variant instead of the normal one. Build a mental list. DO NOT produce any JSON output yet.
 
 3. DEDUP PASS (DO NOT OUTPUT YET):
    Apply RULE 1.5. Scan the list from Step 2. If multiple entries match the same gold standard (producing identical doc_type), keep only the first occurrence. Remove the rest. DO NOT produce any JSON output yet.
