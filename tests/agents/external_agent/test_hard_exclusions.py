@@ -235,3 +235,82 @@ class TestPoliceCorrespondenceNotStripped:
         )
         doc_types = {d["doc_type"] for d in result["document_set"]}
         assert self.POLICE_CORRESPONDENCE_DOC in doc_types
+
+
+class TestFitToInterviewExclusion:
+    """Medical Certificate / Fit to Interview should be stripped when the case
+    has no medical condition affecting the insured's capacity to be interviewed.
+
+    Uses narrower hooks than the general 'medical certificate' entry: drops
+    'ambulance' (matches emergency-response mentions like 'Ambulance Victoria
+    were on scene' at a fire, not the insured's condition) and 'injur' (matches
+    negations like 'No injuries reported'). A fit-to-interview certificate is
+    only relevant when the insured has a significant medical condition —
+    hospital, admission, surgery, medical treatment, or mental health.
+    """
+
+    FIT_TO_INTERVIEW_DOC = "Medical Certificate / Fit to Interview"
+
+    def test_stripped_on_staged_arson_fire_response_ambulance(self):
+        # Staged Arson case: 'Ambulance Victoria were on scene' is fire response,
+        # 'No injuries reported' is a negation — neither should keep the doc.
+        result = strip_hard_exclusions(
+            {"document_set": [
+                {"doc_type": self.FIT_TO_INTERVIEW_DOC, "doc_details": ""},
+            ]},
+            initial_review=(
+                "Fire at property, completely gutted. Staged arson concerns. "
+                "Fire Rescue Victoria deemed cause suspicious. "
+                "Victoria Police and Ambulance Victoria were on scene assisting FRV operations. "
+                "No injuries reported. Insured was in SA at the time of the fire."
+            ),
+            additional_info="",
+            investigation_types=["Staged Arson"],
+        )
+        doc_types = {d["doc_type"] for d in result["document_set"]}
+        assert self.FIT_TO_INTERVIEW_DOC not in doc_types
+
+    def test_stripped_when_no_medical_mention(self):
+        result = strip_hard_exclusions(
+            {"document_set": [
+                {"doc_type": self.FIT_TO_INTERVIEW_DOC, "doc_details": ""},
+            ]},
+            initial_review="Single vehicle accident, kangaroo swerve, hit a tree. No medical issues.",
+            additional_info="",
+            investigation_types=["Reckless"],
+        )
+        doc_types = {d["doc_type"] for d in result["document_set"]}
+        assert self.FIT_TO_INTERVIEW_DOC not in doc_types
+
+    @pytest.mark.parametrize("hook", [
+        "insured was hospitalized for observations",
+        "insured admitted to hospital overnight",
+        "insured undergoing medical treatment",
+        "insured recovering from surgery",
+        "insured has mental health concerns",
+    ])
+    def test_kept_when_significant_medical_condition(self, hook):
+        result = strip_hard_exclusions(
+            {"document_set": [
+                {"doc_type": self.FIT_TO_INTERVIEW_DOC, "doc_details": ""},
+            ]},
+            initial_review=f"Motor accident. {hook}.",
+            additional_info="",
+            investigation_types=["Reckless"],
+        )
+        doc_types = {d["doc_type"] for d in result["document_set"]}
+        assert self.FIT_TO_INTERVIEW_DOC in doc_types
+
+    def test_general_medical_certificate_still_uses_broader_hooks(self):
+        # A general 'Medical Certificate' (without 'fit to interview') should
+        # still use the original broader hooks including 'ambulance' and 'injur'.
+        result = strip_hard_exclusions(
+            {"document_set": [
+                {"doc_type": "Medical Certificate", "doc_details": ""},
+            ]},
+            initial_review="Ambulance attended the scene. No injuries reported.",
+            additional_info="",
+            investigation_types=["Reckless"],
+        )
+        doc_types = {d["doc_type"] for d in result["document_set"]}
+        assert "Medical Certificate" in doc_types
