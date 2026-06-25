@@ -219,7 +219,7 @@ Steps:
 
 7. Review the final list. Ensure all core methodology items are present and all non-core items pass the validation gate.
 
-For each included document type, output the doc_type and doc_details as they appear in INVESTIGATION PROCESSES — do NOT rewrite or finalize the wording. A later step will apply SME-standard phrasing. Before output, strip any parenthetical conditional qualifiers such as "(only request if there are concerns)", "(only request if X)", or "(if applicable)" — these must NOT appear in either doc_type or doc_details.
+For each included document type, output the doc_type and doc_details as they appear in INVESTIGATION PROCESSES — do NOT rewrite or finalize the wording. A later step will apply SME-standard phrasing. Before output, strip ONLY conditional qualifier parentheticals — phrases that GATE whether to request the document, such as "(only request if there are concerns)", "(only request if X)", "(if applicable)". Do NOT strip parentheticals that CLARIFY the timeframe or scope (e.g., "(i.e. 1-3 days surrounding the date of loss)", "(claim lodgement and policy inception)") — these are part of the methodology timeframe and MUST be preserved so the later SME step can append them as a suffix.
 </TASK>
 
 <CONTEXT>
@@ -267,8 +267,8 @@ BEFORE finalizing any documents, you MUST understand these rules. Violating thes
 **RULE 2 - NEUTRAL LANGUAGE**: Do not use: "fraudulent", "fraud", "suspicious", "red flags", "motive", "collusion", "grossly", "high-risk". Refer to the underlying event as "incident" rather than "assault" in both doc_type and doc_details. Describe the incident neutrally (e.g., "the incident on [date] at [location]"); do not preface it with "alleged", "potential", or any qualifier that pre-judges the case. Do not infer intent or wrongdoing in any doc_details.
 
 **RULE 2.5 - DOC_TYPE NAMING (CRITICAL)**:
-- **Gold standard match (RULE 3b)**: doc_type MUST use the gold standard entry name — discard the PREVIOUS VERSION doc_type entirely. Then append the methodology timeframe from PREVIOUS VERSION doc_details as a dash suffix if one is present (e.g., `"Service and Maintenance History - 3 months prior to date of loss"`). Extract the timeframe as the portion of doc_details that specifies how far from the date of loss records should cover (e.g., "3 months from date of loss", "1 week from date of loss", "surrounding the date of loss"). If PREVIOUS VERSION doc_details has no timeframe, use the gold standard doc_type as-is.
-- **Fallback (RULE 3c, no match)**: doc_type is the PREVIOUS VERSION doc_type. Append methodology timeframe from PREVIOUS VERSION doc_details if present.
+- **Gold standard match (RULE 3b)**: FIRST extract the timeframe from PREVIOUS VERSION `doc_type` OR `doc_details` — whichever contains it — BEFORE discarding the PREVIOUS VERSION doc_type. The timeframe is the portion that specifies how far from the date of loss records should cover (e.g., "3 months from date of loss", "1 week from date of loss", "surrounding the date of loss", "surrounding the loss", "close proximity of the date of loss", "1-3 days surrounding the date of loss", "1 week prior to and after the accident"). Include any clarifying parenthetical that is part of the timeframe (e.g., "(i.e. 1-3 days surrounding the date of loss)", "(claim lodgement and policy inception)"). Then discard the PREVIOUS VERSION doc_type entirely and use the gold standard entry name. Append the extracted timeframe verbatim as a dash suffix if one is present (e.g., `"Service and Maintenance History - 3 months prior to date of loss"`, `"Telephone Records - surrounding the loss (claim lodgement and policy inception)"`). If neither doc_type nor doc_details has a timeframe, use the gold standard doc_type as-is.
+- **Fallback (RULE 3c, no match)**: doc_type is the PREVIOUS VERSION doc_type. Extract and append timeframe from PREVIOUS VERSION `doc_type` or `doc_details` (check both) if present.
 - Do NOT fabricate a timeframe.
 
 **RULE 3a - FINANCIAL STATEMENTS BUSINESS VARIANT (applies when INSURED TYPE is "business")**:
@@ -307,7 +307,7 @@ Example: PREVIOUS VERSION doc_type is "Financial Statements around time of incid
 Apply SME-standard wording to each document type in PREVIOUS VERSION:
 
 Steps:
-1. Read PREVIOUS VERSION to extract each doc_type and its doc_details (for timeframe extraction per RULE 2.5). Read INITIAL REVIEW to identify direct parties (insured, claimant, drivers) for grouping per STYLE.
+1. Read PREVIOUS VERSION to extract each doc_type and its doc_details (for timeframe extraction per RULE 2.5 — check BOTH fields; the timeframe may be in either doc_type or doc_details). Read INITIAL REVIEW to identify direct parties (insured, claimant, drivers) for grouping per STYLE.
 
 2. MATCHING PASS (DO NOT OUTPUT YET):
    For each PREVIOUS VERSION entry, identify its gold standard match (or note "no match" for RULE 3c fallback). When INSURED TYPE is "business" and RULE 3b matches the entry to the Financial Statements document class, apply RULE 3a to select the "Financial Statements (Business)" variant instead of the normal one. Build a mental list. DO NOT produce any JSON output yet.
