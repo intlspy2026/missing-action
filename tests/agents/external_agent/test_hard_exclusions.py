@@ -170,3 +170,68 @@ class TestMotorSportRacetrackExclusion:
         )
         doc_types = {d["doc_type"] for d in result["document_set"]}
         assert "Motor Sport/Racetrack Evidence" in doc_types
+
+
+class TestPoliceCorrespondenceNotStripped:
+    """A police doc_type containing the substring 'correspondence' must NOT be
+    stripped by the correspondence/email hard exclusion. Police inclusion is
+    governed by the LLM's attendance-status rule (RULE 3 item 15), not the
+    deterministic pre-filter, so the doc must always reach the LLM.
+    """
+
+    POLICE_CORRESPONDENCE_DOC = (
+        "A copy of all correspondence from the Police including but not limited .."
+    )
+
+    def test_police_correspondence_not_stripped_on_nil_case(self):
+        # Mt Ommaney "no record" = confirmed nil. The doc must still reach the
+        # LLM (which will EXCLUDE via item 15's confirmed-nil branch); the
+        # pre-filter must not strip it via the correspondence rule.
+        result = strip_hard_exclusions(
+            {"document_set": [
+                {"doc_type": self.POLICE_CORRESPONDENCE_DOC, "doc_details": ""},
+            ]},
+            initial_review=(
+                "Called Mt Ommaney police station. Adv no record or incidents reported. "
+                "Adv to try and call Dayboro police station. Called Dayboro station, no answer. "
+                "Police/Citec: Nil results."
+            ),
+            additional_info="",
+            investigation_types=["Reckless"],
+        )
+        doc_types = {d["doc_type"] for d in result["document_set"]}
+        assert self.POLICE_CORRESPONDENCE_DOC in doc_types
+
+    def test_police_correspondence_not_stripped_on_attended_case(self):
+        # Police actually attended and a report was issued. The pre-filter must
+        # not strip this doc — without the police guard, the 'correspondence'
+        # substring would classify it under correspondence and strip it on the
+        # no-email-hook case, wrongly removing a legitimate police-attendance doc.
+        result = strip_hard_exclusions(
+            {"document_set": [
+                {"doc_type": self.POLICE_CORRESPONDENCE_DOC, "doc_details": ""},
+            ]},
+            initial_review=(
+                "Police attended the incident. Police report number SAP12345678 issued. "
+                "Charges laid against the insured."
+            ),
+            additional_info="",
+            investigation_types=["Reckless"],
+        )
+        doc_types = {d["doc_type"] for d in result["document_set"]}
+        assert self.POLICE_CORRESPONDENCE_DOC in doc_types
+
+    def test_police_correspondence_not_stripped_on_zero_police_mention(self):
+        # No mention of police at all. Still must reach the LLM (item 15's
+        # not-mentioned branch will EXCLUDE). The pre-filter's job is not to
+        # decide police relevance.
+        result = strip_hard_exclusions(
+            {"document_set": [
+                {"doc_type": self.POLICE_CORRESPONDENCE_DOC, "doc_details": ""},
+            ]},
+            initial_review="Single vehicle accident, kangaroo swerve, hit a tree.",
+            additional_info="",
+            investigation_types=["Reckless"],
+        )
+        doc_types = {d["doc_type"] for d in result["document_set"]}
+        assert self.POLICE_CORRESPONDENCE_DOC in doc_types

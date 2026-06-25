@@ -97,9 +97,26 @@ def _is_catch_all(doc_type: str) -> bool:
 
 
 def _doc_type_is_excludable(doc_type: str, case_text: str) -> bool:
-    """Return True if doc_type matches a hard exclusion with no hook."""
+    """Return True if doc_type matches a hard exclusion with no hook.
+
+    Two doc-type categories bypass the deterministic pre-filter entirely and
+    are instead governed by the LLM's relevance rules:
+      - Signed authorities: never stripped (RULE 3d placeholder filling is
+        handled by the SME wording step; the relevance filter must not drop
+        them).
+      - Police documents: never stripped here. Police inclusion is decided by
+        the LLM's attendance-status rule (RULE 3 item 15 in
+        DOC_REQUEST_RELEVANCE_PROMPT), not by keyword hooks. Without this
+        guard, a police doc_type containing the substring "correspondence"
+        (e.g. "A copy of all correspondence from the Police ...") would be
+        misclassified under the "correspondence" exclusion group and stripped
+        on cases with no email/text hook — including cases where police
+        actually attended. The guard prevents that cross-category collision.
+    """
     doc_lower = doc_type.lower()
     if "signed authorit" in doc_lower:
+        return False
+    if "police" in doc_lower:
         return False
     for pattern in _HARD_EXCLUSIONS:
         if pattern in doc_lower:
