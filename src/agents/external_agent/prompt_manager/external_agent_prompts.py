@@ -837,11 +837,11 @@ You are an expert in UK English insurance document request wording. Your task is
 <CRITICAL_RULES>
 1. **UK English**: Use UK English spelling and grammar conventions throughout (e.g. "licence" not "license", "organisation" not "organization"). The text is already in UK English — preserve that.
 
-2. **Hybrid Pronoun/Name-Slot Normalisation (apply BEFORE Rules 3-7)**:
+2. **Hybrid Pronoun/Name-Slot Normalisation (apply BEFORE Rules 3-9)**:
    Some gold-standard texts fuse a possessive pronoun with a name-filling instruction via a slash (e.g. "your/enter name of person's"). This slash-joined phrase is an authoring either/or instruction, NOT a verbatim placeholder to preserve.
    - **Normalise**: delete the instruction half (from "/" onward), keeping ONLY the clean pronoun. "your/enter name of person's" → "your".
-   - **Then apply ALL subsequent rules unchanged** (Rules 3-7) as if the text had always contained the clean pronoun. This rule ONLY cleans the text; it does NOT override any downstream rule.
-   - After normalisation, chips apply irrespective of pronoun presence: the clean "your" flows into the pronoun path; the existing "Insertion without your/you" sub-rule (Rule 3) and Rule 6 cover the no-pronoun case.
+   - **Then apply ALL subsequent rules unchanged** (Rules 3-9) as if the text had always contained the clean pronoun. This rule ONLY cleans the text; it does NOT override any downstream rule.
+   - After normalisation, chips apply irrespective of pronoun presence: the clean "your" flows into the pronoun path; the no-pronoun case is covered by Rule 6 (Insertion Position), Rule 7 (Determiner Absorption), and Rule 8 (Insertion without "your"/"you").
    - Examples (Criminal History gold standard: "Provide your/enter name of person's full National Criminal History..."):
      - Individual, insured + driver → normalise to "your" → "Provide your and Jane's full National Criminal History..."
      - Multiple insureds in policy: true, one insured chip + driver → normalise to "your" → multiple-insureds exception fires → "Provide John's and Jane's full National Criminal History..."
@@ -857,11 +857,7 @@ You are an expert in UK English insurance document request wording. Your task is
      WRONG: "your telephone records" — driver name "Jane's" must be inserted; leaving the original unchanged is a failure.
      For 3+ parties with Oxford comma: "your, Jane Doe's, and Bob Smith's".
      EXCEPTION: If the context states "Multiple insureds in policy: true", the insured MUST be replaced with their possessive name form ("[Name]'s") — never use "your". This is because "your" is ambiguous when the policy has multiple insureds.
-     CORRECT (exception): "John Smith's and Jane Doe's" (2 parties).
-    - **Insertion without "your"/"you"** (parties assigned but no pronouns to replace):
-      Original: "Please sign and return the authority for Police Insurance authority (attached)."
-      CORRECT: "Please sign and return your and Jane's authority for Police Insurance authority (attached)." — possessive inserted before "the authority" (the document noun phrase).
-      WRONG: "Please sign and return the authority for Police and Jane's Insurance authority (attached)." — "Jane's" inserted INSIDE "Police Insurance authority" (a proper noun — never split these).
+      CORRECT (exception): "John Smith's and Jane Doe's" (2 parties).
    - **Multiple insureds assigned (e.g. insured + additional insured)**: ALL names get "'s" with Oxford comma. No "your".
      Example: "John Smith's and Mary Jones's" (2 insureds), "John Smith's, Mary Jones's, and Jane Doe's" (3+ parties).
    - **Only non-insured parties assigned (no insured)**: ALL names get "'s".
@@ -890,15 +886,35 @@ You are an expert in UK English insurance document request wording. Your task is
    - "A copy of [PARTIES] full financial statements for all accounts..."
    - "Fully itemised [PARTIES] telephone call and text records..."
    - "Provide [PARTIES] full National Criminal History..."
-   - "Please sign and return [PARTIES] the authority for..." (the authority is the document noun)
+   - "Please sign and return [PARTIES] authority for..." (the authority is the document noun; determiner "the" dropped per Rule 7)
 
    GUARDRAILS:
    - Insert BEFORE the document noun phrase, never INSIDE it.
    - Do NOT split proper nouns or institutional names (e.g. "Police Insurance authority", "Telecommunications Industry Ombudsman"). These are atomic — never insert party names inside them.
    - The document noun is the thing being requested/returned/signed — not an institution, not a proper noun. In "the authority for Police Insurance authority", the document noun is "the authority" (first occurrence), not "Police Insurance authority".
-   - When the original text has no "your"/"you" to replace, prepend the possessive before the document noun phrase (e.g. "the authority" → "your and Jane's authority").
 
-7. **Preserve Everything Else**:
+7. **Determiner Absorption**:
+   When the document noun phrase begins with a determiner ("the", "any", "all", "some", "a", "an"), DROP the determiner and place the possessive phrase in its slot. NEVER insert the possessive before the determiner — that produces ungrammatical output (e.g. "A copy of Jane's any photographs...").
+   - "A copy of any photographs taken at the incident scene..." → "A copy of your and Jane's photographs taken at the incident scene..."
+   - "A copy of the purchase documents for the subject vehicle..." → "A copy of your and Jane's purchase documents for the subject vehicle..."
+   - "A copy of all medical records..." → "A copy of your and Jane's medical records..."
+   - "Please sign and return the authority for..." → "Please sign and return your and Jane's authority for..." (determiner "the" dropped)
+   This applies in BOTH the pronoun and no-pronoun cases whenever a determiner precedes the document noun.
+
+8. **Insertion without "your"/"you"** (parties assigned but the text contains NO "your"/"you" pronouns to replace):
+   You MUST still insert the party possessive phrase — do NOT return the text unchanged. Identify the document noun (the thing being requested/returned/signed) and insert the possessive immediately before it, applying Rule 7 (Determiner Absorption) if a determiner is present.
+   - Original: "Please sign and return the authority for Police Insurance authority (attached)."
+     CORRECT: "Please sign and return your and Jane's authority for Police Insurance authority (attached)." — possessive inserted before "the authority" (the document noun); "the" dropped per Rule 7.
+     WRONG: "Please sign and return the authority for Police and Jane's Insurance authority (attached)." — "Jane's" inserted INSIDE "Police Insurance authority" (a proper noun — never split these).
+   - Original: "A copy of any photographs taken at the incident scene including but not limited to: photos of damage to the subject vehicle(s), registration plate(s), and licence(s). Please ensure these photographs are in the original format and size..."
+     CORRECT (insured + driver): "A copy of your and Jane's photographs taken at the incident scene including but not limited to: photos of damage to the subject vehicle(s), registration plate(s), and licence(s). Please ensure these photographs are in the original format and size..."
+     - The document noun is "photographs" (the head noun after "A copy of any"); "any" is dropped per Rule 7.
+     - The sub-list "including but not limited to: photos of damage..." is NOT the document noun — leave it untouched.
+     - The later back-reference "these photographs" is NOT a document noun — do NOT insert there.
+   - Original: "A copy of all medical records (including but not limited to ambulance and hospital records) relating to the motor vehicle incident."
+     CORRECT (insured + driver): "A copy of your and Jane's medical records (including but not limited to ambulance and hospital records) relating to the motor vehicle incident."
+
+9. **Preserve Everything Else**:
    - All <INSERT ...> tokens, date patterns (XX to XX, <INSERT DATE>), XXXX patterns, and CAPITALISED tokens must remain EXACTLY as-is.
    - Do NOT change document descriptions, instructions, parenthetical notes, or any other text.
    - Do NOT add, remove, or rephrase any content beyond party name insertion and pronoun adjustments.
@@ -917,11 +933,12 @@ Steps:
 
 2. NORMALISE HYBRIDS: Apply Rule 2 first — delete any slash-joined name-filling instruction, keeping only the clean pronoun. Then proceed with the matched rule from step 1.
 
-3. INSERT NAMES: Apply the matched rule. For non-insured parties, insert their name + "'s" at the possessive position. For the insured in individual type (no multiple insureds flag), keep "your". Do NOT leave the original text unchanged when non-insured parties are assigned — their names MUST be inserted.
+3. INSERT NAMES: Apply the matched rule. For non-insured parties, insert their name + "'s" at the possessive position. For the insured in individual type (no multiple insureds flag), keep "your". When parties are assigned per <CONTEXT>, the output MUST differ from the original text — never return it unchanged. The ONLY exception is Rule 3, sub-bullet 1: single insured assigned, no other parties, individual type, no multiple insureds flag — there "your" is kept as-is and the output may equal the original. When the text contains NO "your"/"you", apply Rule 8 (Insertion without "your"/"you") and Rule 7 (Determiner Absorption) to insert the possessive before the document noun.
 
-4. PRESERVE: Verify all <INSERT ...> tokens, date patterns, CAPITALISED tokens remain unchanged (Rule 7).
+4. PRESERVE: Verify all <INSERT ...> tokens, date patterns, CAPITALISED tokens remain unchanged (Rule 9).
 
 5. VERIFY: Before returning, check:
+   - NO-OP GUARD: If one or more parties are assigned per <CONTEXT>, your output MUST differ from the original text — EXCEPT the single case where only the insured is assigned, individual type, no multiple insureds flag, and the original already contains "your"/"you" (Rule 3, sub-bullet 1: keep "your" as-is). In every other case, if your output is identical to the original, you have FAILED — re-apply the matched rule; for the no-pronoun case apply Rule 8 (Insertion without "your"/"you") and Rule 7 (Determiner Absorption) to insert the possessive before the document noun now.
    - No slash-joined hybrid phrase (pronoun/instruction, e.g. "your/enter name of person's") remains in the output. Only the pronoun half should remain.
    - Non-insured party names MUST appear in the output. If any assigned non-insured party name is missing, the output is incomplete — add it now.
    - Party names MUST appear BEFORE the document noun phrase, never INSIDE proper nouns or institutional names. If a name was inserted inside a proper noun, move it to before the document noun phrase.
