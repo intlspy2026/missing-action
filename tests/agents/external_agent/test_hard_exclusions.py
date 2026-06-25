@@ -237,16 +237,12 @@ class TestPoliceCorrespondenceNotStripped:
         assert self.POLICE_CORRESPONDENCE_DOC in doc_types
 
 
-class TestFitToInterviewExclusion:
-    """Medical Certificate / Fit to Interview should be stripped when the case
-    has no medical condition affecting the insured's capacity to be interviewed.
-
-    Uses narrower hooks than the general 'medical certificate' entry: drops
-    'ambulance' (matches emergency-response mentions like 'Ambulance Victoria
-    were on scene' at a fire, not the insured's condition) and 'injur' (matches
-    negations like 'No injuries reported'). A fit-to-interview certificate is
-    only relevant when the insured has a significant medical condition —
-    hospital, admission, surgery, medical treatment, or mental health.
+class TestMedicalCertificateExclusion:
+    """Medical Certificate (including the 'Fit to Interview' variant) should be
+    stripped unless the case notes explicitly mention 'medical certificate'.
+    Medical-condition hooks (hospital, injury, ambulance) are too broad — e.g.
+    'Ambulance Victoria were on scene' at a fire or 'No injuries reported' would
+    false-positive keep the doc. Require the literal phrase.
     """
 
     FIT_TO_INTERVIEW_DOC = "Medical Certificate / Fit to Interview"
@@ -270,40 +266,41 @@ class TestFitToInterviewExclusion:
         doc_types = {d["doc_type"] for d in result["document_set"]}
         assert self.FIT_TO_INTERVIEW_DOC not in doc_types
 
-    def test_stripped_when_no_medical_mention(self):
+    def test_stripped_when_no_medical_certificate_mention(self):
+        # Hospital/injury/ambulance mentions alone should NOT keep the doc —
+        # only an explicit 'medical certificate' mention should.
         result = strip_hard_exclusions(
             {"document_set": [
                 {"doc_type": self.FIT_TO_INTERVIEW_DOC, "doc_details": ""},
             ]},
-            initial_review="Single vehicle accident, kangaroo swerve, hit a tree. No medical issues.",
+            initial_review=(
+                "Insured was hospitalized for observations. "
+                "Ambulance attended the scene. Minor injuries reported."
+            ),
             additional_info="",
             investigation_types=["Reckless"],
         )
         doc_types = {d["doc_type"] for d in result["document_set"]}
         assert self.FIT_TO_INTERVIEW_DOC not in doc_types
 
-    @pytest.mark.parametrize("hook", [
-        "insured was hospitalized for observations",
-        "insured admitted to hospital overnight",
-        "insured undergoing medical treatment",
-        "insured recovering from surgery",
-        "insured has mental health concerns",
-    ])
-    def test_kept_when_significant_medical_condition(self, hook):
+    def test_kept_when_medical_certificate_explicitly_mentioned(self):
         result = strip_hard_exclusions(
             {"document_set": [
                 {"doc_type": self.FIT_TO_INTERVIEW_DOC, "doc_details": ""},
             ]},
-            initial_review=f"Motor accident. {hook}.",
+            initial_review=(
+                "Insured was hospitalized. IRO to obtain a medical certificate "
+                "confirming capacity to participate in interview."
+            ),
             additional_info="",
             investigation_types=["Reckless"],
         )
         doc_types = {d["doc_type"] for d in result["document_set"]}
         assert self.FIT_TO_INTERVIEW_DOC in doc_types
 
-    def test_general_medical_certificate_still_uses_broader_hooks(self):
-        # A general 'Medical Certificate' (without 'fit to interview') should
-        # still use the original broader hooks including 'ambulance' and 'injur'.
+    def test_general_medical_certificate_also_requires_phrase(self):
+        # A general 'Medical Certificate' (without 'fit to interview') uses the
+        # same 'medical certificate' hook — stripped when no mention.
         result = strip_hard_exclusions(
             {"document_set": [
                 {"doc_type": "Medical Certificate", "doc_details": ""},
@@ -313,4 +310,4 @@ class TestFitToInterviewExclusion:
             investigation_types=["Reckless"],
         )
         doc_types = {d["doc_type"] for d in result["document_set"]}
-        assert "Medical Certificate" in doc_types
+        assert "Medical Certificate" not in doc_types
