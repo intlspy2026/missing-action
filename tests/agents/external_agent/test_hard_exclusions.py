@@ -103,7 +103,10 @@ class TestCoreItemsNotStripped:
 
 
 class TestCCTVFootageExclusion:
-    """CCTV footage should be stripped unless the case mentions cameras/CCTV/footage/surveillance/video."""
+    """CCTV footage should be stripped unless the case mentions cctv/cameras/surveillance.
+    'footage' and 'video' hooks were removed because they match news/media footage
+    (e.g. Staged Arson '7 news footage says the fire was at 4.20am') — not CCTV.
+    """
 
     def test_cctv_stripped_when_no_hook(self):
         result = strip_hard_exclusions(
@@ -118,12 +121,30 @@ class TestCCTVFootageExclusion:
         doc_types = {d["doc_type"] for d in result["document_set"]}
         assert "CCTV Footage" not in doc_types
 
+    def test_cctv_stripped_on_staged_arson_news_footage(self):
+        # Staged Arson case: '7 news footage' is media coverage, not CCTV —
+        # the 'footage' hook was removed to prevent this false positive.
+        result = strip_hard_exclusions(
+            {"document_set": [
+                {"doc_type": "CCTV Footage", "doc_details": ""},
+            ]},
+            initial_review=(
+                "Fire at property, completely gutted. Staged arson concerns. "
+                "7 news footage says the fire was at 4.20am and no-one was in any of the four units. "
+                "https://www.youtube.com/watch?v=G_tQbEM6zKY "
+                "Sunrise empty apartment block undergoing renovations unknown cause."
+            ),
+            additional_info="",
+            investigation_types=["Staged Arson"],
+        )
+        doc_types = {d["doc_type"] for d in result["document_set"]}
+        assert "CCTV Footage" not in doc_types
+
     @pytest.mark.parametrize("hook", [
         "CCTV footage of the incident",
         "cameras at the servo",
-        "the insured reviewed the footage",
         "surveillance at the location",
-        "video recording of the crash",
+        "security cameras at the entrance",
     ])
     def test_cctv_kept_when_hook_present(self, hook):
         docs = {"document_set": [{"doc_type": "CCTV Footage", "doc_details": ""}]}
@@ -311,3 +332,17 @@ class TestMedicalCertificateExclusion:
         )
         doc_types = {d["doc_type"] for d in result["document_set"]}
         assert "Medical Certificate" not in doc_types
+
+    def test_kept_when_mental_health_mentioned(self):
+        # Mental health concerns affect interview capacity — keep the doc even
+        # when 'medical certificate' is not explicitly mentioned.
+        result = strip_hard_exclusions(
+            {"document_set": [
+                {"doc_type": self.FIT_TO_INTERVIEW_DOC, "doc_details": ""},
+            ]},
+            initial_review="Insured has mental health concerns. Possible criminal history.",
+            additional_info="",
+            investigation_types=["Reckless"],
+        )
+        doc_types = {d["doc_type"] for d in result["document_set"]}
+        assert self.FIT_TO_INTERVIEW_DOC in doc_types
