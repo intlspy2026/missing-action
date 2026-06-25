@@ -100,3 +100,73 @@ class TestCoreItemsNotStripped:
         )
         doc_types = {d["doc_type"] for d in result["document_set"]}
         assert "Police report" in doc_types
+
+
+class TestCCTVFootageExclusion:
+    """CCTV footage should be stripped unless the case mentions cameras/CCTV/footage/surveillance/video."""
+
+    def test_cctv_stripped_when_no_hook(self):
+        result = strip_hard_exclusions(
+            {"document_set": [
+                {"doc_type": "CCTV Footage", "doc_details": ""},
+                {"doc_type": "Telephone Records", "doc_details": ""},
+            ]},
+            initial_review="Single vehicle accident, kangaroo swerve, hit a tree. Insured swerved and lost control.",
+            additional_info="",
+            investigation_types=["Reckless"],
+        )
+        doc_types = {d["doc_type"] for d in result["document_set"]}
+        assert "CCTV Footage" not in doc_types
+
+    @pytest.mark.parametrize("hook", [
+        "CCTV footage of the incident",
+        "cameras at the servo",
+        "the insured reviewed the footage",
+        "surveillance at the location",
+        "video recording of the crash",
+    ])
+    def test_cctv_kept_when_hook_present(self, hook):
+        docs = {"document_set": [{"doc_type": "CCTV Footage", "doc_details": ""}]}
+        result = strip_hard_exclusions(
+            docs,
+            initial_review=f"Motor accident. {hook}",
+            additional_info="",
+            investigation_types=["Reckless"],
+        )
+        doc_types = {d["doc_type"] for d in result["document_set"]}
+        assert "CCTV Footage" in doc_types
+
+
+class TestMotorSportRacetrackExclusion:
+    """Motor Sport/Racetrack Evidence should be stripped unless the case mentions actual motor-sport participation, not just the investigation-type label."""
+
+    def test_motor_sport_stripped_when_only_label(self):
+        result = strip_hard_exclusions(
+            {"document_set": [
+                {"doc_type": "Motor Sport/Racetrack Evidence", "doc_details": ""},
+            ]},
+            initial_review="Single vehicle accident, kangaroo swerve, hit a tree.",
+            additional_info="",
+            investigation_types=["Reckless", "Motor Sports"],
+        )
+        doc_types = {d["doc_type"] for d in result["document_set"]}
+        assert "Motor Sport/Racetrack Evidence" not in doc_types
+
+    @pytest.mark.parametrize("hook", [
+        "insured participated in a track day at Queensland Raceway",
+        "CAMS logbook located",
+        "drag racing on the street",
+        "racetrack event last weekend",
+        "motorsport registration paperwork",
+        "racing circuit event",
+    ])
+    def test_motor_sport_kept_when_hook_present(self, hook):
+        docs = {"document_set": [{"doc_type": "Motor Sport/Racetrack Evidence", "doc_details": ""}]}
+        result = strip_hard_exclusions(
+            docs,
+            initial_review=f"Motor accident. {hook}",
+            additional_info="",
+            investigation_types=["Reckless"],
+        )
+        doc_types = {d["doc_type"] for d in result["document_set"]}
+        assert "Motor Sport/Racetrack Evidence" in doc_types

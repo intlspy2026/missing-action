@@ -62,6 +62,11 @@ _HARD_EXCLUSIONS = {
     "sms":               [r"\bemail\b", r"\btext messages?\b", r"\bsms\b",
                           r"\bcorrespondence\b", r"\bmessages?\b",
                           r"\binstant messages?\b"],
+    "cctv footage":      [r"\bcctv\b", r"\bcamera", r"\bfootage\b",
+                          r"\bsurveillance\b", r"\bvideo\b"],
+    "motor sport":       [r"\bmotorsport\b", r"\bracetrack\b", r"\brace track\b",
+                          r"\btrack day\b", r"\bcams\b", r"\bracing circuit\b",
+                          r"\bdrag race\b", r"\bdrag racing\b"],
 }
 
 # Pre-compile hook patterns for each exclusion group
