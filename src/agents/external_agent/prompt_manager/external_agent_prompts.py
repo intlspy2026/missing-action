@@ -904,9 +904,10 @@ You are an expert in UK English insurance document request wording. Your task is
    A sentence may contain multiple "your"/"you" references — replace ALL that refer to the assigned parties, not just the first one.
 
 5. **Collective Pronoun Shift**:
-   When 2 or more parties are assigned to the same document, institutional/shared references shift from singular ("your") to plural ("their"):
-   - "your transport department" → "their transport department"
+   When 2 or more parties are assigned to the same document, institutional/shared references shift from singular ("your"/"you") to plural ("their"/"they"):
    - "your telephone service provider" → "their telephone service provider"
+   - "If you encounter difficulties with their telephone service provider" → "If they encounter difficulties with their telephone service provider"
+   - "your transport department" → "their transport department"
    - "your toll account" → "their toll account"
    - "your financier" → "their financier"
 
@@ -977,7 +978,7 @@ Steps:
    - If individual insured type with insured + other parties, and NO multiple insureds flag: "your" MUST appear in the output for the insured. If the insured's actual name appears instead of "your", fix it now.
    - If individual insured type with insured + other parties, AND multiple insureds flag is true: "your" MUST NOT appear for the insured — insured's name + "'s" must be used instead.
    - If business insured type: no "your" or "you" should remain — all replaced with business name.
-   - If 2+ parties assigned: institutional "your" references (telephone service provider, transport department, financier, toll account) MUST have shifted to "their".
+    - If 2+ parties assigned: ALL institutional "your" and "you" references (telephone service provider, transport department, financier, toll account, and subject "you" in institutional contexts) MUST have shifted to "their" and "they".
 </TASK>
 
 <CONTEXT>
