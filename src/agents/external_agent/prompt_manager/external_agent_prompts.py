@@ -461,7 +461,7 @@ You are identifying which additional enquiry types from INVESTIGATION PROCESSES 
 - **Citation discipline**: cite only the anchoring details needed to make the enquiry actionable (party names, location, date). Do not enumerate every property sub-area, every claimed item, or every case detail in each enquiry — anchor to one or two specifics.
 - **Tone**: neutral and request-focused. State what the investigator is asked to do, not why suspicion exists.
 - **No filler**: omit hedging boilerplate ("if attendance occurred", "where identified", "if any prosecution has been commenced"). The investigator already has the case context.
-- **One enquiry per theme**: INVESTIGATION PROCESSES lists multiple enquiries flatly, but many belong to the same investigative theme. Recognise the themes and aggregate all enquiries that belong to the same theme into a single output enquiry — combining their sub-tasks into enquiry_detail. Do NOT output one entry per methodology line where mergeable themes exist. Do NOT merge entries targeting fundamentally different respondent categories (e.g., a formal interview of a specific named party vs. a general canvass for unknown witnesses) — these require different types of engagement even if at the same location. When multiple methodology entries target the same entity or organisation (e.g., Police — with sub-asks for interview, reports, documentation, brief of evidence), merge ALL of them into a single output enquiry combining all sub-tasks — do not output separate entries for sub-asks to the same entity.
+- **One enquiry per theme**: INVESTIGATION PROCESSES lists multiple enquiries flatly, but many belong to the same investigative theme. Recognise the themes and aggregate all enquiries that belong to the same theme into a single output enquiry — combining their sub-tasks into enquiry_detail. Do NOT output one entry per methodology line where mergeable themes exist. When multiple methodology entries target the same entity or organisation (e.g., Police — with sub-asks for interview, reports, documentation, brief of evidence), merge ALL of them into a single output enquiry combining all sub-tasks — do not output separate entries for sub-asks to the same entity. When methodology entries target different respondent categories (e.g., a witness interview and a venue CCTV request, or an area canvass and a CCTV request at the loss location) but relate to the same location, people, and timeframe for the same investigative purpose, merge them into a single output enquiry covering all sub-tasks. If the entries relate to genuinely different purposes or unconnected locations, keep them separate.
 </STYLE>
 
 <CRITICAL_RULES>
@@ -516,7 +516,7 @@ Steps:
 
 4. Include details about what needs to be done in each enquiry. Ensure enquiries and details are clear and avoid using any jargon.
 
-5. Apply the STYLE guidelines — including the "one enquiry per theme" merge rule — to finalise the output.
+5. Before applying the merge rule, cross-reference all contextualised enquiries against each other to identify shared locations, parties, and timeframes — a witness listed in one enquiry may be the same person present at the venue referenced in another, or a canvass location may overlap with a CCTV request location. Then apply the STYLE guidelines including the "one enquiry per theme" merge rule to finalise the output.
 </TASK>
 
 <CONTEXT>
