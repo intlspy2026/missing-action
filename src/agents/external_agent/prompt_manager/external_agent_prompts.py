@@ -492,7 +492,7 @@ BEFORE listing any enquiries, you MUST understand these rules. Violating these r
 
 **RULE 3 - PARTY SCOPE**: Only frame enquiries around parties directly involved in the current claim under investigation. Use INITIAL REVIEW and ADDITIONAL INFORMATION to identify who the direct parties are. Individuals mentioned in prior claims, historical associations, or background checks within INITIAL REVIEW or ADDITIONAL INFORMATION are NOT direct parties to the current claim. Do not generate enquiries focused on associated individuals who are not direct parties. Replace generic references in INVESTIGATION PROCESSES with the specific individuals identified from INITIAL REVIEW and ADDITIONAL INFORMATION.
 
-**RULE 4 - EXTERNAL SCOPE ONLY**: All enquiries must be actions an external investigator can perform in the field (e.g., canvassing, interviewing witnesses, obtaining records from third parties). Exclude any enquiry that relates to internal processes, internal review, internal assessments, or summarising results of enquiries already conducted by the insurer's own team. Exclude any enquiry that involves interviewing the primary insured directly — this is covered by a separate interview plan section. CCTV and record requests must be limited to the incident scene and its immediate surroundings. Do not request CCTV of pre-incident activities at venues, licensed premises, or retail locations. EXCEPTION — DUI/alcohol investigations: When the investigation involves a DUI or alcohol policy exclusion and the insured identifies a specific business venue (pub, bar, club, restaurant, licensed premises) where they consumed alcohol prior to driving, CCTV footage from that venue may be requested to verify alcohol consumption, timing and demeanour prior to driving. This is the only exception to the pre-incident CCTV prohibition. Prior insurance verification: if INITIAL REVIEW or ADDITIONAL INFORMATION already reference prior claims or prior insurance under headings such as Customer Workbench, Claim Network, Claim Centre, ClaimHistory, Motorweb, Filenet, concurrent claims, or previous policies, exclude that enquiry — the prior insurer is Suncorp. If no prior claims or prior insurance appear anywhere in INITIAL REVIEW or ADDITIONAL INFORMATION, raise a prior insurance enquiry targeting the insured to request their documents. Never generate an enquiry targeting the prior insurer.
+**RULE 4 - EXTERNAL SCOPE ONLY**: All enquiries must be actions an external investigator can perform in the field (e.g., canvassing, interviewing witnesses, obtaining records from third parties). Exclude any enquiry that relates to internal processes, internal review, internal assessments, or summarising results of enquiries already conducted by the insurer's own team. Exclude any enquiry that involves interviewing the primary insured directly — this is covered by a separate interview plan section. CCTV and record requests must be limited to the incident scene and its immediate surroundings. Do not request CCTV of pre-incident activities at venues, licensed premises, or retail locations. EXCEPTION — DUI/alcohol investigations: When the INVESTIGATION TYPE includes DUI or an alcohol policy exclusion and the insured identifies a specific business venue (pub, bar, club, restaurant, licensed premises) where they consumed alcohol prior to driving, CCTV footage from that venue may be requested to verify alcohol consumption, timing and demeanour prior to driving. This is the only exception to the pre-incident CCTV prohibition. Prior insurance verification: if INITIAL REVIEW or ADDITIONAL INFORMATION already reference prior claims or prior insurance under headings such as Customer Workbench, Claim Network, Claim Centre, ClaimHistory, Motorweb, Filenet, concurrent claims, or previous policies, exclude that enquiry — the prior insurer is Suncorp. If no prior claims or prior insurance appear anywhere in INITIAL REVIEW or ADDITIONAL INFORMATION, raise a prior insurance enquiry targeting the insured to request their documents. Never generate an enquiry targeting the prior insurer.
 
 **RULE 5 - CONTEXTUALISE**: You must rewrite each enquiry from INVESTIGATION PROCESSES using case-specific details from INITIAL REVIEW and ADDITIONAL INFORMATION. This includes:
     a. Adapt template details to match the actual case — omit elements that don't apply and include only what is relevant.
@@ -515,14 +515,14 @@ Steps:
 
 4. Include details about what needs to be done in each enquiry. Ensure enquiries and details are clear and avoid using any jargon.
 
-5. Output each filtered enquiry as a separate entry, with ONE exception — the co-location merge:
-   After filtering and contextualising, scan all entries that passed the filter. When two or more enquiries target the SAME physical location AND the SAME people or category of people, merge them into a single entry. Combine all sub-tasks (interviewing people, obtaining CCTV/records, canvassing) into one enquiry_detail.
+5. Before outputting, apply the co-location merge:
+   Scan all filtered entries. Merge any entries that target the SAME physical location AND the SAME people or category of people into a single entry — combining all sub-tasks (interviewing, CCTV/records, canvassing) into one enquiry_detail.
 
    Co-location merge examples:
    - "interview witnesses at [venue]" + "obtain CCTV from [venue]" → ONE entry: "attend [venue], interview staff/patrons, and obtain CCTV"
    - "canvass [incident scene]" + "interview independent parties at [incident scene]" → ONE entry: "canvass [incident scene] and interview witnesses and tow operators present"
 
-   Do NOT merge enquiries at DIFFERENT locations or targeting DIFFERENT people — those remain separate entries. General theme aggregation (e.g., merging all police-related enquiries) is handled by a later step; your merge is limited to same-location/same-people only.
+   After merging co-located entries, output the result. Enquiries at different locations or targeting different people remain standalone. General theme aggregation (e.g., merging all police-related enquiries) is handled by a later step; your merge is limited to same-location/same-people only.
 </TASK>
 
 <CONTEXT>
@@ -542,6 +542,11 @@ The ADDITIONAL INFORMATION includes additional notes on the claim, which can inc
 <ADDITIONAL INFORMATION>
 {additional_info}
 </ADDITIONAL INFORMATION>
+
+The INVESTIGATION TYPE indicates the type of investigation for this claim:
+<INVESTIGATION TYPE>
+{investigation_type}
+</INVESTIGATION TYPE>
 </CONTEXT>
 
 <OUTPUT>
@@ -572,13 +577,13 @@ BEFORE drafting any enquiries, you MUST understand these rules. Violating these 
 **RULE 0 - EMPTY PREVIOUS VERSION**: If PREVIOUS VERSION is empty — meaning it contains no enquiries and no text content — return an empty response immediately. Do not derive narrative enquiries. Do not apply any other rules. Do not generate any output. Nothing to do, nothing to return.
 
 **RULE 1 - SOURCE RESTRICTION**: Every enquiry in your output MUST originate from one of two permitted sources:
-    a. PREVIOUS VERSION — the methodology-driven enquiries already filtered and contextualised for this case. You MUST include all entries from PREVIOUS VERSION unless you merge them into a theme-aggregated entry.
+    a. PREVIOUS VERSION — the methodology-driven enquiries already filtered and contextualised for this case. Every entry from PREVIOUS VERSION must be REPRESENTED in your output — either as a standalone entry or merged into a theme-aggregated entry. Apply RULE 6 (AGGREGATE BY THEME) to merge entries that share the same theme. Do NOT output one entry per PREVIOUS VERSION entry where mergeable themes exist.
     b. The claimant's incident account within INITIAL REVIEW — narrative-driven enquiries (see TASK Step 2). The narrative is the current claim's first-hand account as reported by the claimant. It may appear under headings such as "Claim Lodgement", "Loss Description", "Circumstances", "What Happened", "Verint", "Nice", "Genysis", "Calls", or any similar heading, or without an explicit heading. Distinguish it from IRO analysis, background checks, policy details, and prior claims history including their own loss descriptions.
 If an enquiry cannot be traced back to either source, it MUST be excluded.
 
 **RULE 2 - PARTY SCOPE**: Only frame enquiries around parties directly involved in the current claim under investigation. Use INITIAL REVIEW and ADDITIONAL INFORMATION to identify who the direct parties are. Individuals mentioned in prior claims, historical associations, or background checks within INITIAL REVIEW or ADDITIONAL INFORMATION are NOT direct parties to the current claim. Do not generate enquiries focused on associated individuals who are not direct parties.
 
-**RULE 3 - EXTERNAL SCOPE ONLY**: All enquiries must be actions an external investigator can perform in the field (e.g., canvassing, interviewing witnesses, obtaining records from third parties). Exclude any enquiry that relates to internal processes, internal review, internal assessments, or summarising results of enquiries already conducted by the insurer's own team. Exclude any enquiry that involves interviewing the primary insured directly — this is covered by a separate interview plan section. CCTV and record requests must be limited to the incident scene and its immediate surroundings. Do not request CCTV of pre-incident activities at venues, licensed premises, or retail locations. EXCEPTION — DUI/alcohol investigations: When the investigation involves a DUI or alcohol policy exclusion and the insured identifies a specific business venue (pub, bar, club, restaurant, licensed premises) where they consumed alcohol prior to driving, CCTV footage from that venue may be requested to verify alcohol consumption, timing and demeanour prior to driving. This is the only exception to the pre-incident CCTV prohibition. Prior insurance verification: if INITIAL REVIEW or ADDITIONAL INFORMATION already reference prior claims or prior insurance under headings such as Customer Workbench, Claim Network, Claim Centre, ClaimHistory, Motorweb, Filenet, concurrent claims, or previous policies, exclude that enquiry — the prior insurer is Suncorp. If no prior claims or prior insurance appear anywhere in INITIAL REVIEW or ADDITIONAL INFORMATION, raise a prior insurance enquiry targeting the insured to request their documents. Never generate an enquiry targeting the prior insurer.
+**RULE 3 - EXTERNAL SCOPE ONLY**: All enquiries must be actions an external investigator can perform in the field (e.g., canvassing, interviewing witnesses, obtaining records from third parties). Exclude any enquiry that relates to internal processes, internal review, internal assessments, or summarising results of enquiries already conducted by the insurer's own team. Exclude any enquiry that involves interviewing the primary insured directly — this is covered by a separate interview plan section. CCTV and record requests must be limited to the incident scene and its immediate surroundings. Do not request CCTV of pre-incident activities at venues, licensed premises, or retail locations. EXCEPTION — DUI/alcohol investigations: When the INVESTIGATION TYPE includes DUI or an alcohol policy exclusion and the insured identifies a specific business venue (pub, bar, club, restaurant, licensed premises) where they consumed alcohol prior to driving, CCTV footage from that venue may be requested to verify alcohol consumption, timing and demeanour prior to driving. This is the only exception to the pre-incident CCTV prohibition. Prior insurance verification: if INITIAL REVIEW or ADDITIONAL INFORMATION already reference prior claims or prior insurance under headings such as Customer Workbench, Claim Network, Claim Centre, ClaimHistory, Motorweb, Filenet, concurrent claims, or previous policies, exclude that enquiry — the prior insurer is Suncorp. If no prior claims or prior insurance appear anywhere in INITIAL REVIEW or ADDITIONAL INFORMATION, raise a prior insurance enquiry targeting the insured to request their documents. Never generate an enquiry targeting the prior insurer.
 
 **RULE 4 - NEUTRAL LANGUAGE**: Do not use: "fraudulent", "fraud", "suspicious", "red flags", "motive", "collusion", "grossly", "high-risk". Refer to the underlying event as "incident" rather than "assault" in both the enquiry title and enquiry_detail. Describe the incident neutrally (e.g., "the incident on [date] at [location]") — do not preface with "alleged", "potential", or any qualifier that pre-judges the case. Do not infer intent or wrongdoing.
 
@@ -613,7 +618,12 @@ Steps:
 
 4. **Derive enquiries from explanations that imply an external entity**: When the narrative cites an explanation for a material circumstance or decision and that explanation implies a specific external entity capable of independent verification — even if that entity is not named — derive an enquiry targeting that entity to verify the explanation. Do NOT treat an involved party's restatement of the explanation as satisfying this step; only an enquiry targeting the implied external entity counts. Skip explanations that lack a concrete, verifiable external entity (e.g., weather, traffic, or personal reasons).
 
-5. **Aggregate by theme**: Apply RULE 6 (AGGREGATE BY THEME). Group ALL enquiries (methodology + narrative-derived) by underlying theme. Combine enquiries that address the same subject, location, party, or investigative action into a single output entry — merging their sub-tasks and details into enquiry_detail. Output MUST be one enquiry per theme identified.
+5. **Aggregate by theme** — execute this procedure:
+   a. Pool ALL enquiries (methodology + narrative-derived) into a single list.
+   b. Identify entries that share the same named party (e.g., all police-related enquiries). Merge each group into ONE entry combining all sub-tasks into enquiry_detail.
+   c. Identify entries that share the same investigative goal or overlapping purpose. Merge each group into ONE entry.
+   d. If no entries share the same party, goal, or purpose, no aggregation is needed — output the entries as they are.
+   e. Output MUST be one enquiry per theme, not one per source line.
 
 6. Review the final list. For each enquiry, verify the target entity appears by name in INITIAL REVIEW or ADDITIONAL INFORMATION — remove any enquiry whose target is not explicitly named. Ensure all methodology-driven entries from PREVIOUS VERSION are reflected, all narrative-derived entries pass guardrails, and the output is concise with neutral language and no filler.
 </TASK>
@@ -635,6 +645,11 @@ The ADDITIONAL INFORMATION includes additional notes on the claim, which can inc
 <ADDITIONAL INFORMATION>
 {additional_info}
 </ADDITIONAL INFORMATION>
+
+The INVESTIGATION TYPE indicates the type of investigation for this claim:
+<INVESTIGATION TYPE>
+{investigation_type}
+</INVESTIGATION TYPE>
 </CONTEXT>
 
 <OUTPUT>
@@ -724,6 +739,7 @@ The ADDITIONAL INFORMATION includes additional notes on the claim, which can inc
 """
 
 ADDITIONAL_ENQUIRIES_FEEDBACK_PROMPT = """
+{investigation_type_block}
 <TASK>
 **YOUR TASK**
 Revise the PREVIOUS VERSION of the {section_name} by:

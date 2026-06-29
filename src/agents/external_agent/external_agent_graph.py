@@ -1535,6 +1535,9 @@ def get_graph(llm: BaseChatModel) -> StateGraph:
 
         initial_review = state.get("initial_review", "")
         additional_info = state.get("additional_info", "")
+        investigation_types = state.get("investigation_type", []) or []
+        investigation_type_str = ", ".join(investigation_types)
+        investigation_type_block = f"<INVESTIGATION TYPE>\n{investigation_type_str}\n</INVESTIGATION TYPE>" if investigation_type_str else ""
         system_prompt = EXTERNAL_AGENT_SYSTEM_PROMPT
         parser = PydanticOutputParser(pydantic_object=AdditionalEnquiriesSet)
         knowledge_json = None
@@ -1560,6 +1563,7 @@ def get_graph(llm: BaseChatModel) -> StateGraph:
                 initial_review=initial_review,
                 additional_info=additional_info,
                 knowledge_block=knowledge_block,
+                investigation_type_block=investigation_type_block,
                 format=parser.get_format_instructions(),
             )
         else:
@@ -1601,6 +1605,7 @@ def get_graph(llm: BaseChatModel) -> StateGraph:
                     initial_review=initial_review,
                     additional_info=additional_info,
                     knowledge=knowledge_json,
+                    investigation_type=investigation_type_str,
                     format=parser.get_format_instructions(),
                 )
                 relevance_prompts = [SystemMessage(content=system_prompt),
@@ -1627,6 +1632,7 @@ def get_graph(llm: BaseChatModel) -> StateGraph:
                     prev_version=prev_version_json,
                     initial_review=initial_review,
                     additional_info=additional_info,
+                    investigation_type=investigation_type_str,
                     format=parser.get_format_instructions(),
                 )
                 final_prompts = [SystemMessage(content=system_prompt),
