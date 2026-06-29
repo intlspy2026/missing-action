@@ -522,11 +522,11 @@ Steps:
 
 2. Read INITIAL REVIEW and ADDITIONAL INFORMATION to extract case-specific details (names, dates, locations, incident specifics). ADDITIONAL INFORMATION may contain supplementary details (e.g., police reports, engineer reports, incident reports) not captured in INITIAL REVIEW — use these as additional evidence where relevant.
 
-3. For each remaining (relevant) enquiry, contextualise it with case-specific details from Step 2 (apply RULE 5). Replace generic template references with specific names, dates, and locations. Apply RULE 7 to ensure contextualisation does not shift the investigative target.
+3. For each remaining (relevant) enquiry, contextualise it with case-specific details from Step 2 (apply RULE 5). Replace generic template references with specific names, dates, and locations. Apply RULE 7 to ensure contextualisation does not shift the investigative target. When contextualising multiple enquiries, explicitly reference any shared people, locations, or timeframes across related entries so the connection is visible in the text.
 
 4. Include details about what needs to be done in each enquiry. Ensure enquiries and details are clear and avoid using any jargon.
 
-5. Before applying the merge rule, cross-reference all contextualised enquiries against each other to identify shared locations, parties, and timeframes. Where a connection exists between enquiries (e.g., a witness named in one enquiry was present at the venue referenced in another), update each enquiry's detail text to reflect the shared context — for example, "the friend Frank was with at the pub" instead of just "the friend he was catching up with". This ensures the shared location and people are visible in each enquiry's text for subsequent merge rules. Then apply RULE 8 (SAME-ENTITY MERGE), followed by RULE 9 (CROSS-RESPONDENT MERGE), then apply the STYLE guidelines including the "one enquiry per theme" merge rule to finalise the output.
+5. Then apply RULE 8 (SAME-ENTITY MERGE), followed by RULE 9 (CROSS-RESPONDENT MERGE), then apply the STYLE guidelines including the "one enquiry per theme" merge rule to finalise the output.
 </TASK>
 
 <CONTEXT>
