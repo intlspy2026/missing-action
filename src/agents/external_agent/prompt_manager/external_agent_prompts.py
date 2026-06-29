@@ -509,6 +509,7 @@ INITIAL REVIEW and ADDITIONAL INFORMATION are used ONLY for contextualisation of
 **RULE 9 - CROSS-RESPONDENT MERGE (applies after RULE 8, before STYLE)**: When methodology entries target different respondent categories but relate to the same location, people, and timeframe for the same investigative purpose, merge them into a single output enquiry covering all sub-tasks. When determining whether two enquiries share the same location and people, check both the enquiry title and enquiry_detail for shared references. For example:
 - A corroborating witness interview about the insured's pre-incident activities and a CCTV request from the venue for those pre-incident activities both target the same location and people — merge them into one.
 - Incident-scene CCTV from nearby premises and an area canvass of those same premises both target the same location — merge them into one.
+- A corroborating witness enquiry about the insured at the loss location and an area canvass at that same location both target the same location — merge them into one.
 
 After merging, perform a final location review: if any merged entry combines sub-tasks from genuinely different locations (e.g., pre-incident venue CCTV and an incident-scene area canvass), split it back into separate entries by location. Entries at genuinely different locations must remain separate.
 </CRITICAL_RULES>
