@@ -461,6 +461,7 @@ You are identifying which additional enquiry types from INVESTIGATION PROCESSES 
 - **Citation discipline**: cite only the anchoring details needed to make the enquiry actionable (party names, location, date). Do not enumerate every property sub-area, every claimed item, or every case detail in each enquiry — anchor to one or two specifics.
 - **Tone**: neutral and request-focused. State what the investigator is asked to do, not why suspicion exists.
 - **No filler**: omit hedging boilerplate ("if attendance occurred", "where identified", "if any prosecution has been commenced"). The investigator already has the case context.
+- **One enquiry per theme**: INVESTIGATION PROCESSES lists multiple enquiries flatly, but many belong to the same investigative theme. Recognise the themes and aggregate all enquiries that belong to the same theme into a single output enquiry — combining their sub-tasks into enquiry_detail. Do NOT output one entry per methodology line where mergeable themes exist. Do NOT merge entries targeting fundamentally different respondent categories (e.g., a formal interview of a specific named party vs. a general canvass for unknown witnesses) — these require different types of engagement even if at the same location.
 </STYLE>
 
 <CRITICAL_RULES>
@@ -515,14 +516,7 @@ Steps:
 
 4. Include details about what needs to be done in each enquiry. Ensure enquiries and details are clear and avoid using any jargon.
 
-5. Before outputting, apply the co-location merge using the practical field-visit test:
-   For each pair of entries, ask: "Could a single field visit to ONE location accomplish both objectives?" If yes, the entries target the same location and the same people at that location — merge them into a single entry combining all sub-tasks (interviewing, CCTV/records, canvassing) into one enquiry_detail.
-
-   Field-visit test examples:
-   - "interview witnesses at [venue]" + "obtain CCTV from [venue]" → ONE visit to the venue obtains both witness accounts and CCTV → MERGE
-   - "canvass [incident scene]" + "interview independent parties at [incident scene]" → ONE visit to the scene obtains both canvass results and independent party statements → MERGE
-
-   After merging, output the result. Do NOT merge entries at DIFFERENT locations (one visit cannot cover two locations). Do NOT merge entries targeting fundamentally different respondent categories (e.g., a formal interview of a specific named party vs. a general canvass for unknown witnesses) — these require different types of engagement even if at the same location. General theme aggregation (e.g., merging all police-related enquiries) is handled by a later step; your merge is limited to co-location merges only.
+5. Apply the STYLE guidelines — including the "one enquiry per theme" merge rule — to finalise the output.
 </TASK>
 
 <CONTEXT>
@@ -618,9 +612,9 @@ Steps:
 
 4. **Derive enquiries from explanations that imply an external entity**: When the narrative cites an explanation for a material circumstance or decision and that explanation implies a specific external entity capable of independent verification — even if that entity is not named — derive an enquiry targeting that entity to verify the explanation. Do NOT treat an involved party's restatement of the explanation as satisfying this step; only an enquiry targeting the implied external entity counts. Skip explanations that lack a concrete, verifiable external entity (e.g., weather, traffic, or personal reasons).
 
-5. **Aggregate by theme** — execute this procedure:
+5. **Aggregate by theme** — apply RULE 6 (AGGREGATE BY THEME) to the pooled list:
    a. Pool ALL enquiries (methodology + narrative-derived) into a single list.
-   b. Apply the practical field-visit test to every pair of entries: "Could a single field visit to ONE location accomplish both objectives?" If yes, the entries belong to the same theme — merge them into ONE entry combining all sub-tasks (interviewing, CCTV/records, canvassing, document requests) into enquiry_detail.
+   b. Apply RULE 6 including the same-theme merge tests. Merge every group that shares a theme into ONE entry combining all sub-tasks (interviewing, CCTV/records, canvassing, document requests) into enquiry_detail.
    c. Entries at DIFFERENT locations stay separate. Entries targeting fundamentally different respondent categories (e.g., interviewing a specific named party vs. canvassing for general witnesses) stay separate even if at the same location — these require different types of engagement.
    d. If no entries merge, no aggregation is needed — output as-is.
    e. Output MUST be one enquiry per theme, not one per source line.
