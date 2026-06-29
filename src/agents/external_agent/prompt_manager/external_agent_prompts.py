@@ -510,8 +510,6 @@ INITIAL REVIEW and ADDITIONAL INFORMATION are used ONLY for contextualisation of
 - A corroborating witness interview about the insured's pre-incident activities and a CCTV request from the venue for those pre-incident activities both target the same location and people — merge them into one.
 - Incident-scene CCTV from nearby premises and an area canvass of those same premises both target the same location — merge them into one.
 
-When determining whether two enquiries share the same location and people for merging under this rule, reference the underlying case facts from INITIAL REVIEW and ADDITIONAL INFORMATION directly — not just the contextualised text of each enquiry. For example, if the case facts establish that the insured was at a specific venue with a named individual during the pre-incident timeframe, a witness interview entry and a venue CCTV entry targeting that same timeframe share the same location and people and MUST be merged — even if neither enquiry's text explicitly mentions the other.
-
 After merging, perform a final location review: if any merged entry combines sub-tasks from genuinely different locations (e.g., pre-incident venue CCTV and an incident-scene area canvass), split it back into separate entries by location. Entries at genuinely different locations must remain separate.
 </CRITICAL_RULES>
 
