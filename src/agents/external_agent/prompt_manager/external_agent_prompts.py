@@ -506,10 +506,11 @@ INITIAL REVIEW and ADDITIONAL INFORMATION are used ONLY for contextualisation of
 
 **RULE 8 - SAME-ENTITY MERGE**: When multiple methodology entries from INVESTIGATION PROCESSES target the same organisation or entity (e.g., Law Enforcement/Police — with sub-asks for interview, reports, documentation, brief of evidence, charge sheets), merge ALL of them into a single output enquiry combining all sub-tasks into enquiry_detail. This rule OVERRIDES theme-based separation — even if sub-asks appear to belong to different themes (e.g., interview vs. records), they must be merged into one when the target entity is the same and all sub-asks relate to the same incident. Do NOT output separate entries for sub-asks to the same entity.
 
-**RULE 9 - CROSS-RESPONDENT MERGE**: When methodology entries target different respondent categories but relate to the same location, people, and timeframe for the same investigative purpose, merge them into a single output enquiry covering all sub-tasks. For example:
+**RULE 9 - CROSS-RESPONDENT MERGE (applies after RULE 8, before STYLE)**: When methodology entries target different respondent categories but relate to the same location, people, and timeframe for the same investigative purpose, merge them into a single output enquiry covering all sub-tasks. For example:
 - A corroborating witness interview about the insured's pre-incident activities and a CCTV request from the venue for those pre-incident activities both target the same location and people — merge them into one.
 - Incident-scene CCTV from nearby premises and an area canvass of those same premises both target the same location — merge them into one.
-Entries at genuinely different locations stay separate — for example, pre-incident venue CCTV and an incident-scene area canvass target different locations and are not merged.
+
+After merging, perform a final location review: if any merged entry combines sub-tasks from genuinely different locations (e.g., pre-incident venue CCTV and an incident-scene area canvass), split it back into separate entries by location. Entries at genuinely different locations must remain separate.
 </CRITICAL_RULES>
 
 <TASK>
@@ -525,7 +526,7 @@ Steps:
 
 4. Include details about what needs to be done in each enquiry. Ensure enquiries and details are clear and avoid using any jargon.
 
-5. Before applying the merge rule, cross-reference all contextualised enquiries against each other to identify shared locations, parties, and timeframes — a witness listed in one enquiry may be the same person present at the venue referenced in another. Then apply RULE 8 (SAME-ENTITY MERGE) first, then RULE 9 (CROSS-RESPONDENT MERGE), followed by the STYLE guidelines including the "one enquiry per theme" merge rule to finalise the output.
+5. Before applying the merge rule, cross-reference all contextualised enquiries against each other to identify shared locations, parties, and timeframes — a witness listed in one enquiry may be the same person present at the venue referenced in another. Then apply RULE 8 (SAME-ENTITY MERGE), followed by RULE 9 (CROSS-RESPONDENT MERGE), then apply the STYLE guidelines including the "one enquiry per theme" merge rule to finalise the output.
 </TASK>
 
 <CONTEXT>
