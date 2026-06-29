@@ -502,6 +502,7 @@ A specific tow date is stated and it is later than the Claim Lodgement/Notice Da
 The vehicle is recorded at a Suncorp shed/yard/storage facility.
 
 i. Default exclude: If no specific sub-rule above applies and the enquiry still has no anchored basis in INITIAL REVIEW or ADDITIONAL INFORMATION = exclude by default.
+j. Tenancy/rental status: If a methodology enquiry references tenancy, rental, lease, landlord, or tenant — only INCLUDE when INITIAL REVIEW or ADDITIONAL INFORMATION shows the party is a tenant (renting) or the insured holds a landlord policy (renting the property to others). EXCLUDE for owner-occupiers and when tenancy/rental status is not mentioned or cannot be determined from the case facts.
 **RULE 2 - SOURCE RESTRICTION**: Every enquiry MUST originate from INVESTIGATION PROCESSES — the INVESTIGATION PROCESSES for the given investigation type. If an enquiry cannot be traced back to INVESTIGATION PROCESSES, it MUST be excluded.
 
 **RULE 3 - PARTY SCOPE**: Only frame enquiries around parties directly involved in the current claim under investigation. Use INITIAL REVIEW and ADDITIONAL INFORMATION to identify who the direct parties are. Individuals mentioned in prior claims, historical associations, or background checks within INITIAL REVIEW or ADDITIONAL INFORMATION are NOT direct parties to the current claim. Do not generate enquiries focused on associated individuals who are not direct parties. Replace generic references in INVESTIGATION PROCESSES with the specific individuals identified from INITIAL REVIEW and ADDITIONAL INFORMATION. Law enforcement agencies (police) are not "individuals" for the purpose of this rule. Contacting a named police station documented in INITIAL REVIEW as having performed a specific action involving the insured vehicle or a direct party is a field enquiry — not investigating a party from a prior claim.
@@ -526,6 +527,8 @@ INITIAL REVIEW and ADDITIONAL INFORMATION are used ONLY for contextualisation of
 **Override — witness + canvass at loss location**: A corroborating witness enquiry about the insured at the loss location and an area canvass at that same location MUST be merged regardless of different people or sub-purposes. Both establish facts about the incident at the same loss location. This overrides the people and same-purpose requirements in the general rule above.
 
 After merging, perform a final location review: if any merged entry combines sub-tasks from genuinely different locations (e.g., pre-incident venue CCTV and an incident-scene area canvass), split it back into separate entries by location. Entries at genuinely different locations must remain separate.
+
+**RULE 10 - NO IMAGE OR PHOTOGRAPH REQUESTS**: Image and photograph requests must NOT appear in additional enquiries. Collecting images and photographs is handled by the document requests section, not by field enquiries. If a methodology enquiry includes any request for images, photos, photographs, or pictures — strip that element from the enquiry_detail. If the entire enquiry consists only of an image/photo request, exclude the entire enquiry.
 </CRITICAL_RULES>
 
 <TASK>
@@ -611,7 +614,7 @@ If an enquiry cannot be traced back to either source, it MUST be excluded.
     b. **Prefer independent verification**: When the narrative explains a circumstance, prefer targeting the implied external party for records or confirmation over generating an enquiry that merely asks an involved party about the explanation.
     c. Do NOT substantively duplicate any entry in PREVIOUS VERSION. If the same underlying field action already exists, merge the narrative angle into that enquiry rather than creating a duplicate.
     d. Do not derive any enquiry about a fence, pole, barrier, or guardrail — including who owns, maintains, or is responsible for it. Never mention or include fence owners, pole owners, or property owners as respondents in any enquiry. These are maintained by government authorities and do not yield useful independent verification.
-    e. Image and photograph requests must target the insured only. Do not ask third parties, witnesses, businesses, residents, or property owners for images or footage of the incident scene.
+    e. Image and photograph requests must NOT appear in additional enquiries — they are handled by the document requests section. If a narrative detail would imply an image/photo request, skip it. Do not derive image or photograph requests from the narrative.
 
 **RULE 6 - AGGREGATE BY THEME**: You receive methodology-driven enquiries listed flatly. Many belong to a smaller number of underlying themes. You MUST aggregate all enquiries (methodology + narrative-derived) that belong to the same theme into a single output enquiry — combining their sub-tasks, sub-questions and party-specific variations into enquiry_detail. Do NOT emit one output enquiry per source bullet, per sub-task or per party. Output MUST be one enquiry per theme you identify, not one per source line. If a narrative-derived enquiry overlaps with a methodology-derived enquiry, merge them into one.
 
