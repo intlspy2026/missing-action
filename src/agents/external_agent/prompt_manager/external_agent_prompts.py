@@ -506,7 +506,7 @@ INITIAL REVIEW and ADDITIONAL INFORMATION are used ONLY for contextualisation of
 
 **RULE 8 - SAME-ENTITY MERGE**: When multiple methodology entries from INVESTIGATION PROCESSES target the same organisation or entity (e.g., Law Enforcement/Police — with sub-asks for interview, reports, documentation, brief of evidence, charge sheets), merge ALL of them into a single output enquiry combining all sub-tasks into enquiry_detail. This rule OVERRIDES theme-based separation — even if sub-asks appear to belong to different themes (e.g., interview vs. records), they must be merged into one when the target entity is the same and all sub-asks relate to the same incident. Do NOT output separate entries for sub-asks to the same entity.
 
-**RULE 9 - CROSS-RESPONDENT MERGE (applies after RULE 8, before STYLE)**: When methodology entries target different respondent categories but relate to the same location, people, and timeframe for the same investigative purpose, merge them into a single output enquiry covering all sub-tasks. For example:
+**RULE 9 - CROSS-RESPONDENT MERGE (applies after RULE 8, before STYLE)**: When methodology entries target different respondent categories but relate to the same location, people, and timeframe for the same investigative purpose, merge them into a single output enquiry covering all sub-tasks. When determining whether two enquiries share the same location and people, check both the enquiry title and enquiry_detail for shared references. For example:
 - A corroborating witness interview about the insured's pre-incident activities and a CCTV request from the venue for those pre-incident activities both target the same location and people — merge them into one.
 - Incident-scene CCTV from nearby premises and an area canvass of those same premises both target the same location — merge them into one.
 
@@ -522,7 +522,7 @@ Steps:
 
 2. Read INITIAL REVIEW and ADDITIONAL INFORMATION to extract case-specific details (names, dates, locations, incident specifics). ADDITIONAL INFORMATION may contain supplementary details (e.g., police reports, engineer reports, incident reports) not captured in INITIAL REVIEW — use these as additional evidence where relevant.
 
-3. For each remaining (relevant) enquiry, contextualise it with case-specific details from Step 2 (apply RULE 5). Replace generic template references with specific names, dates, and locations. Apply RULE 7 to ensure contextualisation does not shift the investigative target. When contextualising multiple enquiries, explicitly reference any shared people, locations, or timeframes across related entries so the connection is visible in the text.
+3. For each remaining (relevant) enquiry, contextualise it with case-specific details from Step 2 (apply RULE 5). Replace generic template references with specific names, dates, and locations. Apply RULE 7 to ensure contextualisation does not shift the investigative target. When contextualising multiple enquiries, explicitly reference any shared people, locations, or timeframes across related entries in the enquiry_detail so the connection is visible.
 
 4. Include details about what needs to be done in each enquiry. Ensure enquiries and details are clear and avoid using any jargon.
 
