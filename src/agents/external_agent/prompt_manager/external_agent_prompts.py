@@ -461,10 +461,7 @@ You are identifying which additional enquiry types from INVESTIGATION PROCESSES 
 - **Citation discipline**: cite only the anchoring details needed to make the enquiry actionable (party names, location, date). Do not enumerate every property sub-area, every claimed item, or every case detail in each enquiry — anchor to one or two specifics.
 - **Tone**: neutral and request-focused. State what the investigator is asked to do, not why suspicion exists.
 - **No filler**: omit hedging boilerplate ("if attendance occurred", "where identified", "if any prosecution has been commenced"). The investigator already has the case context.
-- **One enquiry per theme**: INVESTIGATION PROCESSES lists multiple enquiries flatly, but many belong to the same investigative theme. Recognise the themes and aggregate all enquiries that belong to the same theme into a single output enquiry — combining their sub-tasks into enquiry_detail. Do NOT output one entry per methodology line where mergeable themes exist. When methodology entries target different respondent categories but relate to the same location, people, and timeframe for the same investigative purpose, merge them into a single output enquiry covering all sub-tasks. For example:
-  - A corroborating witness interview about the insured's pre-incident activities and a CCTV request from the venue for those pre-incident activities both target the same location and people — merge them into one.
-  - Incident-scene CCTV from nearby premises and an area canvass of those same premises both target the same location — merge them into one.
-Entries at genuinely different locations stay separate — for example, pre-incident venue CCTV and an incident-scene area canvass target different locations and are not merged.
+- **One enquiry per theme**: INVESTIGATION PROCESSES lists multiple enquiries flatly, but many belong to the same investigative theme. Recognise the themes and aggregate all enquiries that belong to the same theme into a single output enquiry — combining their sub-tasks into enquiry_detail. Do NOT output one entry per methodology line where mergeable themes exist. Refer to RULE 9 for merging across different respondent categories.
 </STYLE>
 
 <CRITICAL_RULES>
@@ -508,6 +505,11 @@ INITIAL REVIEW and ADDITIONAL INFORMATION are used ONLY for contextualisation of
 **RULE 7 - PRESERVE METHODOLOGY PURPOSE DURING CONTEXTUALISATION**: When contextualising a methodology entry with case-specific details, preserve the core investigative target and purpose as stated in INVESTIGATION PROCESSES. Do not shift the target. For example, an entry requesting CCTV footage to demonstrate alcohol consumed prior to the incident must remain a request for pre-incident venue CCTV — do not re-interpret it as incident-scene CCTV. The case-specific details you add (names, dates, locations) must fill in the methodology's template, not replace the methodology's investigative purpose.
 
 **RULE 8 - SAME-ENTITY MERGE**: When multiple methodology entries from INVESTIGATION PROCESSES target the same organisation or entity (e.g., Law Enforcement/Police — with sub-asks for interview, reports, documentation, brief of evidence, charge sheets), merge ALL of them into a single output enquiry combining all sub-tasks into enquiry_detail. This rule OVERRIDES theme-based separation — even if sub-asks appear to belong to different themes (e.g., interview vs. records), they must be merged into one when the target entity is the same and all sub-asks relate to the same incident. Do NOT output separate entries for sub-asks to the same entity.
+
+**RULE 9 - CROSS-RESPONDENT MERGE**: When methodology entries target different respondent categories but relate to the same location, people, and timeframe for the same investigative purpose, merge them into a single output enquiry covering all sub-tasks. For example:
+- A corroborating witness interview about the insured's pre-incident activities and a CCTV request from the venue for those pre-incident activities both target the same location and people — merge them into one.
+- Incident-scene CCTV from nearby premises and an area canvass of those same premises both target the same location — merge them into one.
+Entries at genuinely different locations stay separate — for example, pre-incident venue CCTV and an incident-scene area canvass target different locations and are not merged.
 </CRITICAL_RULES>
 
 <TASK>
