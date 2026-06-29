@@ -467,28 +467,37 @@ You are identifying which additional enquiry types from INVESTIGATION PROCESSES 
 <CRITICAL_RULES>
 BEFORE listing any enquiries, you MUST understand these rules. Violating these rules is a critical error.
 
-**RULE 1 - RELEVANCE FILTER**: For each enquiry from INVESTIGATION PROCESSES, assess whether it is applicable based on the facts in INITIAL REVIEW and ADDITIONAL INFORMATION. An enquiry passes the filter only when it satisfies ALL of the conditions below:
+RULE 1 - RELEVANCE FILTER: For each enquiry from INVESTIGATION PROCESSES, assess whether it is applicable based on the facts in INITIAL REVIEW and ADDITIONAL INFORMATION. An enquiry passes the filter only when it satisfies ALL of the conditions below:
 
-    a. Conditional qualifier: If INVESTIGATION PROCESSES includes a conditional qualifier (e.g., "if police attended"), apply that condition against INITIAL REVIEW and ADDITIONAL INFORMATION. If the condition is not met → exclude.
+a. Conditional qualifier: If INVESTIGATION PROCESSES includes a conditional qualifier (e.g., "if applicable", "if requested"), apply that condition against INITIAL REVIEW and ADDITIONAL INFORMATION. If the condition is not met — exclude. Police enquiries are governed exclusively by RULE 1g, not this rule.
 
-    b. Factual basis: If an enquiry references a scenario, person, or event that has no basis in INITIAL REVIEW or ADDITIONAL INFORMATION → exclude.
+b. Factual basis: If an enquiry references a scenario, person, or event that has no basis in INITIAL REVIEW or ADDITIONAL INFORMATION - exclude.
 
-    c. Named target & role-filler: Exclude any enquiry whose target (person, business, or organization) is not named in INITIAL REVIEW or ADDITIONAL INFORMATION. If an INVESTIGATION PROCESSES template references a role but no specific party filling that role appears in INITIAL REVIEW or ADDITIONAL INFORMATION → exclude that enquiry entirely. Never assume an entity exists because a claim detail (damage, estimate, repair need, loss amount, vehicle condition) implies one might — a template passes the filter only when INITIAL REVIEW or ADDITIONAL INFORMATION reference a specific entity — named or described as existing — filling that role.
+c. Named target: Exclude any enquiry whose target (person, business, or organization) is not named in INITIAL REVIEW or ADDITIONAL INFORMATION.
 
-    d. Repairer / panel shop / vehicle assessor: If no repairer, panel shop, smash repairer, or vehicle assessor is named in INITIAL REVIEW or ADDITIONAL INFORMATION, a repairer does not exist → exclude any template referencing a repairer.
+d. Role-filler required: If an INVESTIGATION PROCESSES template references a role but no specific party filling that role appears in INITIAL REVIEW or ADDITIONAL INFORMATION - exclude that enquiry entirely.
 
-    e. Police attendance status — not the mere presence of the word "police" — determines whether a police enquiry is required. INCLUDE a police enquiry when attendance is confirmed (police attended, a police report was issued/numbered, charges laid, brief of evidence, or matter before court) OR when attendance is unconfirmed but under active enquiry (the IRO called/contacted a station but could not yet reach them, is awaiting a response, or it is recorded as unknown/unsure whether police attended) AND no source has confirmed nil. EXCLUDE when any station/source confirmed there was no attendance, no record, or no incident (even if other stations could not be reached), or when police attendance is not mentioned at all or appears only as a nil/no/"No details"/"Nil results" mention with no record of any police enquiry made or attempted. A loose mention of "police" in any subsection, or a "Police/..." heading with nil content, is NOT positive evidence of involvement.
+e. No claim-detail inference: Never assume an entity exists because a claim detail (damage, estimate, repair need, loss amount, vehicle condition) implies one might. A template passes the filter only when INITIAL REVIEW or ADDITIONAL INFORMATION reference a specific entity - named or described as existing - filling that role.
 
-    f. Tow records and tow-operator enquiries: EXCLUDE. Only INCLUDE when a vehicle was actually towed in this claim AND the tow was arranged by the insured or a named third party (NOT by Suncorp/the insurer).
+f. Repairer / panel shop / vehicle assessor: If no repairer, panel shop, smash repairer, or vehicle assessor is named in INITIAL REVIEW or ADDITIONAL INFORMATION, a repairer does not exist = exclude any template referencing a repairer.
 
-        The tow IS insurer-arranged (EXCLUDE) if ANY of these apply:
-        - Suncorp, the insurer, or the assessor arranged it.
-        - No sender is attributed — bare mentions like "tow arranged", "tow booked", "towed to [location]" with no sender attribution.
-        - A specific tow date is stated and it is later than the Notice Date found in INITIAL REVIEW.
-        - The vehicle is recorded at a Suncorp shed/yard/storage facility.
+g. Police attendance status - not the mere presence of the word "police" - determines whether a police enquiry is required. INCLUDE a police enquiry when attendance is confirmed (police attended, a police report was issued/numbered, charges laid, brief of evidence, or matter before court) OR when attendance is unconfirmed but under active enquiry (the IRO called/contacted a station but could not yet reach them, is awaiting a response, or it is recorded as unknown/unsure whether police attended) AND no source has confirmed nil. EXCLUDE when any station/source confirmed there was no attendance, no record, or no incident (even if other stations could not be reached), or when police attendance is not mentioned at all or appears only as a nil/no/"No details"/"Nil results" mention with no record of any police enquiry made or attempted. A loose mention of "police" in any subsection, or a "Police/..." heading with nil content, is NOT positive evidence of involvement.
 
-    g. Default exclude: If no specific sub-rule above applies and the enquiry still has no anchored basis in INITIAL REVIEW or ADDITIONAL INFORMATION → exclude by default.
+INCLUDE also when INITIAL REVIEW documents a specific, named police action involving the insured vehicle or a direct party (e.g., plates seized/detained by a named police station, vehicle held in police custody, a police report or incident number for a prior claim involving the same vehicle, charges laid by a named station), AND that interaction is relevant to the current claim (e.g., same vehicle, vehicle condition at issue, same insured/driver). In such cases, scope the enquiry to obtaining information from that prior police interaction that is relevant to the current claim — not re-investigating the prior claim. A named police station performing a documented action is positive evidence of involvement, not a loose mention.
 
+h. Tow records and tow-operator enquiries: EXCLUDE. Only INCLUDE when a vehicle was actually towed in this claim AND the tow was arranged by the insured or a named third party (NOT by Suncorp/the insurer).
+
+The tow IS insurer-arranged (EXCLUDE) if ANY of these apply:
+
+Suncorp, the insurer, or the assessor arranged it.
+
+No sender is attributed - bare mentions like "tow arranged", "tow booked", "towed to [location]" with no sender attribution.
+
+A specific tow date is stated and it is later than the Claim Lodgement/Notice Date found in INITIAL REVIEW.
+
+The vehicle is recorded at a Suncorp shed/yard/storage facility.
+
+i. Default exclude: If no specific sub-rule above applies and the enquiry still has no anchored basis in INITIAL REVIEW or ADDITIONAL INFORMATION = exclude by default.
 **RULE 2 - SOURCE RESTRICTION**: Every enquiry MUST originate from INVESTIGATION PROCESSES — the INVESTIGATION PROCESSES for the given investigation type. If an enquiry cannot be traced back to INVESTIGATION PROCESSES, it MUST be excluded.
 
 **RULE 3 - PARTY SCOPE**: Only frame enquiries around parties directly involved in the current claim under investigation. Use INITIAL REVIEW and ADDITIONAL INFORMATION to identify who the direct parties are. Individuals mentioned in prior claims, historical associations, or background checks within INITIAL REVIEW or ADDITIONAL INFORMATION are NOT direct parties to the current claim. Do not generate enquiries focused on associated individuals who are not direct parties. Replace generic references in INVESTIGATION PROCESSES with the specific individuals identified from INITIAL REVIEW and ADDITIONAL INFORMATION.
