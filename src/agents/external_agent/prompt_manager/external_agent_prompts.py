@@ -461,7 +461,7 @@ You are identifying which additional enquiry types from INVESTIGATION PROCESSES 
 - **Citation discipline**: cite only the anchoring details needed to make the enquiry actionable (party names, location, date). Do not enumerate every property sub-area, every claimed item, or every case detail in each enquiry — anchor to one or two specifics.
 - **Tone**: neutral and request-focused. State what the investigator is asked to do, not why suspicion exists.
 - **No filler**: omit hedging boilerplate ("if attendance occurred", "where identified", "if any prosecution has been commenced"). The investigator already has the case context.
-- **One enquiry per theme**: INVESTIGATION PROCESSES lists multiple enquiries flatly, but many belong to the same investigative theme. Recognise the themes and aggregate all enquiries that belong to the same theme into a single output enquiry — combining their sub-tasks into enquiry_detail. Do NOT output one entry per methodology line where mergeable themes exist. Do NOT merge entries targeting fundamentally different respondent categories (e.g., a formal interview of a specific named party vs. a general canvass for unknown witnesses) — these require different types of engagement even if at the same location.
+- **One enquiry per theme**: INVESTIGATION PROCESSES lists multiple enquiries flatly, but many belong to the same investigative theme. Recognise the themes and aggregate all enquiries that belong to the same theme into a single output enquiry — combining their sub-tasks into enquiry_detail. Do NOT output one entry per methodology line where mergeable themes exist. Do NOT merge entries targeting fundamentally different respondent categories (e.g., a formal interview of a specific named party vs. a general canvass for unknown witnesses) — these require different types of engagement even if at the same location. When multiple methodology entries target the same entity or organisation (e.g., Police — with sub-asks for interview, reports, documentation, brief of evidence), merge ALL of them into a single output enquiry combining all sub-tasks — do not output separate entries for sub-asks to the same entity.
 </STYLE>
 
 <CRITICAL_RULES>
@@ -597,6 +597,8 @@ If an enquiry cannot be traced back to either source, it MUST be excluded.
     c. **Shared subject**: enquiries about the same person, vehicle, or location from different angles → merge.
     d. **Same named individual**: if the same specific person appears as a target in multiple enquiries → merge them into one, covering all investigative angles in enquiry_detail.
 
+    e. **Same location + related investigative goal**: if two enquiries target different respondent categories but at the same location and serve the same core investigative purpose (e.g., requesting CCTV footage from a venue AND interviewing an individual associated with that venue about events at that venue for the same timeframe), merge them into a single enquiry combining all sub-tasks. This applies when both enquiries aim to establish facts about the same event, timeframe, or activity at that location.
+
 </CRITICAL_RULES>
 
 <TASK>
@@ -615,7 +617,7 @@ Steps:
 5. **Aggregate by theme** — apply RULE 6 (AGGREGATE BY THEME) to the pooled list:
    a. Pool ALL enquiries (methodology + narrative-derived) into a single list.
    b. Apply RULE 6 including the same-theme merge tests. Merge every group that shares a theme into ONE entry combining all sub-tasks (interviewing, CCTV/records, canvassing, document requests) into enquiry_detail.
-   c. Entries at DIFFERENT locations stay separate. Entries targeting fundamentally different respondent categories (e.g., interviewing a specific named party vs. canvassing for general witnesses) stay separate even if at the same location — these require different types of engagement.
+    c. Entries at DIFFERENT locations stay separate. Entries at the same location that target different respondent categories stay separate UNLESS they share the same core investigative purpose as described in merge test (e) below — in which case merge them into one enquiry covering all sub-tasks (interviewing, CCTV/records, canvassing) for that location.
    d. If no entries merge, no aggregation is needed — output as-is.
    e. Output MUST be one enquiry per theme, not one per source line.
 
