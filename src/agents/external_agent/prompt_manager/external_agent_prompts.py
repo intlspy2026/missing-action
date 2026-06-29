@@ -554,13 +554,6 @@ You are drafting the final investigation brief listing additional field activiti
 
 <STYLE>
 - **Length cap**: 2 to 4 sentences per enquiry_detail. Hard cap. No paragraph-length descriptions.
-- **One enquiry per theme**: You receive methodology-driven enquiries listed flatly. Many belong to a smaller number of underlying themes. You must recognise the themes yourself and aggregate all enquiries (methodology + narrative-derived) that belong to the same theme into a single output enquiry — combining their sub-tasks, sub-questions and party-specific variations into enquiry_detail. Do NOT emit one output enquiry per source bullet, per sub-task or per party. Output should be approximately one enquiry per theme you identify, not one per source line. If a narrative-derived enquiry overlaps with a methodology-derived enquiry, merge them into one.
-
-    **Same-theme merge tests** — apply these before finalising. If any test matches, the enquiries MUST be one, not several:
-    a. **Same investigative goal**: enquiries that ask different people the same core question about the same event, timeframe, or subject → merge into one, listing the respondent groups together in enquiry_detail.
-    b. **Overlapping purpose**: enquiries that both aim to establish the same thing (movements, timeline, vehicle status, damage discovery) around the same time or place → merge.
-    c. **Shared subject**: enquiries about the same person, vehicle, or location from different angles → merge.
-    d. **Same named individual**: if the same specific person appears as a target in multiple enquiries → merge them into one, covering all investigative angles in enquiry_detail.
 - **Tone**: neutral and request-focused. State what the investigator is asked to do, not why suspicion exists.
 - **No filler**: omit hedging boilerplate ("if attendance occurred", "where identified", "if any prosecution has been commenced"). The investigator already has the case context.
 - Refer to tow operators, repairers, panel shops, and storage providers by their specific role only (e.g., "the tow operator", "the repairer"). Do not group them under any collective label such as "third parties", "witnesses", or "independent attendees."
@@ -588,6 +581,23 @@ If an enquiry cannot be traced back to either source, it MUST be excluded.
     c. Do NOT substantively duplicate any entry in PREVIOUS VERSION. If the same underlying field action already exists, merge the narrative angle into that enquiry rather than creating a duplicate.
     d. Do not derive any enquiry about a fence, pole, barrier, or guardrail — including who owns, maintains, or is responsible for it. Never mention or include fence owners, pole owners, or property owners as respondents in any enquiry. These are maintained by government authorities and do not yield useful independent verification.
     e. Image and photograph requests must target the insured only. Do not ask third parties, witnesses, businesses, residents, or property owners for images or footage of the incident scene.
+
+**RULE 6 - AGGREGATE BY THEME**: You receive methodology-driven enquiries listed flatly. Many belong to a smaller number of underlying themes. You MUST aggregate all enquiries (methodology + narrative-derived) that belong to the same theme into a single output enquiry — combining their sub-tasks, sub-questions and party-specific variations into enquiry_detail. Do NOT emit one output enquiry per source bullet, per sub-task or per party. Output MUST be one enquiry per theme you identify, not one per source line. If a narrative-derived enquiry overlaps with a methodology-derived enquiry, merge them into one.
+
+    **Same-theme merge tests** — apply these before finalising. If any test matches, the enquiries MUST be one, not several:
+
+    a. **Same location and same parties (MOST COMMON — apply first)**: If two or more enquiries target the same physical location (the same venue, the same incident scene, the same business, the same address) AND the same people or category of people (witnesses at that location, staff at that venue, patrons, bystanders, attendees), they MUST be merged into a single enquiry. The merged enquiry_detail combines ALL sub-tasks: interviewing the people AND obtaining CCTV/records from that location AND canvassing that location. This is the single most common merge case — when in doubt, enquiries at the same location targeting the same people are ONE enquiry, not several.
+
+       Examples:
+       - "interview witnesses at the pub" + "obtain CCTV from the pub" → ONE: "attend the pub, interview staff and patrons, and obtain CCTV"
+       - "canvass the incident scene" + "interview independent parties at the scene" → ONE: "canvass the incident scene and interview witnesses and tow operators present"
+
+    b. **Same investigative goal**: enquiries that ask different people the same core question about the same event, timeframe, or subject → merge into one, listing the respondent groups together in enquiry_detail.
+    c. **Overlapping purpose**: enquiries that both aim to establish the same thing (movements, timeline, vehicle status, damage discovery) around the same time or place → merge.
+    d. **Shared subject**: enquiries about the same person, vehicle, or location from different angles → merge.
+    e. **Same named individual**: if the same specific person appears as a target in multiple enquiries → merge them into one, covering all investigative angles in enquiry_detail.
+
+**RULE 7 - NO CO-LOCATION DUPLICATES**: The final output must not contain two enquiries that target the same physical location and the same people or category of people. Before finalising, scan all output entries pairwise. If any two share the same location and the same people, merge them into one — combining sub-tasks into a single enquiry_detail. This applies to BOTH methodology-driven entries from PREVIOUS VERSION and narrative-derived enquiries: if a narrative-derived enquiry targets the same location and people as a PREVIOUS VERSION entry, fold the narrative angle into that existing entry — do not create a separate output entry.
 </CRITICAL_RULES>
 
 <TASK>
@@ -603,7 +613,7 @@ Steps:
 
 4. **Derive enquiries from explanations that imply an external entity**: When the narrative cites an explanation for a material circumstance or decision and that explanation implies a specific external entity capable of independent verification — even if that entity is not named — derive an enquiry targeting that entity to verify the explanation. Do NOT treat an involved party's restatement of the explanation as satisfying this step; only an enquiry targeting the implied external entity counts. Skip explanations that lack a concrete, verifiable external entity (e.g., weather, traffic, or personal reasons).
 
-5. **Aggregate by theme**: Group ALL enquiries (methodology + narrative-derived) by underlying theme. Combine enquiries that address the same subject, location, party, or investigative action into a single output entry — merging their sub-tasks and details into enquiry_detail. Output approximately one enquiry per theme identified.
+5. **Aggregate by theme**: Apply RULE 6 (AGGREGATE BY THEME) and RULE 7 (NO CO-LOCATION DUPLICATES). Group ALL enquiries (methodology + narrative-derived) by underlying theme. Combine enquiries that address the same subject, location, party, or investigative action into a single output entry — merging their sub-tasks and details into enquiry_detail. Output MUST be one enquiry per theme identified.
 
 6. Review the final list. For each enquiry, verify the target entity appears by name in INITIAL REVIEW or ADDITIONAL INFORMATION — remove any enquiry whose target is not explicitly named. Ensure all methodology-driven entries from PREVIOUS VERSION are reflected, all narrative-derived entries pass guardrails, and the output is concise with neutral language and no filler.
 </TASK>
@@ -977,7 +987,7 @@ Steps:
    - Subject "you" references must use subject form: "you and Jane" — NOT "you and Jane's".
    - If individual insured type with insured + other parties, and NO multiple insureds flag: "your" MUST appear in the output for the insured. If the insured's actual name appears instead of "your", fix it now.
    - If individual insured type with insured + other parties, AND multiple insureds flag is true: "your" MUST NOT appear for the insured — insured's name + "'s" must be used instead.
-   - If business insured type: no "your" or "you" should remain — all replaced with business name.
+    - If business insured type: no "your" or "you" should remain — all replaced with business name.
     - If 2+ parties assigned: ALL institutional "your" and "you" references (telephone service provider, transport department, financier, toll account, and subject "you" in institutional contexts) MUST have shifted to "their" and "they".
 </TASK>
 
