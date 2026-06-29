@@ -526,7 +526,7 @@ Steps:
 
 4. Include details about what needs to be done in each enquiry. Ensure enquiries and details are clear and avoid using any jargon.
 
-5. Before applying the merge rule, cross-reference all contextualised enquiries against each other to identify shared locations, parties, and timeframes — a witness listed in one enquiry may be the same person present at the venue referenced in another. Then apply RULE 8 (SAME-ENTITY MERGE), followed by RULE 9 (CROSS-RESPONDENT MERGE), then apply the STYLE guidelines including the "one enquiry per theme" merge rule to finalise the output.
+5. Before applying the merge rule, cross-reference all contextualised enquiries against each other to identify shared locations, parties, and timeframes. Where a connection exists between enquiries (e.g., a witness named in one enquiry was present at the venue referenced in another), update each enquiry's detail text to reflect the shared context — for example, "the friend Frank was with at the pub" instead of just "the friend he was catching up with". This ensures the shared location and people are visible in each enquiry's text for subsequent merge rules. Then apply RULE 8 (SAME-ENTITY MERGE), followed by RULE 9 (CROSS-RESPONDENT MERGE), then apply the STYLE guidelines including the "one enquiry per theme" merge rule to finalise the output.
 </TASK>
 
 <CONTEXT>
