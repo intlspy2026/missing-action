@@ -509,7 +509,8 @@ INITIAL REVIEW and ADDITIONAL INFORMATION are used ONLY for contextualisation of
 **RULE 9 - CROSS-RESPONDENT MERGE (applies after RULE 8, before STYLE)**: When methodology entries target different respondent categories but relate to the same location, people, and timeframe for the same investigative purpose, merge them into a single output enquiry covering all sub-tasks. When determining whether two enquiries share the same location and people, check both the enquiry title and enquiry_detail for shared references. For example:
 - A corroborating witness interview about the insured's pre-incident activities and a CCTV request from the venue for those pre-incident activities both target the same location and people — merge them into one.
 - Incident-scene CCTV from nearby premises and an area canvass of those same premises both target the same location — merge them into one.
-- A corroborating witness enquiry about the insured at the loss location and an area canvass at that same location both target the same location — merge them into one. This applies even when the witness targets the insured's associates and the canvass targets neighbours, because both establish facts about the incident at the same loss location.
+
+**Override — witness + canvass at loss location**: A corroborating witness enquiry about the insured at the loss location and an area canvass at that same location MUST be merged regardless of different people or sub-purposes. Both establish facts about the incident at the same loss location. This overrides the people and same-purpose requirements in the general rule above.
 
 After merging, perform a final location review: if any merged entry combines sub-tasks from genuinely different locations (e.g., pre-incident venue CCTV and an incident-scene area canvass), split it back into separate entries by location. Entries at genuinely different locations must remain separate.
 </CRITICAL_RULES>
@@ -523,7 +524,7 @@ Steps:
 
 2. Read INITIAL REVIEW and ADDITIONAL INFORMATION to extract case-specific details (names, dates, locations, incident specifics). ADDITIONAL INFORMATION may contain supplementary details (e.g., police reports, engineer reports, incident reports) not captured in INITIAL REVIEW — use these as additional evidence where relevant.
 
-3. For each remaining (relevant) enquiry, contextualise it with case-specific details from Step 2 (apply RULE 5). Replace generic template references with specific names, dates, and locations. Apply RULE 7 to ensure contextualisation does not shift the investigative target. When contextualising multiple enquiries, explicitly reference any shared people, locations, or timeframes across related entries in the enquiry_detail so the connection is visible.
+3. For each remaining (relevant) enquiry, contextualise it with case-specific details from Step 2 (apply RULE 5). Replace generic template references with specific names, dates, and locations. Apply RULE 7 to ensure contextualisation does not shift the investigative target. When contextualising multiple enquiries, explicitly reference any shared people, locations, or timeframes across related entries in the enquiry_detail so the connection is visible. In particular, when contextualising a corroborating witness enquiry and an area canvass at the same loss location, cross-reference them in their enquiry_detail to make the location overlap visible.
 
 4. Include details about what needs to be done in each enquiry. Ensure enquiries and details are clear and avoid using any jargon.
 
@@ -608,7 +609,7 @@ If an enquiry cannot be traced back to either source, it MUST be excluded.
     c. **Shared subject**: enquiries about the same person, vehicle, or location from different angles → merge.
     d. **Same named individual**: if the same specific person appears as a target in multiple enquiries → merge them into one, covering all investigative angles in enquiry_detail.
 
-    e. **Same location + related investigative goal**: if two enquiries target different respondent categories but at the same location and serve the same core investigative purpose (e.g., requesting CCTV footage from a venue AND interviewing an individual associated with that venue about events at that venue for the same timeframe), merge them into a single enquiry combining all sub-tasks. This applies when both enquiries aim to establish facts about the same event, timeframe, or activity at that location.
+    e. **Same location + related investigative goal**: if two enquiries target different respondent categories but at the same location and serve the same core investigative purpose (e.g., requesting CCTV footage from a venue AND interviewing an individual associated with that venue about events at that venue for the same timeframe), merge them into a single enquiry combining all sub-tasks. This applies when both enquiries aim to establish facts about the same event, timeframe, or activity at that location. For example, a corroborating witness enquiry about the insured at the loss location and an area canvass at that same location share a related investigative goal despite different respondent types — merge them.
 
 </CRITICAL_RULES>
 
