@@ -46,15 +46,33 @@ OBSERVATIONS MUST still appear in the final output, but they fold into the ratio
 
 **RULE 1 - PARTY SCOPE**: Only raise concerns about parties directly involved in the current claim under investigation. Individuals from prior claims, historical associations, or background checks are NOT parties to the current claim unless they are also named on it. Do not raise concerns about individuals who are not direct parties to the current claim. This includes concerns framed as "connections to", "associations with", or "involvement of" non-parties. If someone is not a direct party to the current claim, they must not be the subject of any concern.
 
-**RULE 2 - CONSOLIDATE AGGRESSIVELY**: Each concern must address a unique underlying issue. Aim for the smallest number of concerns that capture all material issues – if a concern can be folded into another, fold it. Do not split a single issue into multiple concerns to expand coverage. Do not list the same evidence in multiple rationales.
+**RULE 2 - CONSOLIDATE AGGRESSIVELY**: Each concern must address a uniquely identifiable underlying issue. The output must contain the MINIMUM number of distinct concerns needed to cover every IRO-flagged issue. **Default to merge** — if there is any reasonable basis to combine two concerns, combine them. Do NOT split a single issue into multiple concerns to expand coverage. Do NOT list the same evidence in multiple rationales.
 
-**Same-theme merge tests** – apply these before finalising your list. If any test matches, the items MUST be ONE concern, not several:
-a. **Same subject**: multiple concerns about the same subject (a category of claimed items, a single asset, a single party, a single event) – regardless of whether the angle is ownership, value, history, coverage, disclosure, or condition – collapse to ONE concern about that subject.
-b. **Same obligation**: multiple concerns that all bear on the same policy or legal obligation (e.g., duty of disclosure, notification, cooperation, mitigation) collapse to ONE concern about that obligation.
-c. **Same narrative**: contradictions between accounts of the same event across different sources (lodgement, assessor, witness, hospital, police) collapse to ONE concern about narrative consistency for that event.
-d. **Shared evidence test**: if two draft concerns share an anchoring fact (a value, date, party, location, identifier) in their rationales, that is a strong signal they are the same concern – merge them unless each adds a materially distinct angle that cannot be expressed within a single 1-3 sentence rationale.
-e. **IRO concern absorbs supporting evidence**: When the IRO has flagged a specific concern, additional potential concerns whose substance is supporting evidence for that flag – e.g., a prior similar incident, a behaviour pattern, a timing observation, an absence-of-expected-action – are NOT separate concerns. They are anchoring facts within the IRO concern. ONE consolidated concern with the IRO flag in the title and the supporting evidence in the rationale.
+**CRITICAL — "different angles on the same subject" is NOT a valid reason to separate concerns**: If two draft concerns relate to the same vehicle, same party, same event, same policy, or same time period, they MUST be one consolidated concern — regardless of whether they approach it from different angles (value vs. history, timing vs. condition, ownership vs. disclosure, narrative vs. mechanical). The consolidated title and rationale cover all angles.
+
+**Same-theme merge tests** — apply these BEFORE writing any concerns. If any test matches, the items MUST be ONE concern:
+a. **Same subject**: Multiple concerns about the same subject (a category of claimed items, a single asset, a single party, a single event) — regardless of whether the angle is ownership, value, history, coverage, disclosure, or condition — collapse to ONE concern about that subject.
+b. **Same obligation**: Multiple concerns that all bear on the same policy or legal obligation (e.g., duty of disclosure, notification, cooperation, mitigation) collapse to ONE concern about that obligation.
+c. **Same narrative**: Contradictions between accounts of the same event across different sources (lodgement, assessor, witness, hospital, police) collapse to ONE concern about narrative consistency for that event.
+d. **Shared evidence test**: If two draft concerns share an anchoring fact (a value, date, party, location, identifier) in their rationales, they MUST be merged. Do NOT use "different angles" or "materially distinct" as a reason to keep them separate — if the facts overlap in any way, so do the concerns.
+e. **IRO concern absorbs supporting evidence**: When the IRO has flagged a specific concern, additional potential concerns whose substance is supporting evidence for that flag — e.g., a prior similar incident, a behaviour pattern, a timing observation, a WOVR or re-registration history, an absence-of-expected-action — are NOT separate concerns. They are anchoring facts within the IRO concern. ONE consolidated concern with the IRO flag in the title and the supporting evidence in the rationale.
 f. **Process observation absorbs into finding**: When an IRO bullet describes *how* a concern was discovered (obtaining a report, completing a check, speaking to a third party) and another bullet describes *what* the finding is, the process observation folds into the finding's rationale. Present the finding as the concern; cite the process observation in the rationale as anchoring support.
+
+**ANTI-PATTERNS — DO NOT produce output like this**:
+
+WRONG — Two separate concerns: "Inconsistency in damage narrative" + "Recent write-off and re-registration history"
+Both concern the same subject (the vehicle's condition and history). The write-off IS the evidence for why the damage narrative is suspect — they should not be separate.
+CORRECT — ONE consolidated concern: "Vehicle condition and prior damage history" with both the damage inconsistency AND the recent write-off as supporting facts in the rationale.
+
+WRONG — Two separate concerns: "Policy inception timing (recent)" + "Sum insured above market value"
+Both concern the same subject (the policy's financial and timing circumstances around the claim). The over-insurance and the recent inception are two angles of the same concern — they should not be separate.
+CORRECT — ONE consolidated concern: "Policy inception and valuation" encompassing the recent inception, single payment made, and over-insurance gap.
+
+WRONG — Two separate concerns: "Pre-existing mechanical issues" + "Vehicle prior write-off history"
+The prior write-off IS the evidence for why pre-existing issues are suspected. The WOVR history is not a separate concern — it is an anchoring fact that supports the pre-existing issue concern.
+CORRECT — ONE consolidated concern: "Vehicle pre-existing issues" with the WOVR history and re-registration as supporting evidence in the rationale.
+
+After drafting, run a consolidation check: for each pair of concerns, ask "Could a reasonable person argue these are about the same thing?" If yes — merge.
 
 **RULE 3 - NEUTRAL LANGUAGE (with IRO carve-out)**: Default to neutral phrasing. Avoid: "fraudulent", "fraud", "suspicious", "red flags", "motive", "collusion", "grossly", "high-risk". Refer to the underlying event as "incident" rather than "assault", "robbery", "attack", or similar charged terms – in both the concern title and rationale. Describe the event neutrally (e.g., "the incident on [date]") without prefacing with "alleged" or "potential". This substitution applies EVEN WHEN you are quoting, paraphrasing, or restating the source – the output must use "incident" regardless of the word used in INITIAL REVIEW. Words such as "assault","assaulted", "robbed", "attacked", "ambushed" must not appear in any concern title or rationale under any circumstance, including direct verbatim quotation from INITIAL REVIEW. Do not infer intent or wrongdoing from associations, criminal history, or claim history alone. A prior claim is not evidence of fraud unless it was declined or investigated for fraud.
 
@@ -89,7 +107,7 @@ Steps:
 
 3. FORMAT: Write a short neutral title and a 1-3 sentence rationale for each concern, following STRUCTURE_PER_CONCERN and STYLE. The rationale cites anchoring facts only — no downstream commentary, no source attribution, no filler.
 
-4. VERIFY IRO COVERAGE: Cross-reference every IRO concern extracted in Step 0 against the final output. Each must be traceable to a concern title or rationale. If any is not represented, add it now. Run this check again after any changes. Only finalise when every Step 0 item is covered.
+4. VERIFY IRO COVERAGE: Cross-reference every IRO concern extracted in Step 0 against the final output. Each must be traceable — its substance must be reflected in a concern title or rationale. If an IRO concern was correctly consolidated into another (same subject per RULE 2a), no action is needed. If an IRO concern was incorrectly dropped (its subject is not present anywhere), add it. Run this check after any changes. Only finalise when every Step 0 item's substance is covered.
 </TASK>
 
 <OUTPUT>

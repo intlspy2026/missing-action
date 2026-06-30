@@ -1,0 +1,12 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "plugin": [
+    ["@vectorize-io/opencode-hindsight", {
+      "hindsightApiUrl": "http://localhost:8888",
+      "bankId": "master-agent",
+      "recallBudget": "mid",
+      "retainEveryNTurns": 5,
+      "bankMission": "You are a coding assistant for a multi-agent system (Master Agent / 'ma') containing agents such as external_agent, orchestrator, and smart_investigator. Sessions typically focus on one agent at a time, but decisions may affect shared orchestration contracts, message formats, and inter-agent protocols. Prioritize: agent-specific architecture and state machines, cross-agent interfaces and contracts, investigation/instructions workflow logic, Python conventions, test patterns, and deployment procedures. When context spans multiple agents, flag cross-cutting impact."
+    }]
+  ]
+}

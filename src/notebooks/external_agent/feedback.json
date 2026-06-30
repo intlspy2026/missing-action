@@ -1,0 +1,42 @@
+[
+    {
+      "concern": "Suspected staged accident due to high-risk time and similar circumstances to prior claim.",
+      "rationale": "The accident occurred at 22:15 on a Friday, a high-risk time for staged accidents. Additionally, the circumstances of this claim closely mirror a prior claim (M1011121314) involving the same insured party, Jane Doe, where a single-vehicle accident into a tree resulted in a total loss payout. The similarity in timing, nature of the accident, and progression of the claim raises concerns about potential staging.",
+      "feedback": null
+    },
+    {
+      "concern": "No police attendance or drug/alcohol disclosure at the scene of the accident.",
+      "rationale": "The insured did not report police attendance or provide any drug/alcohol disclosure, which is unusual for a single-vehicle accident involving significant damage. This omission limits independent verification of the accident circumstances and raises questions about the validity of the insured's version of events.",
+      "feedback": "There is no reference to DUI within the initial review, there is no mandatory requirement (legally) to notify police after a SVA. Nil police attendance means you could not substantiate this avenue of investigation, rational is general/seems opinion based. This could be a call out, but isnt necessarily a concern for this investigation."
+    },
+    {
+      "concern": "Insured vehicle grossly overinsured compared to market value.",
+      "rationale": "The insured vehicle, a 2019 Ford Endura Trend, is insured for $27,900, which is significantly higher than its AutoEdge valuation of $14,200-$16,400. This discrepancy suggests potential financial motivation for inflating the claim value, especially given the vehicle's prior write-off history.",
+      "feedback": "Note: the wording 'grossly over insured' was included in the input, therefore, understandably it's in output, but is there an opportunity for us to use non-opinion based language in output (even if included by IRO)."
+    },
+    {
+      "concern": "Prior write-off history of the insured vehicle raises concerns about its condition and valuation.",
+      "rationale": "The insured vehicle was previously listed as a repairable write-off in QLD on 13.04.2023 due to structural damage. Although it passed reinspection on 22.09.2023, its history as a write-off raises questions about its current condition and whether the claimed damage aligns with its pre-accident state.",
+      "feedback": "The concern is valid, however, the rationale limits the justification to only looking at damage profile, rather than also the value of the vehicle as a result of the prior write-off (possible motive)."
+    },
+    {
+      "concern": "Association with John Smith, who has a history of criminal activity and involvement in prior claims.",
+      "rationale": "John Smith, who is linked to Jane Doe through shared contact information and addresses, has 15 criminal listings in QLD. He was involved in a prior claim (M1011121314) with identical circumstances, raising concerns about potential collusion or fraudulent activity between the two parties.",
+      "feedback": "This is most likely an input issue, however, John Smith is not listed in input as a listed party, therefore, criminal history is not relevant to this claim (although include din input), also there is an assumption that because John has a criminal history, he is potentially committing fraud is not appropriate. The main concern relating to John Smith's involvement is covered in concern below."
+    },
+    {
+      "concern": "Insured's prior claim history with similar circumstances and progression raises red flags.",
+      "rationale": "Jane Doe's prior claim (M1011121314) involved a single-vehicle accident into a tree at a high-risk time (00:20 AM) and resulted in a total loss payout. The current claim follows an almost identical pattern, including the timing of calls to progress the claim during off-peak hours, suggesting a potential pattern of fraudulent behavior.",
+      "feedback": "This is an input issue, but commentary around 'potential pattern of fraudulent behaviour' is not appropriate phrasing, needs to be something more like 'concerning pattern of similar claims history', no evidence in notes to suggest prior claim was declined for fraud."
+    },
+    {
+      "concern": "Discrepancy in insured's contact information and association with multiple addresses.",
+      "rationale": "Jane Doe's contact information links to multiple addresses, including one associated with John Smith. This inconsistency in personal details raises concerns about the insured's credibility and potential connections to fraudulent activities.",
+      "feedback": "Not relevant as a concern, again 'connection to fraudulent activity' is too accusatory. Connections to other parties are sometimes an area of concerns, e.g. links to an entity of interest, or business of interest, or people connected with suspected fraud actors. In this instance, no reference to John Smith being suspected of fraud, other than a reference to a possible unknown criminal history."
+    },
+    {
+      "concern": "Unusual behavior during claim lodgment and progression.",
+      "rationale": "The insured lodged the claim while still in the vehicle, with airbags deployed, and made follow-up calls during off-peak hours. This behavior mirrors the progression of the prior claim and may indicate an attempt to control the narrative of the claim.",
+      "feedback": "Not relevant - the points listed in this concern and rationale are already covered above."
+    }
+  ]

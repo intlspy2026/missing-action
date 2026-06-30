@@ -1,0 +1,221 @@
+CLAIM DETAILS
+BRAND: AAMI
+CLAIM #: M123456789
+POLICY #: MPA123456789
+INCEPTION: 18.10.2023
+DATE OF LOSS: 07.02.2025 2215
+DATE OF NOTICE: 07.02.2025 2228
+
+INSURED VEHICLE: 2019 FORD ENDURA TREND (FWD) CA MY19 4D WAGON Standard
+REGO: 123456 // Previous Rego: 789101
+VIN: 2ABCDEFGHIJKLMN0P
+INSURED VALUE: $27,900.00
+CLAIM ESTIMATE: $17,200
+
+MAIN CONTACT
+Jane Doe
+20.07.1996
+04123456789
+Jane.doe@gmail.com
+123 Road Road, Brisbane 4000
+
+VERSION OF EVENTS
+I was driving and lost control and have hit a tree,
+IV POI: front bumper
+
+LOSS LOCATION
+Sewells road, TARNEIT, VIC 3029
+
+REFERRAL REASON
+- Suspected staged accident
+- SVA at high risk time
+- No police --- no police noted in tow auth
+- Accident circs presents concerns
+- IO has a prior t/loss with similar scenarios
+- IV over insured
+- IV has prior WOVR
+- Possible t/loss and possible CDR in veh
+- IV yet to be assessed, however IO prior claim is of similar circs.
+- Claim warrants further review
+
+CLAIMCENTER
+M123456789
+• Lodged via phone 07.02.2025 2232
+• Lodged from SOA, Vic tow allocation arranged
+• Called to progress 08.02.2025 0011
+• Excess outstanding
+• IO sought HC and was advised of review
+• No police attendance
+• No drug/alcohol disclosure
+• No other claims under rego
+M1011121314
+• Same circs, SVA into tree 00:20am 30.08.2023
+• Reported from SOA
+• Called to progress 1 day later 0400am
+• "Jane Jay Doe"
+• Paid out as TL $45,900
+• "John Smith" took over claim when approaching payout
+• John Smith 01.01.1987 0498765432
+• Claim circs and progression identical to current claim
+
+CUSTOMER WORKBENCH
+MPA123456789
+• Addt policy with 4 month tenure for 2018 Land Rover Discovery REGO
+• Prior home claim rejected for no insured event
+
+Jane Doe
+• Alt address 1 Road Street, Brisbane, 4000
+• Prior residence in QLD
+• 04123456789
+• No additional results
+• Jane.doe@gmail.com
+• No additional results
+
+John Smith
+• John.smith@hotmail.co.uk
+• Numerous CTP and motor policies (expired) for various vehicles
+• 0498765432
+• No additional info
+
+PROTECT / PI ARCHIVE
+MPA000000000
+• Incepted via WEB 18.10.23 1700
+• Paid yearly, pol maintained
+• Insured at nearly max value
+• No disclosures
+
+New Business
+• No disclosures
+• No benefits
+
+Recent Renewal
+• Issued 10.09.2024
+
+Investigation Notes Data Extraction
+Section: Recent Renewal & Vehicle History
+
+87 Recent Renewal
+
+88 • Issued 10.09.2024
+
+89 • No disclosures
+
+90
+
+91 MOTORWEB / AUTOEDGE
+
+92 • Currently registered to 18.04.2025
+
+93 • Not currently on WOVR
+
+94 • Not stolen
+
+95 • No securities on VIN
+
+96 • Write off history: Repairable Write-off in QLD 13.04.2023
+
+97 • Ps front, light panel, minor mechanical
+
+98 • Ds front, ds side, ds f qtr, heavy structural
+
+99 • Passed reinspection QLD 22.09.2023
+
+100 • AutoEdge $14,200 - $16,400 126000km avg
+
+101 • Grossly overinsured per AE value
+
+Section: Identity & Background Checks
+
+103 MOHANK / GOOGLE
+
+104 • No hits
+
+105
+
+106 CASPAR
+
+107 Jane Doe
+
+108 • 0498765432 (John Smith’s number)
+
+109 • ABN 12 3456 7890
+
+110 04123456789
+
+111 No results
+
+112 1 Road Street, Brisbane, 4000
+
+113 • Links to: Mr J Smith, who has email address "jsmith@yahoo.com" matching name of John Smith
+
+114 Court searches:
+
+115 • Jane Doe - clear
+
+116 • John Smith - 15 Criminal listings from QLD
+
+118 INTERNET / SOCIALS
+
+119 • No relevant posts
+
+Section: Internal Archives & Verification
+
+121 INVESTIGATIONDOCUMENT ARCHIVE
+
+122 M00000001
+
+123 • John Smith mentioned in a document of purchases from Fowles Auctions
+
+124 M00000002
+
+125 • Address is the same as insured's old QLD address
+
+127 CITEC
+
+128 ABN 12 345 678 900
+
+129 • ABN is not ACN based
+
+130 old reg 678910
+
+131 • Unable to find with point of time search
+
+133 INDEPENDENTVERIFICATION
+
+135 STA Barry
+
+136 • Called Edge in the USA
+
+137 • Probably could get something
+
+138 • Will have a look at salvage sites for sale info
+
+139 • Old QLD rego is 678910
+
+Section: Call Logs & Staged Concerns
+
+141 CALL RECORDINGS
+
+142 Lodgement.02.2025 2232
+
+143 • Insured still in the car when she called
+
+144 • Airbags deployed
+
+145 Enquiry 08.02.2025 0011
+
+146 • Providing towing information
+
+148 Strong staged concerns:
+
+149 SVA at high risk time; Friday 22:15pm
+
+150 Same circs as prior claim resulting in TL payout
+
+151 Same behaviour as prior claim; SVA high risk time, all calls made during off-peak hours
+
+152 Associated party John Smith 15 Criminal listings from QLD
+
+153 Repairable Write-off in QLD 13.04.2023 as a result of prior claim
+
+154 IV over insured
