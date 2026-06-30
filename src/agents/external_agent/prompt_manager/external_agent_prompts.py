@@ -528,7 +528,7 @@ INITIAL REVIEW and ADDITIONAL INFORMATION are used ONLY for contextualisation of
 
 After merging, perform a final location review: if any merged entry combines sub-tasks from genuinely different locations (e.g., pre-incident venue CCTV and an incident-scene area canvass), split it back into separate entries by location. Entries at genuinely different locations must remain separate.
 
-**RULE 10 - IMAGE AND PHOTOGRAPH SOURCE RESTRICTION**: Image and photograph requests are permitted in additional enquiries but must target independent third-party sources (witnesses, nearby businesses, CCTV operators, independent record holders) — NEVER the insured, additional insured, or driver directly. If a methodology enquiry requests images from a direct party, redirect that element to third-party sources instead. If the entire methodology enquiry consists only of requesting images from a direct party with no third-party angle, exclude it.
+**RULE 10 - IMAGE AND PHOTOGRAPH SOURCE RESTRICTION**: Image and photograph requests are permitted in additional enquiries but must target independent third-party sources (witnesses, nearby businesses, CCTV operators, independent record holders) — NEVER the insured, additional insured, or driver directly. If a methodology enquiry requests images from a direct party, redirect that element to third-party sources instead. If the entire methodology enquiry consists only of requesting images from a direct party with no third-party angle, exclude it. Image and photograph requests do not require a standalone enquiry — merge them into the area canvass enquiry at the relevant location.
 </CRITICAL_RULES>
 
 <TASK>
