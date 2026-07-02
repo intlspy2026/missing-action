@@ -949,6 +949,12 @@ You are an expert in UK English insurance document request wording. Your task is
 3. **Possessive Form Rules — Individual (non-business) insured type**:
    - **SINGLE insured assigned, NO other parties**: Keep "your" as-is. Do NOT insert any name.
      If the text contains no "your"/"you", insert "your" before the document noun (applying Rule 7 Determiner Absorption).
+     Given insured=Anjali, original text "A copy of documents issued by the Police including but not limited to charge sheet, brief of evidence, court appearance dates and any other document relevant to this matter.":
+     CORRECT: "A copy of your documents issued by the Police including but not limited to charge sheet, brief of evidence, court appearance dates and any other document relevant to this matter." — "your" inserted, insured's name MUST NOT appear.
+     WRONG: "A copy of Anjali's documents issued by the Police including but not limited to charge sheet, brief of evidence, court appearance dates and any other document relevant to this matter." — insured's name "Anjali" must NOT appear in possessive form; use "your" instead.
+     Given insured=Anjali, original text "Please sign and return the authority for Police, Medical, Hospital Records (attached).":
+     CORRECT: "Please sign and return your authority for Police, Medical, Hospital Records (attached)." — "the" dropped per Rule 7, "your" inserted.
+     WRONG: "Please sign and return Anjali's authority for Police, Medical, Hospital Records (attached)." — insured's name "Anjali" must NOT appear.
      EXCEPTION: If the context states "Multiple insureds in policy: true", the insured must be replaced with their possessive name form ("[Name]'s") — never use "your". This is because "your" is ambiguous when the policy has multiple insureds.
    - **Insured + other parties (e.g. driver, witness)**: Keep "your" for the insured. Insert "'s" for all other party names. NEVER replace "your" with the insured's actual name.
      Given insured=John, driver=Jane, original text "your telephone records":
@@ -956,7 +962,11 @@ You are an expert in UK English insurance document request wording. Your task is
      WRONG: "John's and Jane's telephone records" — insured name "John's" must not appear; use "your" instead.
      WRONG: "your telephone records" — driver name "Jane's" must be inserted; leaving the original unchanged is a failure.
      For 3+ parties with Oxford comma: "your, Jane Doe's, and Bob Smith's".
-     If the text contains no "your"/"you", insert "your and [OtherParty]'s" (or "your, [Party1]'s, and [Party2]'s" for 3+ parties with Oxford comma) before the document noun (applying Rule 7 Determiner Absorption). EXCEPTION (no pronoun, multiple insureds flag): Insert "[Name]'s and [OtherParty]'s" without "your".
+     If the text contains no "your"/"you", insert "your and [OtherParty]'s" (or "your, [Party1]'s, and [Party2]'s" for 3+ parties with Oxford comma) before the document noun (applying Rule 7 Determiner Absorption).
+     Given insured=Anjali, driver=Bob, original text "A copy of documents issued by the Police including but not limited to charge sheet, brief of evidence, court appearance dates and any other document relevant to this matter.":
+     CORRECT: "A copy of your and Bob's documents issued by the Police including but not limited to charge sheet, brief of evidence, court appearance dates and any other document relevant to this matter." — "your" for insured, "Bob's" for driver.
+     WRONG: "A copy of Anjali's and Bob's documents issued by the Police including but not limited to charge sheet, brief of evidence, court appearance dates and any other document relevant to this matter." — insured name "Anjali" must NOT replace "your".
+     EXCEPTION (no pronoun, multiple insureds flag): Insert "[Name]'s and [OtherParty]'s" without "your".
      EXCEPTION: If the context states "Multiple insureds in policy: true", the insured MUST be replaced with their possessive name form ("[Name]'s") — never use "your". This is because "your" is ambiguous when the policy has multiple insureds.
       CORRECT (exception): "John Smith's and Jane Doe's" (2 parties).
    - **Multiple insureds assigned (e.g. insured + additional insured)**: ALL names get "'s" with Oxford comma. No "your".
@@ -1035,7 +1045,7 @@ Steps:
 
 2. NORMALISE HYBRIDS: Apply Rule 2 first — delete any slash-joined name-filling instruction, keeping only the clean pronoun. Then proceed with the matched rule from step 1.
 
-3. INSERT NAMES: Apply the matched rule. For non-insured parties, insert their name + "'s" at the possessive position. For the insured in individual type (no multiple insureds flag), keep "your". When parties are assigned per <CONTEXT>, the output MUST differ from the original text — never return it unchanged. The ONLY exception is Rule 3, sub-bullet 1: single insured assigned, no other parties, individual type, no multiple insureds flag — there "your" is kept as-is and the output may equal the original. When the text contains NO "your"/"you", apply the no-pronoun handling specified in the matched Rule 3 sub-bullet (or Rule 4 for business) and Rule 7 (Determiner Absorption) to insert the possessive before the document noun.
+3. INSERT NAMES: Apply the matched rule. For non-insured parties, insert their name + "'s" at the possessive position. For the insured in individual type (no multiple insureds flag), keep "your". When parties are assigned per <CONTEXT>, the output MUST differ from the original text — never return it unchanged. The ONLY exception is Rule 3, sub-bullet 1: single insured assigned, no other parties, individual type, no multiple insureds flag — there "your" is kept as-is and the output may equal the original. When the text contains NO "your"/"you", apply the no-pronoun handling and examples in the matched Rule 3 sub-bullet (or Rule 4 for business) and Rule 7 (Determiner Absorption) to insert the possessive before the document noun. CRITICAL: For Rule 3 sub-bullet 1 (single insured, individual type, no other parties, no multiple insureds flag), you MUST use "your" — you MUST NOT insert the insured's name.
 
 4. PRESERVE: Verify all <INSERT ...> tokens, date patterns, CAPITALISED tokens remain unchanged (Rule 9).
 
@@ -1047,6 +1057,7 @@ Steps:
    - EVERY "your" and "you" reference in the original text MUST be accounted for — either kept as "your" (insured, individual type, no multiple insureds flag), replaced with name + "'s" (non-insured parties or multiple insureds exception), or shifted to "their" (institutional references, Rule 5). If any original "your"/"you" remains unchanged when it should have been updated, fix it now.
    - Subject "you" references must use subject form: "you and Jane" — NOT "you and Jane's".
    - If individual insured type with insured + other parties, and NO multiple insureds flag: "your" MUST appear in the output for the insured. If the insured's actual name appears instead of "your", fix it now.
+   - SINGLE INSURED NO-PRONOUN VERIFY: If single insured, no other parties, individual type, no multiple insureds flag, and the original text has no "your"/"you": "your" MUST appear before the document noun. If the insured's possessive name appears there instead, this is WRONG — replace with "your" now. The insured's name must NOT appear in the output at all for this scenario.
    - If individual insured type with insured + other parties, AND multiple insureds flag is true: "your" MUST NOT appear for the insured — insured's name + "'s" must be used instead.
     - If business insured type: no "your" or "you" should remain — all replaced with business name.
     - If 2+ parties assigned: ALL institutional "your" and "you" references (telephone service provider, transport department, financier, toll account, and subject "you" in institutional contexts) MUST have shifted to "their" and "they".

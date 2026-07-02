@@ -1232,6 +1232,29 @@ def get_graph(llm: BaseChatModel) -> StateGraph:
                         )
                         parsed = PartyNameInsertionOutput.model_validate_json(content)
                         updated_details = parsed.doc_details
+                        # Post-processing safeguard: for individual single-insured with no
+                        # other parties and no multiple-insureds flag, the LLM may insert
+                        # the insured's name instead of "your". Fix if it did.
+                        if (
+                            insured_type_label == "individual"
+                            and len(assigned_keys) == 1
+                            and not multiple_insureds_line
+                        ):
+                            insured_name = None
+                            for key in assigned_keys:
+                                name = (insured_details.get(key) or "").strip()
+                                if name:
+                                    insured_name = name
+                                    break
+                            if insured_name:
+                                name_possessive = f"{insured_name}'s"
+                                if (
+                                    name_possessive not in original
+                                    and name_possessive in updated_details
+                                ):
+                                    updated_details = updated_details.replace(
+                                        name_possessive, "your"
+                                    )
                     except Exception:
                         logger.warning(
                             "AI party name insertion failed for doc_type=%r. "
