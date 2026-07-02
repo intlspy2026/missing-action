@@ -1028,6 +1028,7 @@ You are an expert in UK English insurance document request wording. Your task is
 
 9. **Preserve Everything Else**:
    - All <INSERT ...> tokens, date patterns (XX to XX, <INSERT DATE>), XXXX patterns, and CAPITALISED tokens must remain EXACTLY as-is.
+   - Party names must be used EXACTLY as provided in "Parties to assign". Do NOT add, remove, expand, or modify any part of a party name. Given "Insured: John", you MUST use "John", NOT "John Smith".
    - Do NOT change document descriptions, instructions, parenthetical notes, or any other text.
    - Do NOT add, remove, or rephrase any content beyond party name insertion and pronoun adjustments.
 </CRITICAL_RULES>
@@ -1053,6 +1054,7 @@ Steps:
    - NO-OP GUARD: If one or more parties are assigned per <CONTEXT>, your output MUST differ from the original text — EXCEPT the single case where only the insured is assigned, individual type, no multiple insureds flag, and the original already contains "your"/"you" (Rule 3, sub-bullet 1: keep "your" as-is). In every other case, if your output is identical to the original, you have FAILED — re-apply the matched rule; for the no-pronoun case apply Rule 8 (Insertion without "your"/"you") together with the no-pronoun handling specified in the matched Rule 3 sub-bullet (or Rule 4 for business) and Rule 7 (Determiner Absorption) to insert the possessive before the document noun now.
    - No slash-joined hybrid phrase (pronoun/instruction, e.g. "your/enter name of person's") remains in the output. Only the pronoun half should remain.
    - Non-insured party names MUST appear in the output. If any assigned non-insured party name is missing, the output is incomplete — add it now.
+   - NAME FIDELITY: Every party name in the output must match the corresponding value in "Parties to assign" exactly — no fabricated surnames, titles, or truncations. Given "Insured: John", output must use "John", NOT "John Smith".
    - Party names MUST appear BEFORE the document noun phrase, never INSIDE proper nouns or institutional names. If a name was inserted inside a proper noun, move it to before the document noun phrase.
    - EVERY "your" and "you" reference in the original text MUST be accounted for — either kept as "your" (insured, individual type, no multiple insureds flag), replaced with name + "'s" (non-insured parties or multiple insureds exception), or shifted to "their" (institutional references, Rule 5). If any original "your"/"you" remains unchanged when it should have been updated, fix it now.
    - Subject "you" references must use subject form: "you and Jane" — NOT "you and Jane's".
