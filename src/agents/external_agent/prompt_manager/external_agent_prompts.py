@@ -948,6 +948,7 @@ You are an expert in UK English insurance document request wording. Your task is
 
 3. **Possessive Form Rules — Individual (non-business) insured type**:
    - **SINGLE insured assigned, NO other parties**: Keep "your" as-is. Do NOT insert any name.
+     If the text contains no "your"/"you", insert "your" before the document noun (applying Rule 7 Determiner Absorption).
      EXCEPTION: If the context states "Multiple insureds in policy: true", the insured must be replaced with their possessive name form ("[Name]'s") — never use "your". This is because "your" is ambiguous when the policy has multiple insureds.
    - **Insured + other parties (e.g. driver, witness)**: Keep "your" for the insured. Insert "'s" for all other party names. NEVER replace "your" with the insured's actual name.
      Given insured=John, driver=Jane, original text "your telephone records":
@@ -955,6 +956,7 @@ You are an expert in UK English insurance document request wording. Your task is
      WRONG: "John's and Jane's telephone records" — insured name "John's" must not appear; use "your" instead.
      WRONG: "your telephone records" — driver name "Jane's" must be inserted; leaving the original unchanged is a failure.
      For 3+ parties with Oxford comma: "your, Jane Doe's, and Bob Smith's".
+     If the text contains no "your"/"you", insert "your and [OtherParty]'s" (or "your, [Party1]'s, and [Party2]'s" for 3+ parties with Oxford comma) before the document noun (applying Rule 7 Determiner Absorption). EXCEPTION (no pronoun, multiple insureds flag): Insert "[Name]'s and [OtherParty]'s" without "your".
      EXCEPTION: If the context states "Multiple insureds in policy: true", the insured MUST be replaced with their possessive name form ("[Name]'s") — never use "your". This is because "your" is ambiguous when the policy has multiple insureds.
       CORRECT (exception): "John Smith's and Jane Doe's" (2 parties).
    - **Multiple insureds assigned (e.g. insured + additional insured)**: ALL names get "'s" with Oxford comma. No "your".
@@ -1033,12 +1035,12 @@ Steps:
 
 2. NORMALISE HYBRIDS: Apply Rule 2 first — delete any slash-joined name-filling instruction, keeping only the clean pronoun. Then proceed with the matched rule from step 1.
 
-3. INSERT NAMES: Apply the matched rule. For non-insured parties, insert their name + "'s" at the possessive position. For the insured in individual type (no multiple insureds flag), keep "your". When parties are assigned per <CONTEXT>, the output MUST differ from the original text — never return it unchanged. The ONLY exception is Rule 3, sub-bullet 1: single insured assigned, no other parties, individual type, no multiple insureds flag — there "your" is kept as-is and the output may equal the original. When the text contains NO "your"/"you", apply Rule 8 (Insertion without "your"/"you") and Rule 7 (Determiner Absorption) to insert the possessive before the document noun.
+3. INSERT NAMES: Apply the matched rule. For non-insured parties, insert their name + "'s" at the possessive position. For the insured in individual type (no multiple insureds flag), keep "your". When parties are assigned per <CONTEXT>, the output MUST differ from the original text — never return it unchanged. The ONLY exception is Rule 3, sub-bullet 1: single insured assigned, no other parties, individual type, no multiple insureds flag — there "your" is kept as-is and the output may equal the original. When the text contains NO "your"/"you", apply the no-pronoun handling specified in the matched Rule 3 sub-bullet (or Rule 4 for business) and Rule 7 (Determiner Absorption) to insert the possessive before the document noun.
 
 4. PRESERVE: Verify all <INSERT ...> tokens, date patterns, CAPITALISED tokens remain unchanged (Rule 9).
 
 5. VERIFY: Before returning, check:
-   - NO-OP GUARD: If one or more parties are assigned per <CONTEXT>, your output MUST differ from the original text — EXCEPT the single case where only the insured is assigned, individual type, no multiple insureds flag, and the original already contains "your"/"you" (Rule 3, sub-bullet 1: keep "your" as-is). In every other case, if your output is identical to the original, you have FAILED — re-apply the matched rule; for the no-pronoun case apply Rule 8 (Insertion without "your"/"you") and Rule 7 (Determiner Absorption) to insert the possessive before the document noun now.
+   - NO-OP GUARD: If one or more parties are assigned per <CONTEXT>, your output MUST differ from the original text — EXCEPT the single case where only the insured is assigned, individual type, no multiple insureds flag, and the original already contains "your"/"you" (Rule 3, sub-bullet 1: keep "your" as-is). In every other case, if your output is identical to the original, you have FAILED — re-apply the matched rule; for the no-pronoun case apply the no-pronoun handling specified in the matched Rule 3 sub-bullet (or Rule 4 for business) and Rule 7 (Determiner Absorption) to insert the possessive before the document noun now.
    - No slash-joined hybrid phrase (pronoun/instruction, e.g. "your/enter name of person's") remains in the output. Only the pronoun half should remain.
    - Non-insured party names MUST appear in the output. If any assigned non-insured party name is missing, the output is incomplete — add it now.
    - Party names MUST appear BEFORE the document noun phrase, never INSIDE proper nouns or institutional names. If a name was inserted inside a proper noun, move it to before the document noun phrase.
